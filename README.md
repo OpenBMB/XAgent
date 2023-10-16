@@ -89,7 +89,10 @@ The local workspace for your XAgent is in `local_workspace`, where you can find 
 bash XAgentServer/dockerfiles/build.sh
 cd XAgentServer
 docker compose up
-docker exec XAgent-Server systemctl start nginx
+
+cd ../XAgentWeb
+npm install
+npm run serve
 ```
 Build the docker image for XAgent-Server and start the docker container.
 You will see the XAgent Server listening on port `8000`.

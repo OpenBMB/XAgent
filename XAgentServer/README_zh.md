@@ -33,7 +33,7 @@ docker compose up
 cd XAgentWeb
 ```
 
-Install Dependencies  安装依赖
+Install Dependencies  安装依赖(建议使用Node.js 20.0及版本以上)
 
 ```bash
 npm install

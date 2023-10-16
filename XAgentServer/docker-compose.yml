@@ -10,8 +10,6 @@ services:
       - "8000:8000"
     networks:
       - default
-    volumes:
-      - ./frontend/dist:/mnt/server/xagent/dist
     container_name: XAgent-Server  
 
 networks:

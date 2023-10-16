@@ -104,13 +104,7 @@ You can check our live demo on [XAgent Official Website](https://www.x-agent.net
 
 We also provide a video demo of using XAgent here.
 
-<div align="center">
-
-<video width="320" height="240" controls>
-  <source src="assets/readme/demo.mp4" type="video/mp4">
-</video>
-
-</div>
+![Demo](assets/readme/demo.gif)
 
 Here we also show some cases of solving tasks by XAgent:
 ## Case 1. Data Analysis: Demonstrating the Effectiveness of Dual-Loop Mechanism

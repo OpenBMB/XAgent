@@ -21,9 +21,6 @@
 
 </p>
 
-</div>
-
-
 # 📖 Introduction
 XAgent is an open-source experimental Large Language Model (LLM) driven autonomous agent that can automatically solve various tasks. 
 It is designed to be a general-purpose agent that can be applied to a wide range of tasks. Currently, XAgent is still in its early stage, and we are working hard to improve it.

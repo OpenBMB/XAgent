@@ -20,7 +20,7 @@ Configurations for ToolServer are stored in `ToolServer/config/`. You can change
 Notes:
 - Change `node.privileged` to `false` in `manager.yml` if you don't want to used docker in ToolServerNode. This will disable the ability to run docker commands in ToolServerNode.
 - Change `idling_close_minutes` in `monitor.yml` to change the time that ToolServerMonitor will wait before closing idle ToolServerNode instances.
-- Add your api keys in `node.yml` to enable bing search and rapid api.
+- Add your api keys in `node.yml` to enable bing search (or use backup search duckduckgo) and rapid api.
 - Change api timeout for Toolserver in `docker-compose.yml` by altering values after `-t` in `services.ToolServerManager.command` if you encounter timeout error of ToolServer.
 
 ## 🛠️ Build and Setup ToolServer

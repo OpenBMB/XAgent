@@ -1,10 +1,10 @@
 import httpx
-import playwright.async_api
 
 from typing import Callable,Any,Coroutine,List
 from bs4 import BeautifulSoup
-# from trafilatura import extract
+from duckduckgo_search import DDGS
 
+from config import logger
 from core.base import BaseEnv
 from core.register import toolwrapper
 
@@ -15,6 +15,9 @@ class WebEnv(BaseEnv):
     def __init__(self,config:dict = {}):
         super().__init__(config=config)
         self.bing_cfg = self.config['bing']
+        if self.bing_cfg['api_key'] is None:
+            logger.warning("Bing API key is not provided, rollback to duckduckgo.")
+        
         self.web_cfg = self.config['web']
         self.headers = {
             "User-Agent":self.web_cfg['user_agent']
@@ -43,27 +46,34 @@ class WebEnv(BaseEnv):
             raise ValueError(f"URL {url} is not a http or https url, please give a valid url!")
         
     async def search_and_browse(self, search_query:str,goals_to_browse:str,region:str=None,num_results = 3) -> List[str]:
-        """Search with bing search tools and browse the website returned by bing search. Note some websites may not be accessable due to network error.
+        """Search with search tools and browse the website returned by search. Note some websites may not be accessable due to network error.
     
         :param string search_query: The search query.
-        :param string goals_to_browse: What's you want to find on the website returned by bing search. If you need more details, request it in here. Examples: 'What is latest news about deepmind?', 'What is the main idea of this article?'
+        :param string goals_to_browse: What's you want to find on the website returned by search. If you need more details, request it in here. Examples: 'What is latest news about deepmind?', 'What is the main idea of this article?'
         :param string? region: The region code of the search, default to `en-US`. Available regions: `en-US`, `zh-CN`, `ja-JP`, `de-DE`, `fr-FR`, `en-GB`.
         :return string: The results of the search.
         """
         
-        endpoint = self.bing_cfg["endpoint"]
         api_key = self.bing_cfg["api_key"]
+        endpoint = self.bing_cfg["endpoint"]
         if region is None:
             region = 'en-US'
+        if api_key is None:
+            pages = [{
+                'name':ret['title'],
+                'snippet':ret['body'],
+                'url':ret['href']
+            } for ret in DDGS().text(search_query, region='wt-wt')]
             
-        result = await self.client.get(endpoint,
+        else:
+            result = await self.client.get(endpoint,
                         headers={'Ocp-Apim-Subscription-Key': api_key},
                         params={'q': search_query, 'mkt': region },
                         timeout=10)
-        result.raise_for_status()
-        result = result.json()
-
-        pages = result["webPages"]["value"]
+            result.raise_for_status()
+            result = result.json()
+            pages = result["webPages"]["value"]
+            
         search_results = []
 
         for idx in range(min(len(pages),num_results)):

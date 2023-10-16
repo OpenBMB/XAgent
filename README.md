@@ -1,5 +1,5 @@
 <div align= "center">
-    <h1> 🪢 XAgent</h1>
+    <h1> <img src="https://www.x-agent.net/assets/main-logo-6-5-2e7e4694.png" height=35 align="texttop">XAgent</h1>
 </div>
 
 <div align="center">
@@ -30,7 +30,7 @@ It is designed to be a general-purpose agent that can be applied to a wide range
 
 🏆 Our goal is to create a super-intelligent agent that can solve any given task!
 
-## 🪢 XAgent
+## <img src="https://www.x-agent.net/assets/main-logo-6-5-2e7e4694.png" height=25 align="texttop"> XAgent
 XAgent is designed with the following features:
 - **Autonomy**: XAgent can automatically solve various tasks without human participation.
 - **Safety**: XAgent is designed to run safely. All actions are constrained inside a docker container. Run it anyway!

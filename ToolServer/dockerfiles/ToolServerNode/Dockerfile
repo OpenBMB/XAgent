@@ -1,0 +1,31 @@
+FROM python:3.10
+
+LABEL Role="toolserver.node"
+
+EXPOSE 31942
+
+WORKDIR /app
+
+RUN apt update && apt install -y build-essential make openjdk-17-jdk-headless curl docker.io docker-compose psmisc sudo
+
+RUN pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple
+
+RUN pip install playwright && playwright install chromium &&  playwright install-deps
+
+COPY ToolServerNode/requirements.txt .
+
+RUN pip install --no-cache-dir -r requirements.txt
+
+RUN rm -rf /tmp/* /var/tmp/*
+
+COPY ToolServerNode .
+
+RUN mkdir -p assets
+
+COPY config/node.yml ./assets/config.yml
+
+HEALTHCHECK --interval=1s --timeout=10s --retries=3 CMD ["bash", "-c", "curl -sS 'http://localhost:31942/' > /dev/null || exit 1"]
+
+RUN mkdir -p workspace
+
+ENTRYPOINT [ "uvicorn", "main:app", "--host", "0.0.0.0","--port","31942" ]

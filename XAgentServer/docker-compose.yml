@@ -1,0 +1,19 @@
+# /AIAgentServer/docker-compose.yml
+
+version: '3'
+
+services:
+
+  app:
+    image: xagent-server:0.1
+    ports:
+      - "8000:8000"
+    networks:
+      - default
+    volumes:
+      - ./frontend/dist:/mnt/server/xagent/dist
+    container_name: XAgent-Server  
+
+networks:
+  default:
+    driver: bridge

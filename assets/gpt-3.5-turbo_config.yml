@@ -1,0 +1,32 @@
+openai_keys:
+  gpt-3.5-turbo-16k:
+    - api_key: sk-xxxxx
+      organization: org-xxxxx
+      model: gpt-3.5-turbo-16k
+    - api_key: sk-xxxxx
+      organization: org-xxxxxx
+      model: gpt-3.5-turbo-16k
+  
+default_completion_kwargs:
+  model: gpt-3.5-turbo-16k
+  temperature: 0.5
+  request_timeout: 60
+
+enable_summary: true
+summary:
+  single_action_max_length: 4096
+  max_return_length: 8192
+
+use_selfhost_toolserver: true
+selfhost_toolserver_url: http://localhost:8080
+
+max_retry_times: 3
+max_subtask_chain_length: 15
+max_plan_refine_chain_length: 3
+max_plan_tree_depth: 3
+max_plan_tree_width: 5
+max_plan_length: 4096
+
+rapidapi_retrieve_tool_count: 0
+
+enable_ask_human_for_help: False

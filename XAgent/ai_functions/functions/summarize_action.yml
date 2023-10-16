@@ -1,0 +1,25 @@
+function_prompt: |
+  Your task is to summarize a given action with careful and critical thinking. 
+
+  --- Current Task ---
+  {current_task}
+  --- Performed Action ---
+  {action}
+  
+  Make sure your answer is in standard json format, start!
+function:
+  name: "summarize_action"
+  description: "Parse and summarize Performed Action and its output."
+  parameters:
+    type: "object"
+    properties:
+      summary:
+        type: "string"
+        description: "A short summary of what Performed Action does by looking at the [tool calling], around 30 words. ! Don't provide information that is not shown in the Action ! ! Don't provide your own opinion !"
+      description:
+        type: "string"
+        description: "Parse Performed Action. Write a short introduction of [thought], [reasoning], [plan], [criticism], [tool_status_code] and focus on parse details of [tool calling] and explain the calling result. Must be specific and concise, around 80 words. Don't include function args here. Maintain Critical Information in Output/Returned That Will Be Useful In The Future."
+      failed_reason_and_reflection:
+        type: "string"
+        description: "If action's `tool_status_code` is not success code, or action does not meet action goals, the action is a failed actions. If action is failed, carefulling examining the [tool calling] and provide failed reason and reflection. Otherwize leave this empty."
+    required: ["summary","description"]

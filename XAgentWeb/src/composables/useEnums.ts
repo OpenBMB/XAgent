@@ -1,0 +1,6 @@
+export const TOKEN = 'token'
+export const USER_INFO = 'user_info'
+export const AUTH_STATE = 'isLogin'
+export const CACHE_LOCATION = 'localStorage'
+export const STORAGE_TOKEN = 'modelforce_token'
+export const HISTORY_TALK = 'history_talk'

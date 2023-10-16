@@ -1,0 +1,65 @@
+version: "0.2"
+debug_mode: false
+logger: "uvicorn"
+logger_level: 20
+
+toolregister:
+  parent_tools_visible: false
+  env_max_tools_display: 10
+  tool_creation_doc: ./assets/HOW_TO_BUILD_NEW_TOOLS.md
+  tool_creation_context:  # available variables in tool creation
+    toolwrapper: core.register
+
+retriver:
+  endpoint: https://api.openai.com/v1/embedding
+  headers:
+    Content-Type: application/json
+  payload:
+    model: text-embedding-ada-002
+  embedding_dim: 1536
+  embedding_file: ./assets/doc_embeding.npy
+  id2tool_file: ./assets/doc2tool.json
+
+bing:
+  api_key: xxx # fill your own key here
+  endpoint: https://api.bing.microsoft.com/v7.0/search
+
+huggingface:
+  image_model: CompVis/stable-diffusion-v1-4
+
+web: 
+  browser: "chrome"
+  headless: true
+  user_agent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.54 Safari/537.36"
+
+filesystem:
+  ignored_list:
+    - "*/.git/*"
+    - "python_notebook.ipynb"
+    - "*/node_modules/*"
+    - "*/venv/*"
+    - "*/__pycache__/*"
+    - "*/.ipynb_checkpoints/*"
+    - "*/.vscode/*"
+    - "*/.idea/*"
+    - "*/.vs/*"
+    - "*/python*/site-packages/*"
+  work_directory: /app/workspace/
+
+notebook:
+  timeout: 60
+  save_name: python_notebook.ipynb
+
+rapidapi:
+  #please refer to  https://github.com/OpenBMB/ToolBench
+  api_raw_json: ./assets/rapidapi_high_quality_apis.json
+  api_infos_json: ./assets/rapidapi_apis_infos.json
+  api_key: # toolbench key
+  endpoint: # toolbench rapidapi endpoint
+
+shell:
+  timeout: 300
+  
+enabled_extensions:
+  # - extensions.envs.rapidapi
+

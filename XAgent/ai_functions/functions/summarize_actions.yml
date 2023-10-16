@@ -1,0 +1,59 @@
+function_prompt: |
+  Your task is to list and summarize the actions of the steps in order, keep all key information to remember.
+  You need first classify the actions into three categories: succeed actions, failed actions, and useful actions. You should check the `tool_status_code` of each action in the Action List, and then classify them into the three categories.
+
+  --- Current Task ---
+  {current_task}
+  --- Performed Action List ---
+  {actions}
+  
+  Start!
+function:
+  name: "summarize_actions"
+  description: "Parse and summarize Performed Action List and their output with status. Judge whether the action is successful or not by the status code. ! Don't provide information that is not shown in the Action List! ! Don't provide your own opinion!"
+  parameters:
+    type: "object"
+    properties:
+      actions_description:
+        type: "array"
+        description: "List of description of Performed Actions, maintain order with Performed Action List. Length should be equal to length of Performed Action List"
+        items:
+          type: "object"
+          description: "Description of action."
+          properties:
+            index:
+              type: "integer"
+              description: "the index of the action in the Action List, range from 0 to len(Action List)-1"
+            summary:
+              type: "string"
+              description: "a short summary of what this action does. Around 30 words."
+            description:
+              type: "string"
+              description: "Parse action with detailed description of goals, reasoning, result and status. Must be specific and concise, don't include function args here, around 50 words. Maintain Critical Information in Output/Returned That Will Be Useful In The Future."
+          required: ["index", "summary", "description"]
+      recent_failed_actions_reflection:
+        type: "array"
+        description: "Max 3 items. If action's status code is not success code, or action does not meet action goals, the action is a failed actions. List as much as possible of recent failed actions that worth reflection. Don't list similar failures."
+        items:
+          type: "object"
+          properties:
+            index:
+              type: "integer"
+              description: "the index of the action in the Action List, range from 0 to len(Action List)-1"
+            failed_reason:
+              type: "string"
+              description: "failed reason of this action."
+          required: ["index","failed_reason"]
+      key_actions:
+        type: "array"
+        description: "Max 5 items. If action result/output contains relevnt content to current task's gool or description (like search results, useful webpage content, file content, etc), the action is a key action. List as much as possible of useful actions."
+        items:
+          type: "integer"
+          description: "the index of the key action in the Action List, range from 0 to len(Action List)-1"
+      suggestions:
+        type: "array"
+        description: "Max 3 items. Learn from failure and success actions, provide suggestions for future actions."
+        items:
+          type: "string"
+          description: "suggestion for future actions"
+    required: ["actions_description","recent_failed_actions_reflection","key_actions","suggestions"]

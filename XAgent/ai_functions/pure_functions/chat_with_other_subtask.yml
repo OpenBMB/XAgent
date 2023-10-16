@@ -1,0 +1,13 @@
+functions:
+  - name: chat_with_other_subtask
+    description: "You are solving the task with a plan. All the subtasks are performed by different Agents. If you have some problems to discuss with the former subtask-handling Agent, Use this Tool. This chat is a multi-turn manner"
+    parameters:
+      type: object
+      properties:
+        target_subtask_id:
+          type: string
+          description: "Which subtask you want to chat to. like '1.2','2', '3.5.2' . This must be a subtask id before your subtask"
+        question:
+          type: string
+          description: "Your questions. You can use this tool for multiple times, and your former question and answers will be saved"
+        

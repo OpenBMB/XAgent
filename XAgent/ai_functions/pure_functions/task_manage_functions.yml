@@ -1,0 +1,66 @@
+task_item: &task_item
+  type: object
+  properties:
+    "subtask name":
+      type: string
+    goal:
+      type: object
+      properties:
+        goal:
+          type: string
+          description: "the main purpose of what the sub-task should handle, and what will you do(tool calls) to reach this goal"
+        criticism:
+          type: string
+          description: "What problems may the current subtask and goal have?"
+    milestones:
+      type: array
+      description: "How to automatically check the subtask is done? The subtasks after this subtask will consider all the milestones are done."
+      items:
+        type: string
+  required: ["subtask name","goal","milestones"]
+
+functions:
+  - name: refine_submit_operation
+    description: "If the plan needs no further refinement, use this function to exit plan refine mode and go on to the next subtask"
+    parameters:
+      type: object
+      properties:
+        content:
+          type: string
+          description: "What you want to say to users"
+      required: ["content"]
+  - name: subtask_split_operation
+    description: "further split the target subtask into subtasks. You can only split a status==FAIL task"
+    parameters:
+      type: object
+      properties:
+        thought:
+          type: string
+          description: "Why you choose this operation, and what you want to do next?"
+        target_subtask_id:
+          type: string
+          description: "Which subtask do you want to modify. This must be a inter split by '.', like '1.2' '2.3.3' or '4'. You must ensure this subtask exists and is a FAIL task"
+        subtasks:
+          type: array
+          description: "Max 4 items, min 2 items. Array of the splited subtasks, length of 2-4"
+          items: *task_item
+      required: ["thought", "target_subtask_id", "subtasks"]
+  - name: subtask_operations
+    description: "Change subtasks, including split, add, modify"
+    parameters:
+      type: object
+      properties:
+        thought:
+          type: string
+          description: "reason for your operation choice and what you want to do next."
+        operation:
+          type: string
+          enum: ["split", "add", "delete", "exit"]
+        target_subtask_id:
+          type: string
+          description: "Which subtask do you want to operate. This must be a inter split by '.', like '1.2' '2.3.3' or '4'. For operation 'split', make sure the target is a leaf node and future node. For operation 'add' and 'delete', make sure the target subtask is not fully processed yet."
+        subtasks:
+          type: array
+          description: "Max 2 items. Array of new subtasks. Useless for operation 'delete'. Make sure do not exceed the max width of the plan tree."
+          items: *task_item
+      required: ["thought", "operation", "target_subtask_id", "subtasks"]

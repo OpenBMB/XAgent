@@ -1,0 +1,28 @@
+function_prompt: |
+  Your task is to select key actions that solve or meet the stage goal of the current task. The output of key actions will be provided to solve further tasks.
+  After that you should give suggestions for future actions. 
+
+  --- Current Task ---
+  {current_task}
+  --- Performed Actions ---
+  {actions}
+  
+  Make sure your answer is in standard json format, start!
+function:
+  name: "actions_reflection"
+  description: "Select useful actions and give suggestions for future actions."
+  parameters:
+    type: "object"
+    properties:
+      key_actions:
+        type: "array"
+        description: "List as much as possible and maximum 5 of key actions which are successful with their output contains crucial/important content to current task's gool or description (like search results, useful webpage content, file content, etc)"
+        items:
+          type: "integer"
+          description: "the index of the key action in the Performed Actions, range from 0 to len(Action List)-1"
+      suggestions:
+        type: "array"
+        description: "Max 3 suggestions. Learn from failure and success actions, provide suggestions for future actions."
+        items:
+          type: "string"
+    required: ["key_actions","suggestions"]

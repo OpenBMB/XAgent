@@ -1,0 +1,26 @@
+:root {
+  --font-size-16: 16px;
+
+  --font-weight-4: 400;
+  --font-weight-5: 500;
+
+  --default-font-size: var(--font-size-16);
+  --default-font-weight: var(--font-weight-4);
+}
+
+:root {
+  --color-danger: red;
+  --color-1: #1c2848;
+}
+
+/* font-size padding margin */
+:root {
+  --size-1216: clamp(0.75rem, 0.38vw + 0.66rem, 1rem);
+  --size-1224: clamp(0.75rem, 1.13vw + 0.49rem, 1.5rem);
+
+  --size-1632: clamp(1rem, 1.5vw + 0.65rem, 2rem);
+
+  --size-2448: clamp(1.5rem, 2.25vw + 0.97rem, 3rem);
+
+  --size-3264: clamp(2rem, 3vw + 1.3rem, 4rem);
+}

@@ -1,0 +1,112 @@
+@import url(./normalize.css);
+@import url(./fonts.css);
+@import url(./var.css);
+@import url(./animation.css);
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+
+  font-size: var(--default-font-size);
+  font-weight: var(--default-font-weight);
+  font-family: 'PingFang-SC-Medium', 'Microsoft YaHei', 'Arial', 'sans-serif';
+}
+
+*,
+:after,
+:before {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+i {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+i svg {
+  font-size: 12px;
+  /* margin: 0 5px; */
+}
+
+ul,
+li {
+  padding: 0;
+  margin: 0;
+}
+
+ul {
+  list-style: none;
+}
+
+hr {
+  white-space: normal;
+  border-style: solid;
+  border-right-width: 0px;
+  border-bottom-width: 0px;
+  border-left-width: 0px;
+  border-color: rgba(0, 0, 0, 0.1);
+  transform-origin: 0px 0px 0px;
+  transform: scale(1, 0.5);
+  visibility: visible;
+  line-height: 1.75;
+}
+
+.position-center {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+}
+
+.ellipsis {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: var(--line-clamp, 2);
+  overflow: hidden;
+}
+
+input::-webkit-input-placeholder {
+  /* WebKit browsers */
+  color: #ccc;
+}
+
+input:-moz-placeholder {
+  /* Mozilla Firefox 4 to 18 */
+  color: #ccc;
+}
+
+input::-moz-placeholder {
+  /* Mozilla Firefox 19+ */
+  color: #ccc;
+}
+
+input:-ms-input-placeholder {
+  /* Internet Explorer 10+ */
+  color: #ccc;
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-transition-delay: 99999s;
+  -webkit-transition: color 99999s ease-out, background-color 99999s ease-out;
+}
+
+/* flex */
+.flex-row {
+  display: flex;
+  flex-direction: row;
+}
+
+.flex-column {
+  display: flex;
+  flex-direction: column;
+}
+
+.flex-center {
+  justify-content: center;
+  align-items: center;
+}

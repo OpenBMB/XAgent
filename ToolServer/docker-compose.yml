@@ -1,0 +1,56 @@
+version: '3'
+
+services:
+  ToolServerManager:
+    image: tool-server-manager:0.2
+    ports:
+      - 8080:8080
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+     DB_HOST: db
+     DB_PORT: 27017
+     DB_USERNAME: ${DB_USERNAME}
+     DB_PASSWORD: ${DB_PASSWORD}
+     DB_COLLECTION: ${DB_COLLECTION}
+    networks:
+      - tool-server-network
+    depends_on:
+      - db
+    command: ["--workers","8","-t","600"]
+
+  ToolServerMonitor:
+    image: tool-server-monitor:0.1
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+     DB_HOST: db
+     DB_PORT: 27017
+     DB_USERNAME: ${DB_USERNAME}
+     DB_PASSWORD: ${DB_PASSWORD}
+     DB_COLLECTION: ${DB_COLLECTION}
+    networks:
+      - tool-server-network
+    depends_on:
+      - db
+
+  db:
+    image: mongo
+    restart: always
+    volumes:
+      - xagentmongodb:/data/db
+    environment:
+     MONGO_INITDB_ROOT_USERNAME: ${DB_USERNAME}
+     MONGO_INITDB_ROOT_PASSWORD: ${DB_PASSWORD}
+    networks:
+      - tool-server-network
+    logging:
+      driver: "none"
+
+volumes:
+  xagentmongodb:
+
+networks:
+  tool-server-network:
+    name: tool-server-network
+    driver: bridge

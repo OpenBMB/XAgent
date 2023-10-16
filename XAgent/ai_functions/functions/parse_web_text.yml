@@ -1,0 +1,30 @@
+completions_kwargs:
+  model: "gpt-3.5-turbo-16k"
+  temperature: 0.6
+  request_timeout: 60
+function_prompt: |
+  I will give you the text gathered from a webpage and a prompt to help you parse it, please remember that the content you provide should be as same language as the webpage you are parsing.
+  -- Webpage -- 
+    {webpage}
+  -- Prompt --
+    {prompt}
+  Action!
+function:
+  name: "parse_web_text"
+  description: "Parse the text of the webpage with the help of prompt. Extract all related infomation about `Prompt` from the webpage. ! Don't provide information that is not shown in the webpage! ! Don't provide your own opinion!"
+  parameters:
+    type: "object"
+    properties:
+      summary:
+        type: "string"
+        description: "Summary of the webpage with 50 words. Make sure all important information about `Prompt` is included. ! Don't provide information that is not shown in the webpage! ! Don't provide your own opinion!"
+      related_details:
+        type: "string"
+        description: "List all webpage details related to prompt here. Maximum 400 words. ! Don't provide information that is not shown in the webpage! ! Don't provide your own opinion!"
+      useful_hyperlinks:
+        type: "array"
+        description: "Maximum 3 items. Select useful hyperlinks in the webpage that related to prompt. Make sure the url is useful for further browse. Don't provide repeated hyperlinks."
+        items:
+          type: "string"
+          description: "! Don't provide hyperlinks that is not shown in the webpage! ! Don't provide your own opinion!"
+    required: [summary,related_details,useful_hyperlinks]

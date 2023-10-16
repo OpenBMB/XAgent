@@ -1,0 +1,17 @@
+uvicorn
+fastapi
+yagmail
+inputimeout
+sqlalchemy
+python-multipart
+colorama
+json5
+func_timeout
+openai
+regex
+jsonschema
+tiktoken
+tenacity
+pinecone-client
+python-dotenv
+markdown2

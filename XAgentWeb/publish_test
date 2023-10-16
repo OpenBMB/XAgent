@@ -1,0 +1,42 @@
+#!/usr/bin/env sh
+
+PACKAGE_NAME=$1
+TYPE=$2
+
+# TEST_HOST=172.16.3.74
+TEST_HOST=web-1.prod.modelbest.co
+PROD_HOST=frontend-1.prod.modelbest.co
+
+if [ $TYPE == "test" ]; then
+     echo test
+
+     scp "./${PACKAGE_NAME}.test.zip" root@${TEST_HOST}:/mnt/frontend/openapi
+
+     if [ $? -eq 0 ]; then
+          echo "succeed"
+
+          ssh root@${TEST_HOST} "cd /mnt/frontend/openapi; rm -r dist;unzip -o -q ${PACKAGE_NAME}.${TYPE}.zip;"
+
+          if [ $? -eq 0 ]; then
+               echo "publish success"
+          fi
+     else
+          echo "failed"
+     fi
+else
+     echo prod
+
+     scp "./${PACKAGE_NAME}.zip" root@${PROD_HOST}:/opt/front/openapi
+
+     if [ $? -eq 0 ]; then
+          echo "succeed"
+
+          ssh root@${PROD_HOST} "cd /opt/front/openapi; unzip -o -q ${PACKAGE_NAME}.zip;"
+
+          if [ $? -eq 0 ]; then
+               echo "publish success"
+          fi
+     else
+          echo "failed"
+     fi
+fi

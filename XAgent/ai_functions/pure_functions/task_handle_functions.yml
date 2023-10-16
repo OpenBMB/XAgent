@@ -1,0 +1,90 @@
+functions:
+  - name: subtask_submit
+    description: "Use this function at the end of the subtask handling process. Together with suggestions"
+    parameters:
+      type: object
+      properties:
+        result:
+          type: object
+          properties:
+            conclusion:
+              description: "Use around 400 words to summarize what you have done to handle this subtask, especially some milestones (such as writing to file xxx, getting information from web xxx). The answer will be shown to user and latter subtask handle agent, so it must contain enough information. "
+              type: string
+            milestones:
+              description: "Show the intermediate file names or thoughts representing your results. Latter subtask-handler will assume all the milestones are solved"
+              items:
+                type: string
+              type: array
+            success:
+              description: "Do you think this subtask has been solved? This will influence latter plan refinement."
+              type: boolean
+          required: ["success", "conclusion", "milestones"]
+        submit_type:
+          type: string
+          description: "Why you choose to submit this subtask"
+          enum: [give_answer, give_up, max_tool_call, human_suggestion]
+        suggestions_for_latter_subtasks_plan:
+          type: object
+          description: "After submitting the subtask. A plan refine agent will iteratively refine the plan(only modify the subtasks that have not been performed). For example, If you failed in this subtask, may this subtask need to be further split into subtasks. If you have unintentionally solved a latter subtask, the latter subtask need to be deleted."
+          properties:
+            need_for_plan_refine:
+              description: "Only True if you think it's necessary to refine the plan otherwise False if the cureent plan is good enough to solve tasks."
+              type: boolean
+            reason:
+              description: "The suggestions of the plan refining. You will affect how the latter plan is refined, so It must be very detailed and very specific. If you think there is no need to change the plan, tell the reason in this field. Around 50 words."
+              type: string
+          required: ["need_for_plan_refine", "reason"]
+      required: ["submit_type", "result", "suggestions_for_latter_subtasks_plan"]
+  - name: subtask_handle
+    description: give some reason together with a tool call.
+    parameters:
+      properties:
+        plan:
+          description: "Max 1 items about what to do next."
+          items:
+            type: string
+            description: "General future action plan about how can you achieve the goal in human tone. Around 30 words."
+          type: array
+        thought:
+          description: "internal reasoning and thoughts, learn from the former results and correct your action. Around 50 words."
+          type: string
+        reasoning:
+          description: "Why you give the `thought`. Around 100 words."
+          type: string
+        criticism:
+          description: "as a super agent, constructive self-criticism of the current thought and plan on its weakness and strength."
+          type: string
+        tool_call:
+          properties:
+            tool_input:
+              description: "All the input must be a json string, the json input format, refer to the AVALIABLE_TOOLS"
+              anyOf:
+                - type: object
+                - type: string
+            tool_name:
+              description: "You can only use AVALIABLE_TOOLS, refer to the prompt"
+              enum: []
+              type: string
+          required: [tool_name]
+          type: object
+      required: ["plan", "thought", "reasoning", "criticism", "tool_call"]
+      type: object
+  - name: ask_human_for_help
+    description: "This is the only tool allow you to interact with human. Use this tool only if you cannot continue task without human help, such as needing more information like unclear requirement, user account, api key, location, etc. Human will receive your query and give you a suggestion or providing the needed information."
+    parameters:
+      properties:
+        requirement:
+          description: "What you want human to help you. This need to be very specific to avoid ambiguity for huamn"
+          type: string
+        requirement_type:
+          description: "Help human to further understand your requirement"
+          enum: [give_information, other_type]
+          type: string
+      required: ["requirement", "requirement_type"]
+      type: object
+  - name: human_interruption
+    description: "Human may give you some suggestions when looking at your task-handling process. This is a alias function to perform this, so you will never call this function. When you recieve this function, you will choose to either continue your subtask, or submit and refine your plan"
+    parameters:
+      type: object
+      properties:
+      required: []

@@ -1,0 +1,72 @@
+@font-face {
+  font-family: Amble;
+  src: url(../fonts/Amble-Regular.woff2);
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: Amble-Bold;
+  src: url(../fonts/Amble-Regular.woff2);
+  font-weight: 700;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'D-DIN';
+  src: url(../fonts/D-DIN.ttf);
+  font-display: swap;
+}
+@font-face {
+  font-family: 'DINCondensed-Bold';
+  src: url(../fonts/D-DIN-Bold.ttf);
+  font-display: swap;
+}
+
+@font-face {
+  font-family: MiSans-Regular;
+  src: url('../fonts/MiSans/MiSans-Regular.eot');
+  src: url('../fonts/MiSans/MiSans-Regular.eot?#iefix') format('embedded-opentype'),
+    url('../fonts/MiSans/MiSans-Regular.woff2') format('woff2'), url('../fonts//MiSans/MiSans-Regular.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: MiSans-Normal;
+  src: url('../fonts/MiSans/MiSans-Normal.eot');
+  src: url('../fonts/MiSans/MiSans-Normal.eot?#iefix') format('embedded-opentype'),
+    url('../fonts/MiSans/MiSans-Normal.woff2') format('woff2'), url('../fonts/MiSans/MiSans-Normal.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: MiSans-Demibold;
+  src: url('../fonts/MiSans/MiSans-Demibold.eot');
+  src: url('../fonts/MiSans/MiSans-Demibold.eot?#iefix') format('embedded-opentype'),
+    url('../fonts/MiSans/MiSans-Demibold.woff2') format('woff2'), url('../fonts/MiSans/MiSans-Demibold.woff') format('woff');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: MiSans-Medium;
+  src: url('../fonts/MiSans/MiSans-Medium.eot');
+  src: url('../fonts/MiSans/MiSans-Medium.eot?#iefix') format('embedded-opentype'),
+    url('../fonts/MiSans/MiSans-Medium.woff2') format('woff2'), url('../fonts/MiSans/MiSans-Medium.woff') format('woff');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: SourceCodePro;
+  src: url('../fonts/SourceCodePro.ttf');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}

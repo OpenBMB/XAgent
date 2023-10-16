@@ -1,0 +1,24 @@
+completions_kwargs:
+  model: "gpt-3.5-turbo-16k"
+  max_tokens: 1000
+  temperature: 0.2
+  timeout: 10
+function_prompt: |
+  This is an example function.{arg1}
+  Return1: A
+  Return2: Unsure
+function:
+  name: "example_function"
+  description: "This is an example function."
+  parameters:
+    type: "object"
+    properties:
+      return1:
+        type: "string"
+        description: "This is the first return."
+        enum: ["A","B","C"]
+      return2:
+        type: "string"
+        description: "This is the second return."
+        enum: ["Unsure","Unsolvable","Solvable"]
+    required: ["return1","return2"]

@@ -1,0 +1,32 @@
+version: "0.2"
+logger: "uvicorn"
+logger_level: 20
+
+database:
+  sqlite_db: /data/server.db
+
+builtin_monitor: false
+
+node:
+  creation_wait_seconds: 30
+  image: "tool-server-node:0.2"
+  network: "tool-server-network"
+  idling_close_minutes: 30
+  health_check: true
+  privileged: true
+  
+redirect_to_node_path:
+  post:
+    - /
+    - /execute_tool
+    - /get_available_tools
+    - /get_json_schema_for_tools
+    - /get_json_schema_for_envs
+    - /retrieving_tools
+    - /register_new_tool
+    - /upload_file
+    - /download_file
+    - /download_workspace
+    - /get_workspace_structure
+  get:
+    - /

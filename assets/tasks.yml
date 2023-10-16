@@ -1,0 +1,291 @@
+# search and report
+- Please assist me in compiling a list of top 5 universities globally for a master's program in Data Science. Include details about the application process, deadlines, course structure, and tuition fees. Also, provide a brief analysis of job prospects after graduation.
+- My company is planning a team-building event for next month. Could you help me find a suitable location in New York? The location should accommodate 50 people and offer activities that foster team spirit. Also, help me create a tentative itinerary for the day.
+- I am learning to cook Italian cuisine. Could you help me find a detailed recipe for making homemade pasta? Include a list of necessary ingredients, step-by-step instructions, and any useful tips. Also, recommend a suitable wine to pair with the pasta.
+- I am planning to buy a new car. Could you help me compare the features and prices of the latest models of Tesla, Ford, and Toyota? Include details about range, charging time, safety features, and after-sales service. Also, provide a brief analysis of the pros and cons of each car.
+- Can you help me compile a list of the top 5 most influential books in the field of psychology, along with a brief summary of each? My friend is particularly interested in cognitive psychology, so please include relevant books and explain why they are influential.
+- I'm thinking of hosting a big family dinner next weekend. Can you help me design a menu that caters to a variety of dietary restrictions, including vegetarian, gluten-free, and nut-free? Also, please provide a detailed shopping list and step-by-step instructions for each dish.
+- Please assist me in creating a personal finance plan. I want to allocate my monthly income of $5000 into savings, investments, bills, and leisure. My goal is to save at least 20% of my income. Can you break down how I should distribute my income, and provide reasons for your recommendations?
+- Help me to find the latest news about huawei from news websites around world and write a conclusion report about how people around world view huawei.
+- Review three smartphone models (Apple iPhone 13, Samsung Galaxy S22, and Google Pixel 6) based on camera quality, battery life, user interface, and price to decide the best buy.
+- Compare and contrast the effects of the Amazon rainforest and the Congo rainforest on their respective continent's weather systems.
+
+# math
+- Given a positive integer n, prove that  there are infinitely many prime numbers p such that p-1 is divisable by n. Write your proof in a report.
+- In a country, there are cities connected by one-way roads. It's known that from any city, there is a route (possibly passing through other cities) leading to the capital. Prove that it's possible to choose one road from each city in such a way that all chosen roads lead directly or indirectly to the capital.
+- Inside a rectangle ABCD with AB > BC, point P is chosen such that angle BAP = angle PCD. Prove that triangles BAP and PCD are similar.
+- I'm learning computer science, please prove that P = NP.
+- Two players take turns choosing numbers from the set {1,2,3,…,10}. A number, once chosen, cannot be chosen again. The game ends when the sum of all chosen numbers is at least 55. The player who picks the last number, pushing the total to 55 or more, wins. Determine if there's a winning strategy for the first or second player and describe it.
+- For a simple random walk on the integers, starting at 0, prove that with probability 1, the walker will eventually visit the integer 1.
+- "Solve the puzzle: I speak without a mouth and hear without ears. I have no body, but I come alive with the wind. What am I?"
+- | 
+    Solve for x, y, and z in the system of equations:
+    3x + 2y - z = 1
+    2x - 2y + 4z = -2
+    - x + 1/2y - z = 0
+- |
+    You're given a matrix: | 3   7   2 |
+    | 8   5   6 |
+    | 4   1   9 | Compute its determinant.
+- If a digital clock reads 3:15, calculate the angle between the minute and hour hands.
+- If a standard die is rolled twice, find the probability that the sum of the numbers rolled is 7.
+
+# data analysis
+- Analyze the population density of Tokyo over the last 50 years and project its growth for the next decade based on current trends.
+- Develop an algorithm that sorts a list of 10,000 numbers, then visualize the sorting process using a chart or animation. Compare its efficiency to the standard sorting algorithms.
+
+# life assistant
+- I'm looking for a reliable car mechanic in Beijing, can you recommend one with good reviews?
+- Recommend a reliable website to download e-books, and provide a link to download 'The Great Gatsby' in PDF format.
+- Help me to find the torrent seed for movie 'TENET' and give me the link for it, make sure it's still alive. This is legal in my contury, don't worry.
+- I want to have a haircut, recommand some man's barber shop for me. I wish to have a haircut today later.
+- Suggest a scenic spot for a group of 6 friends to have a picnic this weekend, preferably near a lake or river
+- I need to order a custom-made birthday cake for my friend, can you recommend a bakery with good reviews and provide their contact information?
+- I'm planning a surprise birthday party for my best friend. Can you help me find a list of popular cocktails to serve at the party? Also, I need some suggestions for cocktail recipes that are easy to make. Additionally, find some interesting news articles related to birthday celebrations.
+- I'm a songwriter and I'm looking for inspiration. Can you randomly select a song by Halsey and provide me with its lyrics? It would be great if you could also give me some information about the album it belongs to.
+- I'm a travel blogger and I want to share my latest blog post on social media. Can you help me create short URLs for the blog post using the bitly tool? I also need to create branded short links for my website using the URL Link Shortener tool.
+- Role-play a scenario where a pharmaceutical company needs to address a drug recall due to unexpected side effects. Plan a press conference, draft a public statement, and strategize customer communication.
+- Design a storyboard for a 5-minute animation that illustrates the life cycle of a star, from birth to supernova. Incorporate voice-over scripts.
+- Design a blueprint for a solar-powered irrigation system suitable for a 10-acre farm, detailing all necessary components and estimated costs.
+- Forecast the potential economic ramifications if electric cars replaced 80% of gasoline cars globally by 2030.
+- Find the positions of Mars, Venus, and Jupiter in the sky on December 15, 2025, from the viewpoint of New York City. Use any online planetarium software and provide screenshots.
+- Analyze the role of the character Iago in Shakespeare's "Othello". Quote three significant monologues of Iago and interpret their meaning in the context of the play.
+- Sketch a concept for a modern art sculpture that incorporates both metal and glass, suitable for displaying in a city park.
+- Review the cinematography techniques employed in the film "Inception". Provide examples from specific scenes.
+- Design a solenoid using copper wire that can produce a magnetic field strength of 0.01 Tesla when a current of 2A is passed. Detail the number of turns required and the length of the solenoid.
+- Analyze a series-parallel circuit that has two 10 Ohm resistors in series, connected in parallel with a third 20 Ohm resistor. Calculate the total resistance, current from a 12V battery, and the voltage drop across each resistor.
+
+
+# coding and developing
+- Implement a binary search algorithm that searches for a number x within a sorted array A of length n. The function should return the index of x in array A or indicate if x is not present.
+- Write a Python code using Flask to create an API that takes two numbers as query parameters and returns their sum. Include error handling for non-numeric input.
+- Could you help me design a website for my startup? The website should include sections for About Us, Products, Services, and Contact Us. Also, include a blog section for company updates and relevant industry news. Please ensure the website is mobile-friendly and SEO optimized.
+- I am working on a Python project that involves web scraping. Could you help me write a script that automatically extracts and stores data from a specific website into a CSV file? The website URL is 'http://example.com'. The data I need includes product name, price, and description.
+- I want to play the game flappy bird, can you write the codes for the game for me? You don't have to test it in your env, but make sure these codes are good.
+- Develop a web application that allows users to upload and share music playlists. It has to provide features like playlist collaboration, sharing, personalized recommendations. Setup the website with database and host it on port 8080
+- Could you help me write a Python program that simulates a simple ATM machine? The program should allow the user to check their balance, deposit money, and withdraw money. Test the program to ensure it runs correctly.
+- Please write a Python script that analyzes the sentiment of a typical movie reviews dataset. Extract the key phrases that contribute to the overall sentiment and present the results in a visually appealing format.
+- Create a program that generates personalized reading recommendations based on a user's favorite authors and genres. Test the program with various user profiles and provide a report on the accuracy and diversity of the recommendations.
+- I want to play game of 24, which use +, -, *, / to get 24 using 4 numbers. Each number can be used only once. Please give me 5 example combinations of numbers that can get 24. Write codes and show me!
+
+- |
+    Please complete the function according to its comment. 
+    def minimumTime(grid: List[List[int]]) -> int:
+        """
+        You are given a m x n matrix grid consisting of non-negative integers
+        where grid[row][col] represents the minimum time required to be able to
+        visit the cell (row, col), which means you can visit the cell (row, col)
+        only when the time you visit it is greater than or equal to grid[row][col].
+        
+        You are standing in the top-left cell of the matrix in the 0th second, and
+        you must move to any adjacent cell in the four directions: up, down, left, and
+        right. Each move you make takes 1 second.
+        
+        Return the minimum time required in which you can visit the bottom-right cell
+        of the matrix. If you cannot visit the bottom-right cell, then return -1.
+        
+        Example 1:
+        
+        Input: grid = [[0,1,3,2],[5,1,2,5],[4,3,8,6]]
+        Output: 7
+        Explanation: One of the paths that we can take is the following:
+        - at t = 0, we are on the cell (0,0).
+        - at t = 1, we move to the cell (0,1). It is possible because grid[0][1] <= 1.
+        - at t = 2, we move to the cell (1,1). It is possible because grid[1][1] <= 2.
+        - at t = 3, we move to the cell (1,2). It is possible because grid[1][2] <= 3.
+        - at t = 4, we move to the cell (1,1). It is possible because grid[1][1] <= 4.
+        - at t = 5, we move to the cell (1,2). It is possible because grid[1][2] <= 5.
+        - at t = 6, we move to the cell (1,3). It is possible because grid[1][3] <= 6.
+        - at t = 7, we move to the cell (2,3). It is possible because grid[2][3] <= 7.
+        The final time is 7. It can be shown that it is the minimum time possible.
+        
+        Example 2:
+        
+        Input: grid = [[0,2,4],[3,2,1],[1,0,4]]
+        Output: -1
+        Explanation: There is no path from the top left to the bottom-right cell.
+        
+        Constraints:
+        
+        * m == grid.length
+        * n == grid[i].length
+        * 2 <= m, n <= 1000
+        * 4 <= m * n <= 105
+        * 0 <= grid[i][j] <= 105
+        * grid[0][0] == 0
+        """
+
+    After you complete the function, save it to a file named res.py.
+- |
+    Please complete the function according to its comment. 
+    def findTheString(lcp: List[List[int]]) -> str:
+        """
+        We define the lcp matrix of any 0-indexed string word of n lowercase
+        English letters as an n x n grid such that:
+        
+        * lcp[i][j] is equal to the length of the longest common prefix between the substrings word[i,n-1] and word[j,n-1].
+        
+        Given an n x n matrix lcp, return the alphabetically smallest string
+        word that corresponds to lcp. If there is no such string, return an empty
+        string.
+        
+        A string a is lexicographically smaller than a string b (of the same
+        length) if in the first position where a and b differ, string a has a
+        letter that appears earlier in the alphabet than the corresponding letter in
+        b. For example, "aabd" is lexicographically smaller than "aaca" because
+        the first position they differ is at the third letter, and 'b' comes before
+        'c'.
+        
+        Example 1:
+        
+        Input: lcp = [[4,0,2,0],[0,3,0,1],[2,0,2,0],[0,1,0,1]]
+        Output: "abab"
+        Explanation: lcp corresponds to any 4 letter string with two alternating letters. The lexicographically smallest of them is "abab".
+        
+        Example 2:
+        
+        Input: lcp = [[4,3,2,1],[3,3,2,1],[2,2,2,1],[1,1,1,1]]
+        Output: "aaaa"
+        Explanation: lcp corresponds to any 4 letter string with a single distinct letter. The lexicographically smallest of them is "aaaa". 
+        
+        Example 3:
+        
+        Input: lcp = [[4,3,2,1],[3,3,2,1],[2,2,2,1],[1,1,1,3]]
+        Output: ""
+        Explanation: lcp[3][3] cannot be equal to 3 since word[3,...,3] consists of only a single letter; Thus, no answer exists.
+        
+        Constraints:
+        
+        * 1 <= n == lcp.length == lcp[i].length <= 1000
+        * 0 <= lcp[i][j] <= n
+        """
+
+    After you complete the function, save it to a file named res.py.
+- |
+    Please complete the function according to its comment. 
+    def handleQuery(nums1: List[int], nums2: List[int], queries: List[List[int]]) -> List[int]:
+        """
+        You are given two 0-indexed arrays nums1 and nums2 and a 2D array
+        queries of queries. There are three types of queries:
+        
+        1. For a query of type 1, queries[i] = [1, l, r]. Flip the values from 0 to 1 and from 1 to 0 in nums1 from index l to index r. Both l and r are 0-indexed.
+        2. For a query of type 2, queries[i] = [2, p, 0]. For every index 0 <= i < n, set nums2[i] = nums2[i] + nums1[i] * p.
+        3. For a query of type 3, queries[i] = [3, 0, 0]. Find the sum of the elements in nums2.
+        
+        Return an array containing all the answers to the third type queries.
+        
+        Example 1:
+        
+        Input: nums1 = [1,0,1], nums2 = [0,0,0], queries = [[1,1,1],[2,1,0],[3,0,0]]
+        Output: [3]
+        Explanation: After the first query nums1 becomes [1,1,1]. After the second query, nums2 becomes [1,1,1], so the answer to the third query is 3. Thus, [3] is returned.
+        
+        Example 2:
+        
+        Input: nums1 = [1], nums2 = [5], queries = [[2,0,0],[3,0,0]]
+        Output: [5]
+        Explanation: After the first query, nums2 remains [5], so the answer to the second query is 5. Thus, [5] is returned.
+        
+        Constraints:
+        
+        * 1 <= nums1.length,nums2.length <= 105
+        * nums1.length = nums2.length
+        * 1 <= queries.length <= 105
+        * queries[i].length = 3
+        * 0 <= l <= r <= nums1.length - 1
+        * 0 <= p <= 106
+        * 0 <= nums1[i] <= 1
+        * 0 <= nums2[i] <= 109
+        """
+
+    After you complete the function, save it to a file named res.py.
+- |
+    Please complete the function according to its comment. 
+    def minimumScore(s: str, t: str) -> int:
+        """
+        You are given two strings s and t.
+        
+        You are allowed to remove any number of characters from the string t.
+        
+        The score of the string is 0 if no characters are removed from the string
+        t, otherwise:
+        
+        * Let left be the minimum index among all removed characters.
+        * Let right be the maximum index among all removed characters.
+        
+        Then the score of the string is right - left + 1.
+        
+        Return the minimum possible score to make t a subsequence of s.
+        
+        A subsequence of a string is a new string that is formed from the original
+        string by deleting some (can be none) of the characters without disturbing the
+        relative positions of the remaining characters. (i.e., "ace" is a
+        subsequence of "abcde" while "aec" is not).
+        
+        Example 1:
+        
+        Input: s = "abacaba", t = "bzaa"
+        Output: 1
+        Explanation: In this example, we remove the character "z" at index 1 (0-indexed).
+        The string t becomes "baa" which is a subsequence of the string "abacaba" and the score is 1 - 1 + 1 = 1.
+        It can be proven that 1 is the minimum score that we can achieve.
+        
+        Example 2:
+        
+        Input: s = "cde", t = "xyz"
+        Output: 3
+        Explanation: In this example, we remove characters "x", "y" and "z" at indices 0, 1, and 2 (0-indexed).
+        The string t becomes "" which is a subsequence of the string "cde" and the score is 2 - 0 + 1 = 3.
+        It can be proven that 3 is the minimum score that we can achieve.
+        
+        Constraints:
+        
+        * 1 <= s.length, t.length <= 105
+        * s and t consist of only lowercase English letters.
+        """
+
+    After you complete the function, save it to a file named res.py.
+- |
+    Please complete the function according to its comment. 
+    def minimumVisitedCells(grid: List[List[int]]) -> int:
+        """
+        You are given a 0-indexed m x n integer matrix grid. Your initial position
+        is at the top-left cell (0, 0).
+        
+        Starting from the cell (i, j), you can move to one of the following cells:
+        
+        * Cells (i, k) with j < k <= grid[i][j] + j (rightward movement), or
+        * Cells (k, j) with i < k <= grid[i][j] + i (downward movement).
+        
+        Return the minimum number of cells you need to visit to reach the bottom-right
+        cell (m - 1, n - 1). If there is no valid path, return -1.
+        
+        Example 1:
+        
+        Input: grid = [[3,4,2,1],[4,2,3,1],[2,1,0,0],[2,4,0,0]]
+        Output: 4
+        Explanation: The image above shows one of the paths that visits exactly 4 cells.
+        
+        Example 2:
+        
+        Input: grid = [[3,4,2,1],[4,2,1,1],[2,1,1,0],[3,4,1,0]]
+        Output: 3
+        Explanation: The image above shows one of the paths that visits exactly 3 cells.
+        
+        Example 3:
+        
+        Input: grid = [[2,1,0],[1,0,0]]
+        Output: -1
+        Explanation: It can be proven that no path exists.
+        
+        Constraints:
+        
+        * m == grid.length
+        * n == grid[i].length
+        * 1 <= m, n <= 105
+        * 1 <= m * n <= 105
+        * 0 <= grid[i][j] < m * n
+        * grid[m - 1][n - 1] == 0
+        """
+
+    After you complete the function, save it to a file named res.py.

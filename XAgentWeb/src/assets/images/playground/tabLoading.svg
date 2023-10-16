@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="16px" height="16px" viewBox="0 0 16 16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>loading-blue</title>
+    <defs>
+        <pattern id="pattern-1" width="100%" height="100%" patternUnits="objectBoundingBox">
+            <use xlink:href="#image-2"></use>
+        </pattern>
+        <image id="image-2" width="14" height="14" xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAAOCAYAAAAfSC3RAAAAAXNSR0IArs4c6QAAAERlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAA6ABAAMAAAABAAEAAKACAAQAAAABAAAADqADAAQAAAABAAAADgAAAAC98Dn6AAAB1UlEQVQoFS2SPW4cMQyFSUoa2wMsHMRImSZ9qlQp3OdYuUkOkEu48QlyhXRBEhgL7K5HIulPYy92VzMUn94PpfffHn+kaBGRKppNU1qqLqxLSi4yn2U+S5OUynOdvRWQKxU+1MRSzDQzqPBVzkpqYqpvh+/ALBM9+O3IVzCNKgGIWvCnRv1V0a4KxpRSVaWzsTPMVs6gUQcqUIoCBYR8NrAgDQ0FITCmdDy5ZAC2mLKBlElHw2SbHq94n2tjt0BQKqBt96FlshQs4TmE+g3MM6yV5hWPgGQHwayklBsbLLRrGqdeUu2siU3Rz5Tf07eDEDMDxB1mM3PD/64MQ5ETkdlD7FdafNen/Pe79X53PPjhcMyHD39SfgJEygbTjC/w5hy3ATpxxF9Lu/PbkI95ezrKU++9+ZfLJ1++blnDdo/oKoNsRqQ9o/vEEDrcrW62juUsh6uynaT3m//p/V3zqkGDmJvkIMZuos9wI5WUrfG6LUTrXopcN9NeLj7OwyuBdzw5oEG6fbKSwdAZtYeJ1RLuhAMF07TLqrZWfbs5zFFlZOqQdCdbEEymODk3Y7olIubMU6/nrQglVUVmcAHE8QlzpTvDbV5SBLlDnGaW8waRH9cGnhfBzCCjNwav8QAAAABJRU5ErkJggg=="></image>
+    </defs>
+    <g id="页面-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="结果页备份-14" transform="translate(-318.000000, -719.000000)" fill="url(#pattern-1)">
+            <g id="编组-11备份-6" transform="translate(318.000000, 714.000000)">
+                <g id="loading-blue" transform="translate(0.000000, 5.000000)">
+                    <path d="M8,12.5 C10.485281,12.5 12.5,10.485281 12.5,8 C12.5,5.51471853 10.485281,3.5 8,3.5 C5.51471853,3.5 3.5,5.51471853 3.5,8 C3.5,10.485281 5.51471853,12.5 8,12.5 Z M8,14.5 C11.5898504,14.5 14.5,11.5898504 14.5,8 C14.5,4.4101491 11.5898504,1.5 8,1.5 C4.4101491,1.5 1.5,4.4101491 1.5,8 C1.5,11.5898504 4.4101491,14.5 8,14.5 Z" id="Oval-(Stroke)"></path>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="12px" height="12px" viewBox="0 0 12 12" version="1.1" xmlns="http://www.w3.org/2000/svg"
+    xmlns:xlink="http://www.w3.org/1999/xlink">
+    <g id="页面-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="默认备份" transform="translate(-36.000000, -129.000000)" fill-rule="nonzero">
+            <g id="加号" transform="translate(36.000000, 129.000000)">
+                <rect id="矩形" fill="#000000" opacity="0" x="0" y="0" width="12" height="12"></rect>
+                <polygon id="路径" fill="#A4A9B6"
+                    points="12 5.33333203 6.66666797 5.33333203 6.66666797 0 5.33332031 0 5.33332031 5.33333203 0 5.33333203 0 6.66667969 5.33333203 6.66667969 5.33333203 12 6.66667969 12 6.66667969 6.66666797 12 6.66666797 12 5.33332031">
+                </polygon>
+            </g>
+        </g>
+    </g>
+</svg>

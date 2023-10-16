@@ -5,10 +5,12 @@
 <div align="center">
 
 
-[![Discord](https://dcbadge.vercel.app/api/server/xagent?style=flat)](https://discord.gg/xagent) [![Twitter](https://img.shields.io/twitter/follow/xagent?style=social)](https://twitter.com/XAgent) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Discord](https://img.shields.io/badge/XAgent-Discord-purple?style=flat)](https://discord.gg/zncs5aQkWZ) [![Twitter](https://img.shields.io/twitter/follow/xagent?style=social)](https://twitter.com/XAgent) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+
+
 
 </div>
-
 
 <p align="center">
   <a href="#Quickstart">Tutorial</a> •
@@ -23,33 +25,33 @@
 
 
 # 📖 Introduction
-XAgent is a open-source experimental Large Language Model (LLM) driven autonomous agent that can automatically solve various tasks. 
+XAgent is an open-source experimental Large Language Model (LLM) driven autonomous agent that can automatically solve various tasks. 
 It is designed to be a general-purpose agent that can be applied to a wide range of tasks. Currently, XAgent is still in its early stage, and we are working hard to improve it.
 
 🏆 Our goal is to create a super-intelligent agent that can solve any given task!
 
 ## 🪢 XAgent
 XAgent is designed with the following features:
-- **Autonomous**: XAgent can automatically solve various tasks without human participation.
+- **Autonomy**: XAgent can automatically solve various tasks without human participation.
 - **Safety**: XAgent is designed to run safely. All actions are constrained inside a docker container. Run it anyway!
-- **Extensible**: XAgent is designed to be extensible. You can easily add new tools to enhance agent's abilities, and even new agents！
+- **Extensibility**: XAgent is designed to be extensible. You can easily add new tools to enhance agent's abilities and even new agents！
 - **GUI**: XAgent provides a friendly GUI for users to interact with the agent. You can also use the command line interface to interact with the agent.
-- **Cooperation with Human**: XAgent can collaborate with you to tackle tasks. It not only has the capability to follow your guidance in solving complex tasks on the go, but also can seek your assistance when it encounters challenges.
+- **Cooperation with Human**: XAgent can collaborate with you to tackle tasks. It not only has the capability to follow your guidance in solving complex tasks on the go but also can seek your assistance when it encounters challenges.
 
 XAgent is composed of three parts:
-- **🤖 Dispatcher** is responsible for dynmically instantiate and dispatching tasks to different agents. It allows us to add new agents and improve the agents' abilities.
-- **🧐 Planner** is responsible for generate and rectify plans for tasks. It divides a task into subtasks and generates milestones for them, allowing agents to solve tasks step by step.
+- **🤖 Dispatcher** is responsible for dynamically instantiating and dispatching tasks to different agents. It allows us to add new agents and improve the agents' abilities.
+- **🧐 Planner** is responsible for generating and rectifying plans for tasks. It divides a task into subtasks and generates milestones for them, allowing agents to solve tasks step by step.
 - **🦾 Actor** is responsible for conducting actions to achieve goals and finish subtasks. The actor utilizes various tools to solve subtasks, and it can also collaborate with human to solve tasks.
 
 ## 🧰 ToolServer
-ToolServer is the server provide XAgent with powerful and safe tools to solve tasks. It is a docker container that provides a safe environment for XAgent to run.
+ToolServer is the server that provides XAgent with powerful and safe tools to solve tasks. It is a docker container that provides a safe environment for XAgent to run.
 Currently, ToolServer provides the following tools:
-- **📝 File Editor** provide a text editing tool that can write, read, and modify files.
-- **📘 Python Notebook** provide a interactive python notebook that can run python code to validate ideas, draw figures, etc.
-- **🌏 Web Browser** provide a web browser that can search and visit webpages.
-- **🖥️ Shell** provide a bash shell tool that can execute any shell commands, even install programs and host services.
-- **🧩 Rapid API** provide a tool to retrieve apis from Rapid API and calling them, which provides a wide range of apis for XAgent to use. See [ToolBench](https://github.com/OpenBMB/ToolBench) to get more information about the Rapid API collections.
-You can also easily add new tools to ToolServer to enhance agent's abilities.
+- **📝 File Editor** provides a text editing tool that can write, read, and modify files.
+- **📘 Python Notebook** provides an interactive Python notebook that can run Python code to validate ideas, draw figures, etc.
+- **🌏 Web Browser** provides a web browser that can search and visit webpages.
+- **🖥️ Shell** provides a bash shell tool that can execute any shell commands, even install programs and host services.
+- **🧩 Rapid API** provides a tool to retrieve APIs from Rapid API and call them, which provides a wide range of APIs for XAgent to use. See [ToolBench](https://github.com/OpenBMB/ToolBench) to get more information about the Rapid API collections.
+You can also easily add new tools to ToolServer to enhance XAgent's abilities.
 
 <div><a id="Quickstart"></a></div>
 
@@ -62,7 +64,7 @@ After that, you should build the docker image for ToolServer and start the docke
 cd ToolServer
 bash build_all.sh && docker-compose up
 ```
-Refer [here](ToolServer/README.md) for the detailed information about our ToolServer.
+Refer [here](ToolServer/README.md) for detailed information about our ToolServer.
 
 ## 🎮 Setup and Run XAgent
 After setting up ToolServer, you can start to run XAgent.
@@ -73,10 +75,10 @@ pip install -r requirements.txt
 
 - Configure XAgent
 You should configure XAgent in `config.yml` before running it. 
-At least one of openai key is provided in `config.yml`, which is used to access OpenAI API.
-We highly recommand to use `gpt-4-32k` to run XAgent, `gpt-4` is also ok for most simple tasks.
-In any case, at least one `gpt-3.5-turbo-16k` api key should be provided as a backup model.
-We do not test or recommand to use `gpt-3.5-turbo` to run XAgent due to very limited context length, you should not try to run XAgent on that.
+At least one OpenAI key is provided in `config.yml`, which is used to access OpenAI API.
+We highly recommend using `gpt-4-32k` to run XAgent, `gpt-4` is also OK for most simple tasks.
+In any case, at least one `gpt-3.5-turbo-16k` API key should be provided as a backup model.
+We do not test or recommend using `gpt-3.5-turbo` to run XAgent due to very limited context length, you should not try to run XAgent on that.
 
 - Run XAgent
 ```bash
@@ -110,15 +112,15 @@ We also provide a video demo of using XAgent here.
 
 </div>
 
-Here we also show some cases of XAgent solving tasks:
+Here we also show some cases of solving tasks by XAgent:
 ## Case 1. Data Analysis: Demonstrating the Effectiveness of Dual-Loop Mechanism
 We start with a case of aiding users in intricate data analysis. Here, our user submitted an `iris.zip` file to XAgent, seeking assistance in data analysis. XAgent swiftly broke down the task into four sub-tasks: (1) data inspection and comprehension, (2) verification of the system's Python environment for relevant data analysis libraries, (3) crafting data analysis code for data processing and analysis, and (4) compiling an analytical report based on the Python code's execution results.
-Here is a figure draw by XAgent.
+Here is a figure drawn by XAgent.
 ![Data Statics by XAgent](assets/readme/statistics.png)
 
 
 ## Case 2. Recommendation: A New Paradigm of Human-Agent Interaction
-Empowered with the unique capability to actively seek human assistance and collaborate in problem-solving, XAgent continues to redefine the boundaries of human-agent cooperation. As depicted in srceenshot below, a user sought XAgent's aid in recommending some great restaurants for a friendly gathering, yet failed to provide specific details. Recognizing the insufficiency of the provided information, XAgent employed the AskForHumanHelp tool, prompting human intervention to elicit the user's preferred location, budget constraints, culinary preferences, and any dietary restrictions. Armed with this valuable feedback, XAgent seamlessly generated tailored restaurant recommendations, ensuring a personalized and satisfying experience for the user and their friends.
+Empowered with the unique capability to actively seek human assistance and collaborate in problem-solving, XAgent continues to redefine the boundaries of human-agent cooperation. As depicted in screenshot below, a user sought XAgent's aid in recommending some great restaurants for a friendly gathering, yet failed to provide specific details. Recognizing the insufficiency of the provided information, XAgent employed the AskForHumanHelp tool, prompting human intervention to elicit the user's preferred location, budget constraints, culinary preferences, and any dietary restrictions. Armed with this valuable feedback, XAgent seamlessly generated tailored restaurant recommendations, ensuring a personalized and satisfying experience for the user and their friends.
 ![Illustration of Ask for Human Help of XAgent](assets/readme/ask_for_human_help.png)
 
 ## Case 3. Training Model: A Sophisticated Tool User
@@ -128,12 +130,12 @@ XAgent not only tackles mundane tasks but also serves as an invaluable aid in co
 ![bert_3](assets/readme/bert_3.png)
 
 ## 📊 Evaluation
-We conduct human preference evaluation to evaluate XAgent's performance. We prepare over 50 realworld complex tasks for evaluation, which can be categorized into 5 class: Search and Report, Coding and Developing, Data Analysis, Math and Life Assistant.
-We compare the result of XAgent with [AutoGPT](https://github.com/Significant-Gravitas/AutoGPT), the result shows a total win of XAgent over AutoGPT. You can download records for XAgent [here](https://drive.google.com/drive/folders/1_slFNXUBQ1CGiNLMCCYoQXZYNGAAdHok?usp=sharing).
+We conduct human preference evaluation to evaluate XAgent's performance. We prepare over 50 real-world complex tasks for evaluation, which can be categorized into 5 classes: Search and Report, Coding and Developing, Data Analysis, Math, and Life Assistant.
+We compare the results of XAgent with [AutoGPT](https://github.com/Significant-Gravitas/AutoGPT), which shows a total win of XAgent over AutoGPT. You can download records for XAgent [here](https://drive.google.com/drive/folders/1_slFNXUBQ1CGiNLMCCYoQXZYNGAAdHok?usp=sharing).
 
 ![HumanPrefer](assets/readme/agent_comparison.png)
 
-We report a significant improvement of XAgent over AutoGPT in term of human preference.
+We report a significant improvement of XAgent over AutoGPT in terms of human preference.
 
 We also evaluate XAgent on the following benchmarks:
 ![Benchmarks](assets/readme/eval_on_dataset.png)
@@ -148,7 +150,7 @@ Coming Soon.
 <div><a id="Citation"></a></div>
 
 # Citation
-If you find our repo useful, please kindly consider cite:
+If you find our repo useful, please kindly consider citing:
 ```angular2
 @misc{xagent2023,
       title={XAgent: An Autonomous Agent for Complex Task Solving}, 

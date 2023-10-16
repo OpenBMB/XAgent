@@ -5,7 +5,7 @@
 <div align="center">
 
 
-[![Discord](https://img.shields.io/badge/XAgent-Discord-purple?style=flat)](https://discord.gg/zncs5aQkWZ) [![Twitter](https://img.shields.io/twitter/follow/xagent?style=social)](https://twitter.com/XAgent) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Discord](https://img.shields.io/badge/XAgent-Discord-purple?style=flat)](https://discord.gg/zncs5aQkWZ) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) ![Welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)
 
 
 

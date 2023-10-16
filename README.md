@@ -110,7 +110,7 @@ We also provide a video demo of using XAgent here.
 <div align="center">
 
 <video width="320" height="240" controls>
-  <source src="assets/demo.mp4" type="video/mp4">
+  <source src="assets/readme/demo.mp4" type="video/mp4">
 </video>
 
 </div>

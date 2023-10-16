@@ -80,8 +80,8 @@ class XAgentInteraction(metaclass=abc.ABCMeta):
         
         
         self.current_step = uuid.uuid4().hex
-        self.logger.typewriter_log(
-            f"CURRENT: {self.current_step}", f"update cache, status {status}, current {current}, update_data: {update_data}")
+        # self.logger.typewriter_log(
+            # f"CURRENT: {self.current_step}", f"update cache, status {status}, current {current}, update_data: {update_data}")
         if status == "inner":
             tool_name = update_data.get("using_tools", {}).get("tool_name", "") if isinstance(update_data, dict) else ""
             
@@ -206,7 +206,7 @@ class XAgentInteraction(metaclass=abc.ABCMeta):
 
     async def auto_send(self, push_data):
 
-        self.logger.info(f"send data: {push_data}")
+        # self.logger.info(f"send data: {push_data}")
         await self.io.Output.run(push_data)
 
     async def auto_receive(self, can_modify=None):

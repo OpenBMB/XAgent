@@ -14,8 +14,8 @@
 
 <p align="center">
   <a href="#Quickstart">Tutorial</a> •
-  <a href="#Demo">Demo</a> •
-  <a href="#Blog">Blog</a> •
+  <a href="https://x-agent.net/">Demo</a> •
+  <a href="https://blog.x-agent.net/blog/xagent/">Blog</a> •
   <a href="#Citation">Citation</a>
 
 

@@ -18,6 +18,7 @@
   <a href="#Citation">Citation</a>
 </p>
 
+
 # 📖 Introduction
 XAgent is an open-source experimental Large Language Model (LLM) driven autonomous agent that can automatically solve various tasks. 
 It is designed to be a general-purpose agent that can be applied to a wide range of tasks. Currently, XAgent is still in its early stage, and we are working hard to improve it.
@@ -25,6 +26,8 @@ It is designed to be a general-purpose agent that can be applied to a wide range
 🏆 Our goal is to create a super-intelligent agent that can solve any given task!
 
 We welcome diverse forms of collaborations, including full-time, part-time roles, and more. If you are interested in the frontiers of agents and want to join us in realizing true autonomous agents, please contact us at xagentteam@gmail.com.
+
+Read this in [中文](README_ZH.md).
 
 ## <img src="assets/readme/xagent_logo.png" height=30 align="texttop"> XAgent
 XAgent is designed with the following features:

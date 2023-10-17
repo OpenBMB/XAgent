@@ -20,7 +20,9 @@ XAgent是一个开源的基于大型语言模型（LLM）的自主代理，可�
 
 🏆 我们的目标是创建一个可以解决任何给定任务的超级智能代理！
 
-我们欢迎各种形式的合作，包括全职、兼职等。如果您对代理的前沿感兴趣，并希望加入我们实现真正的自主代理，请通过xagentteam@gmail.com与我们联系。
+我们欢迎各种形式的合作，包括全职、兼职等。如果您对代理的前沿感兴趣，并希望加入我们实现真正的自主代理，请通过 xagentteam@gmail.com 与我们联系。
+
+以[英文](README.md)阅读。
 
 ## <img src="assets/readme/xagent_logo.png" height=30 align="texttop"> XAgent
 

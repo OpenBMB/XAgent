@@ -138,7 +138,7 @@ We also evaluate XAgent on the following benchmarks:
 
 # 🖌️ Blog
 
-Coming Soon.
+Our blog is available at [here](https://blog.x-agent.net/)!
 
 <div><a id="Citation"></a></div>
 

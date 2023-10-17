@@ -12,6 +12,11 @@
 </div>
 
 <p align="center">
+    <a>English</a> •
+    <a href="README_ZH.md">中文</a>
+</p>
+
+<p align="center">
   <a href="#Quickstart">Tutorial</a> •
   <a href="https://x-agent.net/">Demo</a> •
   <a href="https://blog.x-agent.net/blog/xagent/">Blog</a> •

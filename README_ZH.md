@@ -6,6 +6,11 @@
 
 [![Twitter](https://img.shields.io/twitter/follow/XAgent?style=social)](https://twitter.com/XAgentTeam) [![Discord](https://img.shields.io/badge/XAgent-Discord-purple?style=flat)](https://discord.gg/zncs5aQkWZ) [![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-green.svg)](https://opensource.org/license/apache-2-0/) ![Welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)
 
+<p align="center">
+    <a href="README.md">English</a> •
+    <a>中文</a>
+</p>
+
 </div>
 <p align="center">
   <a href="#Quickstart">指南</a> •

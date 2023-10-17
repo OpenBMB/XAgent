@@ -49,7 +49,7 @@ npm run dev
 
 ## Using XAgent-Server
 
-After completing the above steps, you can access the frontend interface by visiting http://localhost:8000 in a web browser. An example of the interface is shown below:
+After completing the above steps, you can access the frontend interface by visiting http://localhost:8000 in a web browser. Default user: admin, token: xagent-admin, you can use it to login. An example of the interface is shown below:
 
 ![login](https://gitee.com/sailaoda/pic2/raw/master/2023/202309272130865.png)
 

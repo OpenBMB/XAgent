@@ -2,6 +2,35 @@
 
 <template><router-view /></template>
 
+
+<script setup lang="ts">
+import { ElMessage } from 'element-plus';
+
+const router = useRouter()
+const userStore = useUserStore()
+const authStore = useAuthStore()
+
+const DEFAULT_ACCOUNT = 'admin'
+const DEFAULT_PSWD = 'xagent-admin'
+
+const param = {
+  email: DEFAULT_ACCOUNT,
+  token:  DEFAULT_PSWD,
+}
+
+const res: any = await useLoginRequest(param);
+
+if (res?.success) {
+  userStore.setUserInfo(res?.data)
+  authStore.setLoginState(true)
+  authStore.setLoginToken(res?.data?.token)
+  router.push({ path: '/share' });
+} else {
+  ElMessage({ type: 'error', message: res?.message })
+}
+</script>
+
+
 <style>
 #app {
   width: 100%;

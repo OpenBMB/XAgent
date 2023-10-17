@@ -9,10 +9,10 @@ export interface UserInfo {
   mobile: number | string
   smsCode: string
   name: string
-  corporation: string 
-  industry: string
-  position: string 
-  email: string 
+  corporation: string //公司or学校
+  industry: string //行业
+  position: string //职位
+  email: string //邮箱
   emailCode: string
   avatar?: string
   desc?: string

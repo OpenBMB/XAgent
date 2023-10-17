@@ -154,8 +154,6 @@ const queryHistoryData = () => {
     })
 }
 
-
-
 // watchEffect(() => {
 //   if (isShouldRefreshHistory.value) queryHistoryData()
 // })

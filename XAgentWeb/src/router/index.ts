@@ -32,7 +32,7 @@ const PAGE_NOT_FOUND_ROUTE = {
 const routes: Readonly<RouteRecordRaw[]> = [
   {
     path: '/',
-    redirect: '/login',
+    redirect: '/share',
   },
   {
     path: '/login',

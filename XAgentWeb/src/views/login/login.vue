@@ -255,7 +255,7 @@ const submit = async () => {
 
   const res: any = await useLoginRequest(param);
     
-  if (res?.success) {
+  if (res?.success || res.status === 'success') {
     userStore.setUserInfo(res?.data)
     authStore.setLoginState(true)
     authStore.setLoginToken(res?.data?.token)

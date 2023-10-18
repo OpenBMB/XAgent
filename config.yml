@@ -1,23 +1,29 @@
 openai_keys:
   gpt-3.5-turbo-16k:
-    - api_key: sk-KM1Gvq0aVB98Bzc045A26bC5A4C24465B413047210Ac728f
+    - api_key: 使用您自己的api_key
+      api_base: 使用您自己的api_base
       organization: org-xxxxx
       model: gpt-3.5-turbo-16k
-    - api_key: sk-KM1Gvq0aVB98Bzc045A26bC5A4C24465B413047210Ac728f
+    - api_key: 使用您自己的api_key
+      api_base: 使用您自己的api_base
       organization: org-xxxxxx
       model: gpt-3.5-turbo-16k
   gpt-4:    
-    - api_key: sk-KM1Gvq0aVB98Bzc045A26bC5A4C24465B413047210Ac728f
+    - api_key: 使用您自己的api_key
+      api_base: 使用您自己的api_base
       organization: org-xxxxx
       model: gpt-4
-    - api_key: sk-KM1Gvq0aVB98Bzc045A26bC5A4C24465B413047210Ac728f
+    - api_key: 使用您自己的api_key
+      api_base: 使用您自己的api_base
       organization: org-xxxxxx
       model: gpt-4
   gpt-4-32k:
-    - api_key: sk-KM1Gvq0aVB98Bzc045A26bC5A4C24465B413047210Ac728f
+    - api_key: 使用您自己的api_key
+      api_base: 使用您自己的api_base
       organization: org-xxxxx
       model: gpt-4-32k
-    - api_key: sk-KM1Gvq0aVB98Bzc045A26bC5A4C24465B413047210Ac728f
+    - api_key: 使用您自己的api_key
+      api_base: 使用您自己的api_base
       organization: org-xxxxxx
       model: gpt-4-32k
 

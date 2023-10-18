@@ -1,9 +1,9 @@
 openai_keys:
   gpt-3.5-turbo-16k:
-    - api_key: sk-xxxxx
+    - api_key: sk-KM1Gvq0aVB98Bzc045A26bC5A4C24465B413047210Ac728f
       organization: org-xxxxx
       model: gpt-3.5-turbo-16k
-    - api_key: sk-xxxxx
+    - api_key: sk-KM1Gvq0aVB98Bzc045A26bC5A4C24465B413047210Ac728f
       organization: org-xxxxxx
       model: gpt-3.5-turbo-16k
   

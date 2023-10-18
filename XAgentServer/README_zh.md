@@ -49,7 +49,7 @@ npm run dev
 
 
 ## 使用 XAgent-Server
-完成上述操作后，浏览器访问 http://localhost:8000 即可进入前端界面，示例如下 (可以默认用户名: admin, token: xagent-admin 进行登录)：
+完成上述操作后，浏览器访问 http://localhost:5173 即可进入前端界面，示例如下 (可以默认用户名: admin, token: xagent-admin 进行登录)：
 
 ![login](https://gitee.com/sailaoda/pic2/raw/master/2023/202309272130865.png)
 

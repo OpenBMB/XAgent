@@ -108,7 +108,7 @@ npm install
 npm run dev
 ```
 Build the docker image for XAgent-Server and start the docker container.
-You will see the XAgent Server listening on port `8000`.
+You will see the XAgent Server listening on port `8090`.
 Refer [here](XAgentServer/README.md) for the detailed information about our GUI Demo.
 
 <div><a id="Demo"></a></div>

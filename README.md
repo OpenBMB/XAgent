@@ -18,7 +18,7 @@
 
 <p align="center">
   <a href="#Quickstart">Tutorial</a> •
-  <a href="https://x-agent.net/">Demo</a> •
+  <a href="https://www.youtube.com/watch?v=QGkpd-tsFPA">Demo</a> •
   <a href="https://blog.x-agent.net/blog/xagent/">Blog</a> •
   <a href="#Citation">Citation</a>
 </p>

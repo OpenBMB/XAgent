@@ -61,7 +61,7 @@ XAgent由三部分组成：
 然后，您需要构建工具服务器的镜像。在`ToolServer`目录下，运行以下命令：
 ```bash
 cd ToolServer
-bash build_all.sh && docker-compose up
+docker-compose up
 ```
 这将构建工具服务器的镜像并启动工具服务器的容器。如果您想在后台运行容器，请使用`docker-compose up -d`。
 参考[ToolServer](ToolServer/README_ZH.md)获取更多信息。
@@ -90,9 +90,8 @@ python run.py --task "put your task here" --model "gpt-4"
 
 - 使用GUI运行XAgent
 ```bash
-bash XAgentServer/dockerfiles/build.sh
 cd XAgentServer
-docker compose up
+docker-compose up
 
 # 当然，您也可以通过下面的命令启动后端服务
 # python3.10+ is required

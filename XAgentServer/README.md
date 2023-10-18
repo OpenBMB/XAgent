@@ -7,7 +7,8 @@ This is a demo of the XAgent-Server frontend and backend. The backend communicat
 The code for XAgent-Server is located in the `XAgentServer/` directory. Every time the code is modified, the image needs to be rebuilt using the following command:
 
 ```bash
-bash XAgentServer/dockerfiles/build.sh
+cd XAgentServer
+docker-compose build
 ```
 
 ## Launching XAgent-Server
@@ -17,7 +18,7 @@ First, navigate to the demo service folder `XAgentServer/`. Then, to launch the 
 ```bash
 # XAgentServer/
 cd XAgentServer
-docker compose up
+docker-compose up
 ```
 This will start an instance of XAgent-Server listening to port `16204` on the local machine. The configuration details can be found in the `XAgentServer/docker-compose.yml` file.
 

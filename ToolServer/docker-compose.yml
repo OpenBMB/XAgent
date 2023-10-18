@@ -3,6 +3,9 @@ version: '3'
 services:
   ToolServerManager:
     image: tool-server-manager:0.2
+    build:
+      context: .
+      dockerfile: ./dockerfiles/ToolServerManager/Dockerfile
     ports:
       - 8080:8080
     volumes:
@@ -19,8 +22,17 @@ services:
       - db
     command: ["--workers","8","-t","600"]
 
+  ToolServerNode:
+    image: tool-server-node:0.2
+    build:
+      context: .
+      dockerfile: ./dockerfiles/ToolServerNode/Dockerfile
+
   ToolServerMonitor:
     image: tool-server-monitor:0.1
+    build:
+      context: .
+      dockerfile: ./dockerfiles/ToolServerMonitor/Dockerfile
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     environment:

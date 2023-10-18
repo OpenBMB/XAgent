@@ -6,6 +6,9 @@ services:
 
   app:
     image: xagent-server:0.1
+    build:
+      context: ..
+      dockerfile: ./XAgentServer/dockerfiles/Dockerfile
     ports:
       - "8000:8000"
     networks:

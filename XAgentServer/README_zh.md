@@ -7,7 +7,8 @@ XAgent-Server 前后端 Demo，后端通信部分主要由fastapi的`websocket`�
 XAgent-Server的代码在`XAgentServer/`路径下，每次修改代码后，需要重新编译镜像，执行如下命令：
 
 ```bash
-bash XAgentServer/dockerfiles/build.sh
+cd XAgentServer
+docker-compose build
 ```
 
 ## 启动 XAgent-Server
@@ -17,7 +18,7 @@ bash XAgentServer/dockerfiles/build.sh
 ```bash
 # XAgentServer/
 cd XAgentServer
-docker compose up
+docker-compose up
 ```
 这将启动一个XAgent-Server实例，监听本机`16204`端口，配置信息在`XAgentServer/docker-compose.yml`文件中。
 

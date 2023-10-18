@@ -64,7 +64,7 @@ So you should install `docker` and `docker-compose` first.
 After that, you should build the docker image for ToolServer and start the docker container.
 ```bash
 cd ToolServer
-bash build_all.sh && docker-compose up
+docker-compose up
 ```
 Refer [here](ToolServer/README.md) for detailed information about our ToolServer.
 
@@ -92,9 +92,8 @@ After execution, the full `workspace` in `ToolServerNode` will be copied to `run
 
 - Run XAgent with GUI
 ```bash
-bash XAgentServer/dockerfiles/build.sh
 cd XAgentServer
-docker compose up
+docker-compose up
 
 # also, you can start with python
 # python3.10+ is required

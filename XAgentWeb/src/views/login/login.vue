@@ -125,10 +125,10 @@ const DEFAULT_ACCOUNT = 'admin'
 const DEFAULT_PSWD = 'xagent-admin'
 
 const loginForm = reactive<LoginFormInf>({
-  // email: DEFAULT_ACCOUNT,
-  // token: DEFAULT_PSWD,
-  email: "",
-  token: "",
+  email: DEFAULT_ACCOUNT,
+  token: DEFAULT_PSWD,
+  // email: "",
+  // token: "",
 })
 
 const loginFormStatus: any = reactive({
@@ -207,7 +207,7 @@ const getVerifyCode = async () => {
     ElMessage({ type: 'success', message: 'Send successfully' })
     ;(document.querySelector('.code-input') as HTMLElement)?.focus()
   } else {
-    ElMessage({ type: 'error', message: res?.message })
+    ElMessage({ type: 'error', message: (res?.message  || 'Send failed') })
   }
 }
 
@@ -255,7 +255,7 @@ const submit = async () => {
 
   const res: any = await useLoginRequest(param);
     
-  if (res?.success) {
+  if (res?.success || res.status === 'success') {
     userStore.setUserInfo(res?.data)
     authStore.setLoginState(true)
     authStore.setLoginToken(res?.data?.token)
@@ -263,7 +263,7 @@ const submit = async () => {
     ElMessage({ type: 'success', message: 'Login successfully' })
     router.push({ path: '/share' })
   } else {
-    ElMessage({ type: 'error', message: res?.message })
+    ElMessage({ type: 'error', message: (res?.message || 'Login failed') })
   }
 }
 

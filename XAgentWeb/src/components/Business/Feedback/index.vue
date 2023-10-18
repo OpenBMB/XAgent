@@ -128,11 +128,11 @@ const evaluate = async (rating: feedbackRating, text: string = '') => {
   })
 
   if (res?.code === 0) {
-    ElMessage({ type: 'success', message: '谢谢反馈' })
+    ElMessage({ type: 'success', message: 'Thank you for your feedback' })
     feedbackRef.value.hide()
     emits('evaluateSuccess', { rating, feedbackMsg: text, messageId: data.value.msgID })
   } else {
-    ElMessage({ type: 'error', message: res?.message })
+    ElMessage({ type: 'error', message: res?.message || 'Something went wrong' })
   }
 }
 const copy = () => {

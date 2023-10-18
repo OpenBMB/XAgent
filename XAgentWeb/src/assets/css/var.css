@@ -13,7 +13,7 @@
   --color-1: #1c2848;
 }
 
-/* font-size padding margin */
+/* 自适应大小 font-size padding margin */
 :root {
   --size-1216: clamp(0.75rem, 0.38vw + 0.66rem, 1rem);
   --size-1224: clamp(0.75rem, 1.13vw + 0.49rem, 1.5rem);

@@ -23,7 +23,7 @@ export interface ChatMsgInfoInf {
   content_html?: string
   childrenIds?: string[]
   subTasks?: Array<SubTaskInter>
-  isLatest?: boolean
+  isLatest?: boolean // 是不是AI最新生成的那条？
 }
 
 export interface HistoryListInf {

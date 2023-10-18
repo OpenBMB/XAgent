@@ -156,7 +156,7 @@ const getVerifyCode = async (type: string) => {
   if (res?.code === 0) {
     ElMessage({ type: 'success', message: 'Verification code sent successfully' })
   } else {
-    ElMessage({ type: 'error', message: res?.message })
+    ElMessage({ type: 'error', message: (res?.message || 'Verification code sent failed') })
   }
 }
 
@@ -190,7 +190,7 @@ const submit = async () => {
       message: 'Please check your email for the verification and back to login page'
     })
   } else {
-    ElMessage({ type: 'error', message: res?.message })
+    ElMessage({ type: 'error', message: (res?.message || 'Sign up failed') })
   }
 }
 </script>

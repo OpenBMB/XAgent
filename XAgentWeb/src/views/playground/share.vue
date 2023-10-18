@@ -63,6 +63,7 @@
 </template>
 
 <script lang="ts" setup>
+import { ElMessage } from "element-plus";
 import { ref } from "vue";
 
 const route = useRoute();
@@ -119,9 +120,11 @@ const getSharedData = async () => {
     page_num: currentPage.value,
   });
 
-  if (res?.success === true) {
+  if (res?.success === true || res?.message === "success") {
     chatMsgInfoStore.setSharedArr(res?.data?.rows || []);
     total.value = res?.data?.total || 0;
+  } else {
+    ElMessage({ type: "error", message: res?.message || "Failed to get data" });
   }
 };
 

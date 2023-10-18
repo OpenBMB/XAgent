@@ -11,6 +11,9 @@ XAgentServer/localstorage
 XAgentServer/logs/
 XAgentServer/prod_server_envs.py
 
+XAgentWeb/node_modules
+XAgentWeb/dist
+
 .DS_Store
 .vscode
 .idea

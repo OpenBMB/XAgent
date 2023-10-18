@@ -132,7 +132,8 @@ XAgent 不仅能处理琐碎任务，还可以在复杂任务中提供宝贵的�
 ## 📊 评测
 我们进行了人类偏好评估，以评估XAgent的性能。我们为评估准备了超过50个现实世界的复杂任务，可以分为5个类别：搜索与报告，编码与开发，数据分析，数学和生活助手。
 
-我们将XAgent的结果与[AutoGPT](https://github.com/Significant-Gravitas/AutoGPT)进行比较，结果显示XAgent完全胜过AutoGPT。您可以在此处[下载]()XAgent的记录链接。
+我们将XAgent的结果与[AutoGPT](https://github.com/Significant-Gravitas/AutoGPT)进行比较，结果显示XAgent完全胜过AutoGPT。
+我们将很快放出XAgent的运行日志。
 ![HumanPrefer](assets/readme/agent_comparison.png)
 我们在人类偏好方面报告了XAgent相对于AutoGPT的显著改进。
 

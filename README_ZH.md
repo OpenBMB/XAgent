@@ -83,6 +83,7 @@ pip install -r requirements.txt
 ```bash
 python run.py --task "put your task here" --model "gpt-4"
 ```
+您可以使用参数`--upload_files`来指定提交给XAgent的文件。
 您的XAgent的本地工作空间在`local_workspace`中，您可以在运行过程中找到XAgent生成的所有文件。
 此外，在`running_records`中，您可以找到所有的中间步骤信息，例如任务状态、LLM的输入输出对、使用的工具等。
 在运行结束后，`ToolServerNode`中的完整`worksapce`也将被打包下载到其中。
@@ -95,7 +96,7 @@ docker compose up
 
 cd ../XAgentWeb
 npm install
-npm run serve
+npm run dev
 ```
 构建XAgent-Server的docker镜像并启动docker容器。
 您将看到XAgent Server在端口`8000`上监听。

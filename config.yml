@@ -1,8 +1,11 @@
 openai_keys:
   gpt-3.5-turbo-16k:
     - api_key: sk-xxxxx
-      organization: org-xxxxx
-      model: gpt-3.5-turbo-16k
+      api_base: https://example.com
+      api_type: azure
+      api_version: 2023-07-01-preview
+      engine: GPT-35-Turbo-16k
+      # you can use any kwargs supported by openai.ChatCompletion here
     - api_key: sk-xxxxx
       organization: org-xxxxxx
       model: gpt-3.5-turbo-16k

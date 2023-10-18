@@ -24,10 +24,11 @@ Notes:
 - Change api timeout for Toolserver in `docker-compose.yml` by altering values after `-t` in `services.ToolServerManager.command` if you encounter timeout error of ToolServer.
 
 ## 🛠️ Build and Setup ToolServer
-All docker image build files are stored in `ToolServer/dockerfiles`, together with the `build.sh` script. 
-You can build them one by one, or build all of them with following command:
+All docker image build files are stored in `ToolServer/dockerfiles`.
+You can build them manually with following command:
 ```bash
-bash ToolServer/build_all.sh
+cd ToolServer
+docker-compose build
 ```
 This will build all the docker images for ToolServerManager, ToolServerMonitor and ToolServerNode.
 

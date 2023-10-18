@@ -24,10 +24,11 @@ ToolServer的配置文件存放在`ToolServer/config/`目录下，你可以修�
 - 如果你遇到ToolServer的超时错误，请在`docker-compose.yml`中修改`services.ToolServerManager.command`中`-t`后面的值以修改ToolServer的超时时间。
 
 ## 🛠️ 编译和启动ToolServer
-所有的docker镜像构建文件都存放在`ToolServer/dockerfiles`目录下，其中`build.sh`脚本用于构建所有的镜像。
-你可以逐个构建镜像，也可以使用如下命令一键构建所有镜像：
+所有的docker镜像构建文件都存放在`ToolServer/dockerfiles`目录下。
+你可以使用如下命令手动构建所有镜像：
 ```bash
-bash ToolServer/build_all.sh
+cd ToolServer
+docker-compose build
 ```
 这将构建ToolServerManager、ToolServerMonitor和ToolServerNode的docker镜像。
 

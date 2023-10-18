@@ -1,5 +1,7 @@
 import uvicorn
 
+from XAgentServer.envs import XAgentServerEnv
+
 if __name__ == "__main__":
-    uvicorn.run(app="app:app", host="0.0.0.0",
-                port=16204, reload=False, workers=8)
+    uvicorn.run(app="app:app", host=XAgentServerEnv.host,
+                port=XAgentServerEnv.port, reload=XAgentServerEnv.reload, workers=XAgentServerEnv.workers)

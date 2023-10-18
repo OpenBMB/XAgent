@@ -1,16 +1,16 @@
-import { defineConfig, UserConfigExport } from 'vite'
 import vue from '@vitejs/plugin-vue'
+import { defineConfig, UserConfigExport } from 'vite'
 
-import banner from 'vite-plugin-banner'
 import AutoImport from 'unplugin-auto-import/vite'
-import Components from 'unplugin-vue-components/vite'
-import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
-import Icons from 'unplugin-icons/vite'
 import IconsResolver from 'unplugin-icons/resolver'
+import Icons from 'unplugin-icons/vite'
+import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
+import Components from 'unplugin-vue-components/vite'
+import banner from 'vite-plugin-banner'
 
-import { createHtmlPlugin } from 'vite-plugin-html'
-import BACKEND_URL from './src/api/backend';
 import { resolve } from 'path'
+import { createHtmlPlugin } from 'vite-plugin-html'
+import BACKEND_URL from './src/api/backend'
 
 function pathResolve(dir: string) {
   // const path = resolve(process.cwd(), '.', dir)
@@ -55,16 +55,16 @@ const config: UserConfigExport = {
     BASE_URL: JSON.stringify(VITE_PUBLIC_PATH),
   },
   server: {
-    proxy: {
-      '/api': BACKEND_URL,
-    },
     // proxy: {
-    //   '/api': {
-    //     target: BACKEND_URL,
-    //     changeOrigin: true,
-    //     rewrite: (path) => path.replace(/^\/api/, ''),
-    //   }
+    //   '/api': BACKEND_URL,
     // },
+    proxy: {
+      '/api': {
+        target: BACKEND_URL,
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, ''),
+      }
+    },
   },
 
   build: {

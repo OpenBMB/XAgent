@@ -137,7 +137,7 @@ const createNewTalk = () => {
     })
     return
   }
-  router.push('/share')
+  router.push('/playground')
 }
 
 const history = ref<{ title: string; convID: string; accountID: number }[]>([])
@@ -277,7 +277,7 @@ const clearHistory = () => {
     //   historyTalkStore.clearHistory()
     //   router.push('/playground')
     // }
-      router.push('/share');
+      router.push('/playground');
     });
   }
 </script>

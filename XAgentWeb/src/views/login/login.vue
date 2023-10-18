@@ -261,7 +261,7 @@ const submit = async () => {
     authStore.setLoginToken(res?.data?.token)
 
     ElMessage({ type: 'success', message: 'Login successfully' })
-    router.push({ path: '/share' })
+    router.push({ path: '/playground' })
   } else {
     ElMessage({ type: 'error', message: (res?.message || 'Login failed') })
   }

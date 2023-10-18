@@ -1,6 +1,4 @@
-import axios from 'axios'
-import { AxiosResponse } from 'axios'
-import { router } from '../router'
+import axios, { AxiosResponse } from 'axios'
 
 type Result<T> = {
   success: boolean
@@ -57,35 +55,35 @@ httpService.interceptors.response.use(
 
 export const useCheckTokenRequest = (): Promise<Result<any>> => {
   const token = useGetLocalCache(STORAGE_TOKEN)
-  return httpService.post('/check', { token })
+  return httpService.post('/api/check', { token })
 }
 
 export const useCheckPhoneRequest = (params: { mobile: string }) => {
-  return httpService.post('/isExist', params)
+  return httpService.post('/api/isExist', params)
 }
 
 
 export const useSignUpRequest = (params: any): Promise<Result<any>> => {
-  return httpService.post('/register', params)
+  return httpService.post('/api/register', params)
 }
 
 export const useSharedConvsRequest = (params: any): Promise<Result<any>> => {
-  return httpService.post('/getSharedInteractions', params)
+  return httpService.post('/api/getSharedInteractions', params)
 }
 
 export const useLoginRequest = (params: { email: string; token: string }) => {
-  return httpService.post('/login', params)
+  return httpService.post('/api/login', params)
 }
 
 export const useRegisterRequest = (params: {
   email: string,
   name: string,
 }) => {
-  return httpService.post('/register', params)
+  return httpService.post('/api/register', params)
 }
 
 export const useLogoutRequest = (): Promise<Result<any>> => {
-  return httpService.get('/logout')
+  return httpService.get('/api/logout')
 }
 
 /**
@@ -151,7 +149,7 @@ export const useApiDetailsRequest = (): Promise<Result<{ balance: number; costAm
 export const useHistoryByIdRequest = (): Promise<Result<{ convInfoList: [] }>> => {
   const userStore = useUserStore()
   const userInfo = userStore.getUserInfo
-  return httpService.post('/getAllInteractors', 
+  return httpService.post('/api/getAllInteractors', 
     { 
       user_id: userInfo?.user_id,
       token: userInfo?.token
@@ -163,7 +161,7 @@ export const useHistoryListRequest = (): Promise<Result<any>> => {
   const userStore = useUserStore()
   const userInfo = userStore.getUserInfo
 
-  return httpService.post('/getUserInteractions', 
+  return httpService.post('/api/getUserInteractions', 
     { 
       user_id: userInfo?.user_id,
       token: userInfo?.token,
@@ -191,7 +189,7 @@ export const useDeleteHistoryRequest = (params: object): Promise<Result<{}>> => 
   const userStore = useUserStore()
   const userInfo = userStore.getUserInfo
 
-  return httpService.post('/deleteInteraction', {
+  return httpService.post('/api/deleteInteraction', {
     user_id: userInfo?.user_id,
     token: userInfo?.token,
     ...params

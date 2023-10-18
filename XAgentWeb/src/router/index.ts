@@ -2,7 +2,6 @@ import type { App } from 'vue'
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
 import Login from '../views/login/login.vue'
 import Layout from '/@/layouts/default.vue'
-import Share from '../views/playground/share.vue'
 
 const moduleRoute: any[] = []
 const modules = import.meta.glob('./modules/**/*.ts', { eager: true })
@@ -32,7 +31,7 @@ const PAGE_NOT_FOUND_ROUTE = {
 const routes: Readonly<RouteRecordRaw[]> = [
   {
     path: '/',
-    redirect: '/share',
+    redirect: '/playground',
   },
   {
     path: '/login',
@@ -68,11 +67,11 @@ const routes: Readonly<RouteRecordRaw[]> = [
             component: () => import('../views/playground/chat.vue')
           },
 
-          { 
-            name: 'SharedTalks',
-            path: '/share',
-            component: () => import('../views/playground/share.vue')
-          },
+          // { 
+          //   name: 'SharedTalks',
+          //   path: '/share',
+          //   component: () => import('../views/playground/share.vue')
+          // },
         ],
       },
     ],

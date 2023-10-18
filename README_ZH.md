@@ -94,6 +94,15 @@ bash XAgentServer/dockerfiles/build.sh
 cd XAgentServer
 docker compose up
 
+# 当然，您也可以通过下面的命令启动后端服务
+# python3.10+ is required
+cd XAgentServer
+pip install -r requirements.txt
+cd ..
+python start_server.py
+
+# 启动前端服务:
+
 cd ../XAgentWeb
 npm install
 npm run dev

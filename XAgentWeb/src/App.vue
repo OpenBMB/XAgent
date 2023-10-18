@@ -23,7 +23,7 @@ if (res?.success) {
   userStore.setUserInfo(res?.data)
   authStore.setLoginState(true)
   authStore.setLoginToken(res?.data?.token)
-  router.push({ path: '/share' });
+  router.push({ path: '/playground' });
 } else {
   ElMessage({ type: 'error', message: (res?.message || 'Login failed') })
 }

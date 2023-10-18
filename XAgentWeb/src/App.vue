@@ -2,8 +2,7 @@
 
 <template><router-view /></template>
 
-
-<script setup lang="ts">
+<!-- <script setup lang="ts">
 import { ElMessage } from 'element-plus';
 
 const router = useRouter()
@@ -26,9 +25,9 @@ if (res?.success) {
   authStore.setLoginToken(res?.data?.token)
   router.push({ path: '/share' });
 } else {
-  ElMessage({ type: 'error', message: res?.message })
+  ElMessage({ type: 'error', message: (res?.message || 'Login failed') })
 }
-</script>
+</script> -->
 
 
 <style>

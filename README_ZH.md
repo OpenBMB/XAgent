@@ -107,8 +107,8 @@ npm install
 npm run dev
 ```
 构建XAgent-Server的docker镜像并启动docker容器。
-您将看到XAgent Server在端口`8000`上监听。
-参考[XAgentServer](XAgentServer/README_ZH.md)获取更多信息。
+您将看到XAgent Server在端口`8090`上监听。
+参考[XAgentServer](XAgentServer/README_zh.md)获取更多信息。
 
 
 <div><a id="Demo"></a></div>

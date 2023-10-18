@@ -37,6 +37,7 @@ from XAgentServer.models.parameter import InteractionParameter
 from XAgentServer.response_body import ResponseBody, WebsocketResponseBody
 from XAgentServer.server import XAgentServer
 from XAgentServer.utils import AutoReplayUtil, ShareUtil
+from fastapi.middleware.cors import CORSMiddleware
 
 
 if not os.path.exists(os.path.join(XAgentServerEnv.base_dir, "logs")):
@@ -142,6 +143,14 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
         content={"status": "failed", "message": exc.errors()}
     )
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=['*'],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 
 def check_user_auth(user_id: str = Form(...),
                     token: str = Form(...)):
@@ -155,7 +164,7 @@ def check_user_auth(user_id: str = Form(...),
     return True
 
 
-@app.post("/register")
+@app.post("/api/register")
 async def register(email: str = Form(...),
                    name: str = Form(...),
                    corporation: str = Form(...),
@@ -194,7 +203,7 @@ async def register(email: str = Form(...),
     return ResponseBody(data=user, success=True, message="Register success, we will send a email to you!")
 
 
-@app.get("/auth")
+@app.get("/api/auth")
 async def auth(user_id: str = Query(...),
                token: str = Query(...)) -> ResponseBody:
     """
@@ -224,7 +233,7 @@ async def auth(user_id: str = Query(...),
     return ResponseBody(data=user.to_dict(), success=True, message="auth success")
 
 
-@app.post("/login")
+@app.post("/api/login")
 async def login(email: str = Form(...),
                 token: str = Form(...)) -> ResponseBody:
     """
@@ -245,7 +254,7 @@ async def login(email: str = Form(...),
     return ResponseBody(data=user.to_dict(), success=True, message="login success")
 
 
-@app.post("/check")
+@app.post("/api/check")
 async def check(token: str = Form(...)) -> ResponseBody:
     """
     
@@ -262,7 +271,7 @@ async def check(token: str = Form(...)) -> ResponseBody:
     return ResponseBody(data=check, success=True, message="token is invalid")
 
 
-@app.post("/upload")
+@app.post("/api/upload")
 async def create_upload_files(files: List[UploadFile] = File(...),
                               user_id: str = Form(...),
                               token: str = Form(...)) -> ResponseBody:
@@ -302,7 +311,7 @@ async def create_upload_files(files: List[UploadFile] = File(...),
                         success=True, message="upload success")
 
 
-@app.post("/getUserInteractions")
+@app.post("/api/getUserInteractions")
 async def get_all_interactions(user_id: str = Form(...),
                                token: str = Form(...),
                                page_size: int = Form(...),
@@ -325,7 +334,7 @@ async def get_all_interactions(user_id: str = Form(...),
     return ResponseBody(data=data, success=True, message="success")
 
 
-@app.post("/getSharedInteractions")
+@app.post("/api/getSharedInteractions")
 async def get_all_interactions(user_id: str = Form(...),
                                token: str = Form(...),
                                page_size: int = Form(...),
@@ -339,7 +348,7 @@ async def get_all_interactions(user_id: str = Form(...),
     return ResponseBody(data=data, success=True, message="success")
 
 
-@app.post("/shareInteraction")
+@app.post("/api/shareInteraction")
 async def share_interaction(user_id: str = Form(...),
                             token: str = Form(...),
                             interaction_id: str = Form(...)) -> ResponseBody:
@@ -359,7 +368,7 @@ async def share_interaction(user_id: str = Form(...),
     return ResponseBody(data=interaction.to_dict(), success=flag, message="success!" if flag else "Failed!")
 
 
-@app.post("/deleteInteraction")
+@app.post("/api/deleteInteraction")
 async def get_all_interactions(user_id: str = Form(...),
                                token: str = Form(...),
                                interaction_id: str = Form(...)) -> ResponseBody:
@@ -382,7 +391,7 @@ async def get_all_interactions(user_id: str = Form(...),
     return ResponseBody(data=data, success=True, message="success")
 
 
-@app.post("/updateInteractionConfig")
+@app.post("/api/updateInteractionConfig")
 async def update_interaction_parameter(user_id: str = Form(...),
                                        token: str = Form(...),
                                        mode: str = Form(...),
@@ -418,7 +427,7 @@ async def update_interaction_parameter(user_id: str = Form(...),
     return ResponseBody(data=update_data, success=True, message="success!")
 
 
-@app.post("/updateInteractionDescription")
+@app.post("/api/updateInteractionDescription")
 async def update_interaction_description(user_id: str = Form(...),
                                          token: str = Form(...),
                                          description: str = Form(...),

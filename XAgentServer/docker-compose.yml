@@ -10,7 +10,7 @@ services:
       context: ..
       dockerfile: ./XAgentServer/dockerfiles/Dockerfile
     ports:
-      - "8000:8000"
+      - "8090:8090"
     networks:
       - default
     container_name: XAgent-Server  

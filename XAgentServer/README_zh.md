@@ -20,7 +20,7 @@ docker-compose build
 cd XAgentServer
 docker-compose up
 ```
-这将启动一个XAgent-Server实例，监听本机`16204`端口，配置信息在`XAgentServer/docker-compose.yml`文件中。
+这将启动一个XAgent-Server实例，监听本机`8090`端口，配置信息在`XAgentServer/docker-compose.yml`文件中。
 
 出现如下输出，就是镜像编译与启动成功了：
 

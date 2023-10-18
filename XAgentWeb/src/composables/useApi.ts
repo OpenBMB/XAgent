@@ -9,7 +9,7 @@ type Result<T> = {
 
 const httpService = axios.create({
   // baseURL: import.meta.env.BASE_URL,
-  baseURL: '',
+  baseURL: 'http://localhost:8090',
   headers: {
     'Content-Type': 'application/x-www-form-urlencoded',
     // 'Content-Type': 'application/json',

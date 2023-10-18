@@ -53,7 +53,7 @@
               placeholder="Enter your email token please"
               autocomplete="off"
               @blur="focusType = ''"
-              @keydown.enter="submit"
+              @keydown.enter="throttledSubmit"
             />
               <p 
                 class="verify-code"
@@ -63,9 +63,13 @@
               </p>
           </div>
 
-          <div class="main-btn flex-row flex-center" @click="submit">
+          <el-button 
+            class="main-btn flex-row flex-center"
+            @click="throttledSubmit"
+            :loading="isSubmitLoading"
+            >
             Login
-          </div>
+          </el-button>
 
           <div 
               v-show="false"
@@ -111,6 +115,7 @@
 import { ElMessage } from 'element-plus';
 import { reactive, ref } from 'vue';
 import ApplyForm from './component/ApplyForm.vue';
+import throttle from '/@/utils/throttle';
 
 const router = useRouter()
 const userStore = useUserStore()
@@ -120,6 +125,8 @@ interface LoginFormInf {
   email: string
   token: string
 }
+
+const isSubmitLoading = ref(false)
 
 const DEFAULT_ACCOUNT = 'admin'
 const DEFAULT_PSWD = 'xagent-admin'
@@ -226,8 +233,13 @@ const isShowForm = ref(false)
 const showApplyForm = () => {
   isShowForm.value = true
 }
+
+
 const submit = async () => {
+
   if (!isExistPhone.value) return
+
+  isSubmitLoading.value = true
 
   loginFormStatus.email.isRequired = loginForm.email === ''
   loginFormStatus.code.isRequired = loginForm.token === ''
@@ -254,8 +266,9 @@ const submit = async () => {
   }
 
   const res: any = await useLoginRequest(param);
+  isSubmitLoading.value = false
     
-  if (res?.success || res.status === 'success') {
+  if (res?.success || res?.message === 'success') {
     userStore.setUserInfo(res?.data)
     authStore.setLoginState(true)
     authStore.setLoginToken(res?.data?.token)
@@ -266,6 +279,10 @@ const submit = async () => {
     ElMessage({ type: 'error', message: (res?.message || 'Login failed') })
   }
 }
+
+// const throttledSubmit = throttle(submit, 4000)
+const throttledSubmit = submit
+
 
 const backHome = () => {
   router.push({ path: '/' })

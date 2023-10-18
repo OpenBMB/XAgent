@@ -15,6 +15,7 @@
     "typeRoots": ["./node_modules/@types/", "./types"],
     "skipLibCheck": true,
     "noEmit": true,
+    "types": ["vite/client"],
     "paths": {
       "/@/*": ["src/*"],
       "/#/*": ["types/*"]

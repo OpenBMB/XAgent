@@ -88,9 +88,13 @@
         </div>
       </div>
       <div class="form-footer flex-column">
-        <div class="submit-btn flex-row flex-center" @click="submit">
+        <el-button 
+            class="submit-btn flex-row flex-center"
+            :disabled="formState.emailState || isSignUpComplete"
+            :loading="isSignUpLoading"
+            @click="submit">
           Submit Application
-        </div>
+        </el-button>
         <div class="tip" v-show="false">
           Your Applying for using service constitutes your acceptance of the 
            <a target="_blank" href="/terms">
@@ -125,6 +129,7 @@ const goBack = () => {
 }
 
 const focusType = ref('name')
+const isSignUpLoading = ref(false)
 const formState = reactive({ emailState: false, mobileState: false })
 
 const codeTime = reactive({ smsCode: 0, emailCode: 0 })
@@ -170,6 +175,7 @@ const checkEmail = () => {
 
 const isSubmit = ref(false)
 const isSignUp = ref(false)
+const isSignUpComplete = ref(false)
 
 const submit = async () => {
 
@@ -179,12 +185,17 @@ const submit = async () => {
 
   if (!checkResult) return
 
+  isSignUpLoading.value = true
+
   if (formState.emailState) return
   const res = await useSignUpRequest(form)
+
+  isSignUpLoading.value = false
 
   if (res?.success === true) {
     isSignUp.value = true
     emits('signupSuccess', isSignUp.value)
+    isSignUpComplete.value = true
     ElMessage({ 
       type: 'success', 
       message: 'Please check your email for the verification and back to login page'

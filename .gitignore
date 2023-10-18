@@ -28,3 +28,5 @@ local_workspace/**
 !local_workspace/readme.md
 sync.py
 assets/private.yml
+
+XAgentWeb/src/api/backend.ts

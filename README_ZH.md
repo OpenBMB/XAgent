@@ -14,7 +14,7 @@
 </div>
 <p align="center">
   <a href="#Quickstart">指南</a> •
-  <a href="https://x-agent.net/">案例</a> •
+  <a href="https://www.youtube.com/watch?v=QGkpd-tsFPA">案例</a> •
   <a href="https://blog.x-agent.net/blog/xagent/">博客</a> •
   <a href="#Citation">引用</a>
 </p>

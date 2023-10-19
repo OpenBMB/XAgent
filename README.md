@@ -76,6 +76,7 @@ pip install -r requirements.txt
 ```
 
 - Configure XAgent
+
 You should configure XAgent in `config.yml` before running it. 
 At least one OpenAI key is provided in `config.yml`, which is used to access OpenAI API.
 We highly recommend using `gpt-4-32k` to run XAgent, `gpt-4` is also OK for most simple tasks.

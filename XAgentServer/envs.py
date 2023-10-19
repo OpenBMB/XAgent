@@ -24,7 +24,7 @@ class XAgentServerEnv:
     # if you want to connect more than one XAgentServer, you can set check_running to True, 
     # in which case the XAgentServer will check whether the interaction is running in other XAgentServer
     check_running: bool = False
-    host = "localhost"
+    host = "0.0.0.0"
     port = 8090
     debug = True
     reload = True

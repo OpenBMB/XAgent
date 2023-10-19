@@ -271,7 +271,7 @@ async def check(token: str = Form(...)) -> ResponseBody:
     return ResponseBody(data=check, success=True, message="token is invalid")
 
 
-@app.post("/api/upload")
+@app.post("/upload")
 async def create_upload_files(files: List[UploadFile] = File(...),
                               user_id: str = Form(...),
                               token: str = Form(...)) -> ResponseBody:

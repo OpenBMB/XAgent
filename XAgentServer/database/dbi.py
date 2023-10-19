@@ -1,9 +1,10 @@
+import traceback
 from datetime import datetime
 
+from sqlalchemy.orm import Session
 from sqlalchemy.sql import func
 
 from XAgentServer.database import InteractionBaseInterface, UserBaseInterface
-from XAgentServer.database.connect import DBConnection
 from XAgentServer.database.models import (Interaction, Parameter,
                                           SharedInteraction, User)
 from XAgentServer.envs import XAgentServerEnv
@@ -20,8 +21,8 @@ class UserDBInterface(UserBaseInterface):
         self.db_url = envs.DB.db_url
 
 
-    def register_db(self, connection: DBConnection):
-        self.db = connection.get_db()
+    def register_db(self, db: Session):
+        self.db = db
 
     def init(self):
         raise NotImplementedError
@@ -81,16 +82,25 @@ class UserDBInterface(UserBaseInterface):
 
 
     def add_user(self, user_dict: dict):
-        self.db.add(User(**user_dict))
-        self.db.commit()
+        try:
+            self.db.add(User(**user_dict))
+            self.db.commit()
+        except Exception as e:
+            self.db.rollback()
+            print(traceback.print_exec())
 
     def update_user(self, user: XAgentUser):
         db_user = self.db.query(User).filter(User.user_id == user.user_id, User.deleted == False).first()
-        db_user.available = user.available
-        db_user.email = user.email
-        db_user.name = user.name
-        db_user.token = user.token
-        self.db.commit()
+        try:
+            db_user.available = user.available
+            db_user.email = user.email
+            db_user.name = user.name
+            db_user.token = user.token
+            db_user.update_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            self.db.commit()
+        except Exception as e:
+            self.db.rollback()
+            print(traceback.print_exec())
 
 
 class InteractionDBInterface(InteractionBaseInterface):
@@ -101,10 +111,13 @@ class InteractionDBInterface(InteractionBaseInterface):
         self.db_url = envs.DB.db_url
 
 
-    def register_db(self, connection: DBConnection):
-        self.db = connection.get_db()
+    def register_db(self, db: Session):
+        self.db = db
 
     def init(self):
+        """
+        not use
+        """
         raise NotImplementedError
     
 
@@ -120,16 +133,34 @@ class InteractionDBInterface(InteractionBaseInterface):
         return InteractionBase.from_db(interaction) if interaction else None
 
     def create_interaction(self, base: InteractionBase) -> InteractionBase:
-        self.db.add(Interaction(**base.to_dict()))
-        self.db.commit()
+        """
+        创建一个对话
+        """
+        try:
+            self.db.add(Interaction(**base.to_dict()))
+            self.db.commit()
+        except Exception as e:
+            self.db.rollback()
+            print(traceback.print_exec())
         return None
     
     def add_parameter(self, parameter: InteractionParameter):
-        self.db.add(Parameter(**parameter.to_dict()))
-        self.db.commit()
+        """
+        创建一个对话
+        """
+        try:
+            self.db.add(Parameter(**parameter.to_dict()))
+            self.db.commit()
+        except Exception as e:
+            self.db.rollback()
+            print(traceback.print_exec())
+
         return None
 
     def get_interaction_by_user_id(self, user_id: str, page_size: int = 20, page_num: int = 1) -> list[dict]:
+        """
+        查看对话历史
+        """
         total = self.db.query(func.count(Interaction.id)).filter(Interaction.user_id == user_id, Interaction.is_deleted == False).scalar()
         interaction_list = self.db.query(Interaction).filter(Interaction.user_id == user_id, Interaction.is_deleted == False).limit(page_size).offset((page_num - 1) * page_size).all()
         data = []
@@ -145,6 +176,9 @@ class InteractionDBInterface(InteractionBaseInterface):
     
 
     def get_shared_interactions(self, page_size: int = 20, page_num: int = 1) -> list[dict]:
+        """
+        获取社区分享的数据
+        """
         total = self.db.query(func.count(SharedInteraction.id)).filter(SharedInteraction.is_deleted == False).scalar()
         interaction_list = self.db.query(SharedInteraction).filter(SharedInteraction.is_deleted == False).order_by(SharedInteraction.star.desc()).limit(page_size).offset((page_num - 1) * page_size).all()
         data = []
@@ -169,31 +203,43 @@ class InteractionDBInterface(InteractionBaseInterface):
     
 
     def update_interaction(self, base_data: dict):
-        if "interaction_id" not in base_data:
-            raise ValueError("interaction_id is required")
-        interaction = self.db.query(Interaction).filter(Interaction.interaction_id == base_data["interaction_id"]).first()
-        if interaction is None:
-            raise ValueError("interaction is not exist")
-        for k, v in base_data.items():
-            if k == "interaction_id":
-                continue
-            setattr(interaction, k, v)
-        interaction.update_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        self.db.commit()
+        try:
+            if "interaction_id" not in base_data:
+                raise ValueError("interaction_id is required")
+            interaction = self.db.query(Interaction).filter(Interaction.interaction_id == base_data["interaction_id"]).first()
+            if interaction is None:
+                raise ValueError("interaction is not exist")
+            for k, v in base_data.items():
+                if k == "interaction_id":
+                    continue
+                setattr(interaction, k, v)
+            interaction.update_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            self.db.commit()
+        except Exception as e:
+            self.db.rollback()
+            print(traceback.print_exec())
 
     def update_interaction_status(self, interaction_id: str, status: str, message: str, current_step: int):
-        db_interaction = self.db.query(Interaction).filter(Interaction.interaction_id == interaction_id).first()
-        db_interaction.status = status
-        db_interaction.message = message
-        db_interaction.current_step = current_step
-        db_interaction.update_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        self.db.commit()
+        try:
+            db_interaction = self.db.query(Interaction).filter(Interaction.interaction_id == interaction_id).first()
+            db_interaction.status = status
+            db_interaction.message = message
+            db_interaction.current_step = current_step
+            db_interaction.update_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            self.db.commit()
+        except Exception as e:
+            self.db.rollback()
+            print(traceback.print_exec())
 
     def update_interaction_parameter(self, interaction_id: str, parameter: InteractionParameter):
-        db_parameter = self.db.query(Parameter).filter(Parameter.interaction_id == interaction_id, Parameter.parameter_id == parameter.parameter_id).first()
-        if db_parameter is None:
-            self.db.add(Parameter(**parameter.to_dict()))
-        self.db.commit()
+        try:
+            db_parameter = self.db.query(Parameter).filter(Parameter.interaction_id == interaction_id, Parameter.parameter_id == parameter.parameter_id).first()
+            if db_parameter is None:
+                self.db.add(Parameter(**parameter.to_dict()))
+            self.db.commit()
+        except Exception as e:
+            self.db.rollback()
+            print(traceback.print_exec())
 
     def is_running(self, user_id: str):
         interaction = self.db.query(Interaction).filter(Interaction.user_id == user_id, Interaction.status.in_(("running", "waiting"))).first()
@@ -204,12 +250,20 @@ class InteractionDBInterface(InteractionBaseInterface):
         return [InteractionParameter.from_db(param) for param in parameters]
     
     def delete_interaction(self, interaction_id: str):
-        interaction = self.db.query(Interaction).filter(Interaction.interaction_id == interaction_id).first()
-        if interaction is None:
-            raise ValueError("interaction is not exist")
-        interaction.is_deleted = True
-        self.db.commit()
+        try:
+            interaction = self.db.query(Interaction).filter(Interaction.interaction_id == interaction_id).first()
+            if interaction is None:
+                raise ValueError("interaction is not exist")
+            interaction.is_deleted = True
+            self.db.commit()
+        except Exception as e:
+            self.db.rollback()
+            print(traceback.print_exec())
 
     def add_share(self, shared: SharedInteractionBase):
-        self.db.add(SharedInteraction(**shared.to_dict()))
-        self.db.commit()
+        try:
+            self.db.add(SharedInteraction(**shared.to_dict()))
+            self.db.commit()
+        except Exception as e:
+            self.db.rollback()
+            print(traceback.print_exec())

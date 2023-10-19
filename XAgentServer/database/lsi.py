@@ -3,6 +3,8 @@ import json
 import os
 from datetime import datetime
 
+from sqlalchemy.orm import Session
+
 from XAgentServer.database import InteractionBaseInterface, UserBaseInterface
 from XAgentServer.envs import XAgentServerEnv
 from XAgentServer.interaction import InteractionParameter
@@ -23,6 +25,9 @@ class UserLocalStorageInterface(UserBaseInterface):
         self.envs = envs
         self.user_list_cache = []
         self.init()
+
+    def register_db(self, db: Session):
+        self.db = db
 
     def init(self):
         if not os.path.exists(os.path.dirname(self.db_url)):
@@ -147,6 +152,10 @@ class InteractionLocalStorageInterface(InteractionBaseInterface):
         self.interaction_list_cache = []
         self.interaction_parameter_cache = []
         self.init()
+
+    def register_db(self, db: Session):
+        self.db = db
+    
 
     def init(self):
         if not os.path.exists(os.path.dirname(self.db_url)):
@@ -310,5 +319,9 @@ class InteractionLocalStorageInterface(InteractionBaseInterface):
                       indent=2, ensure_ascii=False)
 
     def get_shared_interaction(self, interaction_id: str) -> InteractionBase | None:
-        raise NotImplementedError
+        interaction_list = self.get_interaction_list()
+        for interaction in interaction_list:
+            if interaction["interaction_id"] == interaction_id:
+                return InteractionBase(**interaction)
+        return None
     

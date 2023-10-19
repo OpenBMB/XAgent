@@ -1,5 +1,7 @@
 from typing import Union
 
+from sqlalchemy.orm import Session
+
 from XAgentServer.envs import XAgentServerEnv
 from XAgentServer.models.interaction import InteractionBase
 from XAgentServer.models.parameter import InteractionParameter
@@ -11,6 +13,9 @@ class UserBaseInterface:
     """
     def __init__(self, envs: XAgentServerEnv) -> None:
         pass
+
+    def register_db(self, db: Session):
+        self.db = db
 
     def init(self):
         raise NotImplementedError
@@ -48,6 +53,9 @@ class UserBaseInterface:
 class InteractionBaseInterface:
     def __init__(self, envs: XAgentServerEnv) -> None:
         pass
+
+    def register_db(self, db: Session):
+        self.db = db
 
     def init(self):
         raise NotImplementedError

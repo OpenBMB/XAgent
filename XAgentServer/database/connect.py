@@ -15,18 +15,11 @@ class DBConnection:
 
         
         engine = create_engine(
-            SQLALCHEMY_DATABASE_URL, pool_size=30, max_overflow=10, pool_timeout=30, pool_recycle=-1
+            SQLALCHEMY_DATABASE_URL, pool_size=10, max_overflow=2, pool_timeout=30, pool_recycle=-1
         )
 
         # Base.metadata.create_all(bind=engine)
         
         SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
-        self.db = SessionLocal()
-
-
-    def get_db(self):
-        return self.db
-    
-    def close_db(self):
-        self.db.close()
+        self.db_session = SessionLocal()

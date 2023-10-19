@@ -1,16 +1,17 @@
 from __future__ import annotations
+
 import asyncio
 import os
 import threading
-from fastapi import WebSocket, WebSocketDisconnect
 from typing import Dict, List
 
-from fastapi import WebSocket, status
-from XAgentIO.exception import XAgentIOWebSocketReceiveError, XAgentIOWebSocketSendError
-from XAgentServer.envs import XAgentServerEnv
-from XAgentServer.response_body import WebsocketResponseBody
+from fastapi import WebSocket, WebSocketDisconnect, status
 
+from XAgentIO.exception import (XAgentIOWebSocketReceiveError,
+                                XAgentIOWebSocketSendError)
+from XAgentServer.envs import XAgentServerEnv
 from XAgentServer.loggers.logs import Logger
+from XAgentServer.response_body import WebsocketResponseBody
 
 
 class Singleton(type):
@@ -49,24 +50,6 @@ class WebSocketConnectionManager(metaclass=Singleton):
                 return connection[websocket_id]
         return None
     
-    async def send(self, websocket_id: str, data: str):
-        websocket = self.get_connection(websocket_id)
-        if websocket is None:
-            self.logger.error(f"websocket {websocket_id} is not connected. Send failed.")
-            raise XAgentIOWebSocketSendError
-        await websocket.send_text(data)
-
-    async def receive(self, websocket_id: str):
-        websocket = self.get_connection(websocket_id)
-        if websocket is None:
-            self.logger.error(f"websocket {websocket_id} is not connected. Receive failed.")
-            raise XAgentIOWebSocketReceiveError(
-                'WebSocket is not connected. Receive failed.'
-            )
-        
-        data = await websocket.receive_json()
-        self.logger.info(f"Received data from websocket {websocket_id}")
-        return data
 
     async def broadcast_pong(self):
         while True:
@@ -75,7 +58,12 @@ class WebSocketConnectionManager(metaclass=Singleton):
             
             for connection in self.active_connections:
                 for websocket_id, websocket in connection.items():
-                    await websocket.send_text(WebsocketResponseBody(status="pong", data={"type": "pong"}, message="pong").to_text())
+                    try:
+                        await websocket.send_text(WebsocketResponseBody(status="pong", data={"type": "pong"}, message="pong").to_text())
+                    except Exception as e:
+                        self.logger.error(f"websocket {websocket_id} is disconnected")
+                        self.active_connections.remove(connection)
+                        continue
             await asyncio.sleep(20)
             
 

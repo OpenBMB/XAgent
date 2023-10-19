@@ -526,8 +526,11 @@ class MainServer(WebSocketEndpoint):
         self.interactionInterface = interactionInterface
 
     def register_db(self):
-        self.db = connection.db_session
-        logger.info("init websocket db session")
+        if connection:
+            self.db = connection.db_session
+            logger.info("init websocket db session")
+        else:
+            self.db = None
         self.userInterface.register_db(self.db)
         self.interactionInterface.register_db(self.db)
 
@@ -708,8 +711,11 @@ class RecorderServer(WebSocketEndpoint):
         self.interactionInterface = interactionInterface
 
     def register_db(self):
-        self.db = connection.db_session
-        logger.info("init websocket db session")
+        if connection:
+            self.db = connection.db_session
+            logger.info("init websocket db session")
+        else:
+            self.db = None
         self.userInterface.register_db(self.db)
         self.interactionInterface.register_db(self.db)
 
@@ -850,8 +856,11 @@ class ReplayServer(WebSocketEndpoint):
         self.interactionInterface = interactionInterface
 
     def register_db(self):
-        self.db = connection.db_session
-        logger.info("init websocket db session")
+        if connection:
+            self.db = connection.db_session
+            logger.info("init websocket db session")
+        else:
+            self.db = None
         self.userInterface.register_db(self.db)
         self.interactionInterface.register_db(self.db)
 
@@ -931,8 +940,11 @@ class SharedServer(WebSocketEndpoint):
         self.interactionInterface = interactionInterface
 
     def register_db(self):
-        self.db = connection.db_session
-        logger.info("init websocket db session")
+        if connection:
+            self.db = connection.db_session
+            logger.info("init websocket db session")
+        else:
+            self.db = None
         self.userInterface.register_db(self.db)
         self.interactionInterface.register_db(self.db)
 

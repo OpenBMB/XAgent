@@ -1,6 +1,8 @@
 <div align= "center">
-    <h1> <img src="assets/readme/xagent_logo.png" height=40 align="texttop">XAgent</h1>
+    <h1> <img src="https://github.com/OpenBMB/XAgent/assets/98798977/924c8766-296a-4298-9f86-a997ad0b4577" height=40 align="texttop">&nbsp; XAgent</h1>
 </div>
+
+
 
 <div align="center">
 

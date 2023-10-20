@@ -1,7 +1,7 @@
 FROM node:lts-alpine AS XAgentWeb
 EXPOSE 5173
 WORKDIR /app
-COPY ./XAgentWeb/package.json ./XAgentWeb/package-lock.json ./
+COPY ./XAgentWeb/package.json ./
 RUN npm config set registry https://registry.npmmirror.com/ && npm install
 COPY ./XAgentWeb .
 RUN npm run build

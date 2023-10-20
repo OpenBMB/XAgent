@@ -46,7 +46,7 @@ if __name__ == '__main__':
     if args.quiet:
         original_stdout = sys.stdout
         from XAgent.running_recorder import recorder
-        sys.stdout = open(os.path.join(recorder.record_root_dir,"command_line.ansi"),"w")
+        sys.stdout = open(os.path.join(recorder.record_root_dir,"command_line.ansi"),"w",encoding="utf-8")
     cmd.start(
         args.task,
         role="Assistant",

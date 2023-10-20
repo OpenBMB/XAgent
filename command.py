@@ -181,7 +181,7 @@ if __name__ == "__main__":
         if len(sys.argv) >= 3:
             original_stdout = sys.stdout
             from XAgent.running_recorder import recorder
-            sys.stdout = open(os.path.join(recorder.record_root_dir,"command_line.ansi"),"w")
+            sys.stdout = open(os.path.join(recorder.record_root_dir,"command_line.ansi"),"w",encoding="utf-8")
             
         cmd.start(
             sys.argv[1],

@@ -31,7 +31,7 @@ def dynamic_json_fixs(args,function_schema,messages:list=[],error_message:str=No
                 '--- Notice ---',
                 '- You need to carefully check the json string and fix the errors or adding missing value in it.',
                 '- Do not give your own opinion or imaging new info or delete exisiting info!', 
-                '- Make sure the new function call does not contains infomation about this fix task!',
+                '- Make sure the new function call does not contains information about this fix task!',
                 '--- Broken Json String ---',
                 args,
                 'Start!'

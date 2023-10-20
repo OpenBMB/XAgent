@@ -34,7 +34,7 @@ class UserLocalStorageInterface(UserBaseInterface):
             os.makedirs(os.path.dirname(self.db_url))
             
         if not os.path.exists(self.db_url):
-            with open(self.db_url, "w") as f:
+            with open(self.db_url, "w", encoding="utf-8") as f:
                 if self.envs.default_login:
                     json.dump([{
                         "user_id": "admin",
@@ -122,7 +122,7 @@ class UserLocalStorageInterface(UserBaseInterface):
 
     def add_user(self, user_dict: dict):
         self.user_list_cache.append(user_dict)
-        with open(self.db_url, "w") as f:
+        with open(self.db_url, "w", encoding="utf-8") as f:
             json.dump(self.user_list_cache, f, indent=2, ensure_ascii=False)
 
     def update_user(self, user: XAgentUser):
@@ -130,7 +130,7 @@ class UserLocalStorageInterface(UserBaseInterface):
             if user.user_id == user_dict["user_id"]:
                 user_dict["available"] = user.available
 
-        with open(self.db_url, "w") as f:
+        with open(self.db_url, "w", encoding="utf-8") as f:
             json.dump(self.user_list_cache, f, indent=2, ensure_ascii=False)
 
 
@@ -162,14 +162,14 @@ class InteractionLocalStorageInterface(InteractionBaseInterface):
             os.makedirs(os.path.dirname(self.db_url))
 
         if not os.path.exists(self.db_url):
-            with open(self.db_url, "w") as f:
+            with open(self.db_url, "w", encoding="utf-8") as f:
                 json.dump([], f, indent=2, ensure_ascii=False)
 
         if not os.path.exists(os.path.dirname(self.parameter_url)):
             os.makedirs(os.path.dirname(self.parameter_url))
 
         if not os.path.exists(self.parameter_url):
-            with open(self.parameter_url, "w") as f:
+            with open(self.parameter_url, "w", encoding="utf-8") as f:
                 json.dump({}, f, indent=2, ensure_ascii=False)
 
         with open(self.db_url, "r", encoding="utf-8") as f:
@@ -195,7 +195,7 @@ class InteractionLocalStorageInterface(InteractionBaseInterface):
 
     def create_interaction(self, base: InteractionBase):
         self.interaction_list_cache.append(base.to_dict())
-        with open(self.db_url, "w") as f:
+        with open(self.db_url, "w", encoding="utf-8") as f:
             json.dump(self.interaction_list_cache, f,
                       indent=2, ensure_ascii=False)
 
@@ -211,7 +211,7 @@ class InteractionLocalStorageInterface(InteractionBaseInterface):
                 self.interaction_parameter_cache[parameter.interaction_id].append(
                     parameter.to_dict())
 
-            with open(self.parameter_url, "w") as f:
+            with open(self.parameter_url, "w", encoding="utf-8") as f:
                 json.dump(self.interaction_parameter_cache,
                           f, indent=2, ensure_ascii=False)
                 
@@ -268,7 +268,7 @@ class InteractionLocalStorageInterface(InteractionBaseInterface):
                     self.interaction_list_cache[i][k] = v
                 break
 
-        with open(self.db_url, "w") as f:
+        with open(self.db_url, "w", encoding="utf-8") as f:
             json.dump(self.interaction_list_cache, f,
                       indent=2, ensure_ascii=False)
 
@@ -283,7 +283,7 @@ class InteractionLocalStorageInterface(InteractionBaseInterface):
                     "%Y-%m-%d %H:%M:%S")
                 break
 
-        with open(self.db_url, "w") as f:
+        with open(self.db_url, "w", encoding="utf-8") as f:
             json.dump(self.interaction_list_cache, f,
                       indent=2, ensure_ascii=False)
 
@@ -296,7 +296,7 @@ class InteractionLocalStorageInterface(InteractionBaseInterface):
             self.interaction_parameter_cache[interaction_id].append(
                 parameter.to_dict())
 
-        with open(self.parameter_url, "w") as f:
+        with open(self.parameter_url, "w", encoding="utf-8") as f:
             json.dump(self.interaction_parameter_cache,
                       f, indent=2, ensure_ascii=False)
 
@@ -314,7 +314,7 @@ class InteractionLocalStorageInterface(InteractionBaseInterface):
                 self.interaction_list_cache[i]["is_deleted"] = True
                 break
 
-        with open(self.db_url, "w") as f:
+        with open(self.db_url, "w", encoding="utf-8") as f:
             json.dump(self.interaction_list_cache, f,
                       indent=2, ensure_ascii=False)
 

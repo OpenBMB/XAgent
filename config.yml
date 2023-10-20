@@ -31,14 +31,14 @@ default_completion_kwargs:
 
 enable_summary: true
 summary:
-  single_action_max_length: 8192
-  max_return_length: 18432
+  single_action_max_length: 2048
+  max_return_length: 12384
 
 use_selfhost_toolserver: true
 selfhost_toolserver_url: http://localhost:8080
 
 max_retry_times: 3
-max_subtask_chain_length: 20
+max_subtask_chain_length: 15
 max_plan_refine_chain_length: 3
 max_plan_tree_depth: 3
 max_plan_tree_width: 5

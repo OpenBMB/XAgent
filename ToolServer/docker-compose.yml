@@ -16,8 +16,6 @@ services:
      DB_USERNAME: ${DB_USERNAME}
      DB_PASSWORD: ${DB_PASSWORD}
      DB_COLLECTION: ${DB_COLLECTION}
-    networks:
-      - tool-server-network
     depends_on:
       - db
     command: ["--workers","8","-t","600"]
@@ -27,6 +25,8 @@ services:
     build:
       context: .
       dockerfile: ./dockerfiles/ToolServerNode/Dockerfile
+    entrypoint: /bin/sh -c 'echo "Build complete. Exiting..." && exit 0'
+    command: echo "Build complete. Exiting..."
 
   ToolServerMonitor:
     image: tool-server-monitor:0.1
@@ -41,8 +41,6 @@ services:
      DB_USERNAME: ${DB_USERNAME}
      DB_PASSWORD: ${DB_PASSWORD}
      DB_COLLECTION: ${DB_COLLECTION}
-    networks:
-      - tool-server-network
     depends_on:
       - db
 
@@ -54,8 +52,6 @@ services:
     environment:
      MONGO_INITDB_ROOT_USERNAME: ${DB_USERNAME}
      MONGO_INITDB_ROOT_PASSWORD: ${DB_PASSWORD}
-    networks:
-      - tool-server-network
     logging:
       driver: "none"
 
@@ -63,6 +59,6 @@ volumes:
   xagentmongodb:
 
 networks:
-  tool-server-network:
+  default:
     name: tool-server-network
     driver: bridge

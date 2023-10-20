@@ -61,6 +61,6 @@ functions:
           description: "Which subtask do you want to operate. This must be a inter split by '.', like '1.2' '2.3.3' or '4'. For operation 'split', make sure the target is a leaf node and future node. For operation 'add' and 'delete', make sure the target subtask is not fully processed yet."
         subtasks:
           type: array
-          description: "Max 2 items. Array of new subtasks. Useless for operation 'delete'. Make sure do not exceed the max width of the plan tree."
+          description: "Don't add or splite task into subtasks that have been sovled. Max 2 items. Array of new subtasks. Useless for operation 'delete'. Make sure do not exceed the max width of the plan tree."
           items: *task_item
       required: ["thought", "operation", "target_subtask_id", "subtasks"]

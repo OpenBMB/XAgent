@@ -14,7 +14,7 @@ from XAgent.data_structure.plan import Plan
 from XAgent.ai_functions import  function_manager
 from XAgent.running_recorder import recorder
 from XAgent.tool_call_handle import toolserver_interface
-from XAgent.agent.summarize import summarize_plan
+from XAgent.agent.summarize import summarize_plan,clip_text
 from XAgent.config import CONFIG
 def plan_function_output_parser(function_output_item: dict) -> Plan:
     subtask_node = TaskSaveItem()
@@ -165,7 +165,8 @@ class PlanAgent():
         except:
             refine_node_message = ""
         workspace_files = str(toolserver_interface.execute_command_client("FileSystemEnv_print_filesys_struture", {"return_root":True}))
-        
+        workspace_files,length = clip_text(workspace_files,1000,clip_end=True)
+                
         while modify_steps < max_step:
 
             logger.typewriter_log(
@@ -199,7 +200,7 @@ class PlanAgent():
                             "max_step": max_step,
                             "modify_steps": modify_steps,
                             "max_plan_tree_depth": self.config.max_plan_tree_depth,
-                            "workspace_files": workspace_files[:1000],
+                            "workspace_files": workspace_files,
                             "refine_node_message":refine_node_message,
                         }
                     }, 
@@ -368,7 +369,10 @@ class PlanAgent():
         former_subtask_id_list = former_subtask.get_subtask_id_list()
         now_dealing_task_id_list = now_dealing_task.get_subtask_id_list()
         
-        if int(former_subtask_id_list[-1]) + len(function_input["subtasks"]) > self.config.max_plan_tree_width:
+        if former_subtask.get_depth() <= 1:
+            return json.dumps({"error": f"You are not allowed to add a subtask at root level. Nothing happended",}), PlanOperationStatusCode.TARGET_SUBTASK_NOT_FOUND
+        
+        if len(former_subtask.father.children) + len(function_input["subtasks"]) > self.config.max_plan_tree_width: # fixs bugs here: the length calculation is incorrect
             return json.dumps({"error": f"The plan tree has a max width of {self.config.max_plan_tree_width}. '{former_subtask.data.name}' already has a width of {len(former_subtask.children)}. Nothing happended"}), PlanOperationStatusCode.OTHER_ERROR
             
         for i in range(min(len(former_subtask_id_list), len(now_dealing_task_id_list))):

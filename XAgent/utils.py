@@ -15,9 +15,11 @@ encoding = tiktoken.encoding_for_model(CONFIG.default_completion_kwargs['model']
 def get_token_nums(text:str)->int:
     return len(encoding.encode(text))
 
-def clip_text(text:str,max_tokens:int=None,clip_end=True)->str|int:
+def clip_text(text:str,max_tokens:int=None,clip_end=False)->str|int:
     encoded = encoding.encode(text)
     decoded = encoding.decode(encoded[:max_tokens] if clip_end else encoded[-max_tokens:])
+    if len(decoded) != len(text):
+        decoded = decoded + '`wrapped`' if clip_end else '`wrapped`' + decoded
     return decoded, len(encoded)
 
 @unique

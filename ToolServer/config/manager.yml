@@ -9,11 +9,20 @@ builtin_monitor: false
 
 node:
   creation_wait_seconds: 30
-  image: "tool-server-node:0.2"
-  network: "tool-server-network"
   idling_close_minutes: 30
   health_check: true
-  privileged: true
+  creation_kwargs:
+    image: "tool-server-node:0.2"
+    network: "tool-server-network"
+    privileged: true
+    detach: true
+  device_requests:
+  #   - driver: 
+  #     count: 1
+  #     capabilities:
+  #       -
+  #         - gpu
+
   
 redirect_to_node_path:
   post:

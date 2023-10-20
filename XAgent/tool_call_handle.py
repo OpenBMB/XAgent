@@ -304,9 +304,17 @@ class FunctionHandler():
     def get_functions(self, config):
         output = toolserver_interface.get_available_tools()
 
-        available_tools = output['available_tools']
-        openai_function_jsons = output['tools_json']
-
+        available_tools:list = output['available_tools']
+        openai_function_jsons:dict = output['tools_json']
+        
+        black_list = set(['FileSystemEnv_print_filesys_struture',])
+        for item in black_list:
+            try:
+                available_tools.remove(item)
+            except ValueError:
+                pass
+        openai_function_jsons = [openai_function_json for openai_function_json in openai_function_jsons if openai_function_json['name'] not in black_list]
+        
         self.tool_names = available_tools
         self.change_subtask_handle_function_enum(available_tools)
         self.avaliable_tools_description_list = openai_function_jsons

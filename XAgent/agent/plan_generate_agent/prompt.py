@@ -31,6 +31,7 @@ Generate the plan for query with operation SUBTASK_SPLIT, make sure all must rea
 - Do not waste time on making irrelevant or unnecessary plans.
 - The task handler is powered by sota LLM, which can directly answer many questions. So make sure your plan can fully utilze its ability and reduce the complexity of the subtasks tree.
 - You can plan multiple subtasks if you want.
+- Minimize the number of subtasks, but make sure all must reach goals are included in the plan.
 '''
 
 USER_PROMPT = '''This is the the first time you are handling the task, so you should give a initial plan. Here is the query:

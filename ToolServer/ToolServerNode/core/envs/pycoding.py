@@ -5,7 +5,7 @@ import nbformat
 
 from typing import Dict,Any
 from nbclient import NotebookClient
-from nbclient.exceptions import CellExecutionError
+from nbclient.exceptions import CellExecutionError,DeadKernelError
 from nbclient.client import ensure_async
 
 from core.register import toolwrapper
@@ -29,7 +29,7 @@ class PythonNotebook(BaseEnv):
         # make a new notebook
         self.nb = nbformat.v4.new_notebook(
             metadata = {'kernelspec': {'name': 'python', 'language': 'python', 'display_name': 'python'}})
-        self.nbc = NotebookClient(self.nb)
+        self.nbc = NotebookClient(self.nb,timeout=self.nb_cfg['timeout'])
     
     async def _running(self):
         if self.nbc.kc is not None:
@@ -86,15 +86,17 @@ class PythonNotebook(BaseEnv):
             self.nb.cells[cell_index] = nbformat.v4.new_code_cell(code)
         
         try:
-            await asyncio.wait_for(self.nbc.async_execute_cell(self.nb.cells[-1],len(self.nb.cells)-1),self.nb_cfg['timeout'])
+            await self.nbc.async_execute_cell(self.nb.cells[-1],len(self.nb.cells)-1)
         except CellExecutionError as e:
             pass
-        
+        except DeadKernelError as e:
+            await self._reset()
+            
         nbformat.write(self.nb,os.path.join(self.work_directory,self.nb_cfg['save_name']))
         
         return self._format_outputs(self.nb.cells[cell_index].outputs,cell_index,reraise=True,return_binary=True)
         
-    def print_cells_outputs(self)->str:
+    def print_notebook(self)->str:
         """print all notebook cells' content and output.
         
         :return string: all notebook cells description.

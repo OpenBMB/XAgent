@@ -4,7 +4,7 @@ from copy import deepcopy
 from colorama import Fore
 from XAgent.config import CONFIG
 from XAgent.agent.base_agent import BaseAgent
-from XAgent.agent.summarize import summarize_action,summarize_plan
+from XAgent.agent.summarize import summarize_action,summarize_plan,clip_text,get_token_nums
 from XAgent.data_structure.node import ToolNode
 from XAgent.data_structure.tree import TaskSearchTree
 from XAgent.inner_loop_search_algorithms.base_search import BaseSearchMethod
@@ -95,7 +95,7 @@ class ReACTChainSearch(BaseSearchMethod):
 
             file_archi, _, = toolserver_interface.execute_command_client(
                 "FileSystemEnv_print_filesys_struture", {"return_root":True})
-
+            file_archi,length = clip_text(file_archi,1000,clip_end=True)
             human_prompt = ""
             if config.enable_ask_human_for_help:
                 human_prompt = "- Use 'ask_human_for_help' when you need help, remember to be specific to your requirement to help user to understand your problem."
@@ -117,7 +117,7 @@ class ReACTChainSearch(BaseSearchMethod):
                         "all_plan": all_plan
                     },
                     "user": {
-                        "workspace_files": str(file_archi)[:1000]+'`...wrapped...`' if len(str(file_archi)) > 1000 else str(file_archi),
+                        "workspace_files": file_archi,
                         "subtask_id": task_handler.now_dealing_task.get_subtask_id(to_str=True),
                         "max_length": config.max_subtask_chain_length,
                         "step_num": str(now_node.get_depth() + 1),
@@ -275,7 +275,10 @@ class ReACTChainSearch(BaseSearchMethod):
 
             file_archi, _, = toolserver_interface.execute_command_client(
                 "FileSystemEnv_print_filesys_struture",{"return_root":True})
-
+            file_archi,length = clip_text(file_archi,1000,clip_end=True)
+            if length > 1000:
+                file_archi = file_archi+'`...wrapped...`'
+                
             human_prompt = ""
             if config.enable_ask_human_for_help:
                 human_prompt = "- Use 'ask_human_for_help' when you need help, remember to be specific to your requirement to help user to understand your problem."
@@ -294,7 +297,7 @@ class ReACTChainSearch(BaseSearchMethod):
                         "all_plan": all_plan
                     },
                     "user": {
-                        "workspace_files": str(file_archi)[:1000]+'`...wrapped...`' if len(str(file_archi)) > 1000 else str(file_archi),
+                        "workspace_files":file_archi,
                         "subtask_id": task_handler.now_dealing_task.get_subtask_id(to_str=True),
                         "max_length": config.max_subtask_chain_length,
                         "step_num": str(now_node.get_depth()+1),

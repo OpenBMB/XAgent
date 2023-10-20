@@ -18,7 +18,7 @@ def summarize_action(action_process:list[dict], task:str,)->(list[str],str):
         for k,v in args.items():
             if k in black_list:
                 v = '`wrapped`'
-            v_str,v_len = clip_text(str(v),SINGLE_ACTION_MAX_LENGTH-args_len)
+            v_str,v_len = clip_text(str(v),SINGLE_ACTION_MAX_LENGTH-args_len,clip_end=True)
             if v_len < SINGLE_ACTION_MAX_LENGTH-args_len:
                 ret += f'{k}="{v_str}",' if isinstance(v,str) else f'{k}={v_str},'
                 args_len += v_len
@@ -71,7 +71,7 @@ def summarize_action(action_process:list[dict], task:str,)->(list[str],str):
                 f"[tool_status_code] {action['tool_status_code']}",
                 f"\n [tool calling] {raw_actions[index][0]} => "
             ])
-            raw_actions_des += clip_text(raw_actions[index][1],SINGLE_ACTION_MAX_LENGTH-get_token_nums(raw_actions_des),False)[0]
+            raw_actions_des += clip_text(raw_actions[index][1],MAX_RETURN_LENGTH-get_token_nums(raw_actions_des))[0]
             
             summary,tokens = function_manager('summarize_action',
                                               action=raw_actions_des,current_task=task,
@@ -101,22 +101,24 @@ def summarize_action(action_process:list[dict], task:str,)->(list[str],str):
                                   current_task=task)
     
     ret_lenght = {k:get_token_nums(v) for k,v in ret.items()}
+    total_length = sum(ret_lenght.values())
     
     # adding more return to last successful action
     for i in [last_successful_action_index,last_failed_action_index]:
         if i is not None and '[return]' not in ret[i]:
-            s = f'\n[{i}][return] {clip_text(raw_actions[i][1],SINGLE_ACTION_MAX_LENGTH-ret_lenght[i],False)[0]}'
-            ret_lenght[i] += get_token_nums(s)
+            s = f'\n[{i}][return] {clip_text(raw_actions[i][1],(MAX_RETURN_LENGTH-total_length)//2)[0]}'
+            return_length = get_token_nums(s)
+            ret_lenght[i] += return_length
+            total_length += return_length
             ret[i] += s
 
-    total_length = sum(ret_lenght.values())
     key_actions:list = reflection['key_actions']
     key_actions.sort(reverse=True)
     for i in key_actions:
         if total_length >= MAX_RETURN_LENGTH:
             break
         if i in ret and action_process[i]["tool_status_code"] == ToolCallStatusCode.TOOL_CALL_SUCCESS and '[return]' not in ret[i]:
-            s = f'\n[{i}][return] {clip_text(raw_actions[i][1],SINGLE_ACTION_MAX_LENGTH-ret_lenght[i],False)[0]}'
+            s = f'\n[{i}][return] {clip_text(raw_actions[i][1],SINGLE_ACTION_MAX_LENGTH-ret_lenght[i])[0]}'
             if (tokens := get_token_nums(s))> MAX_RETURN_LENGTH-total_length:
                 continue
             total_length += tokens
@@ -127,7 +129,7 @@ def summarize_action(action_process:list[dict], task:str,)->(list[str],str):
         if total_length >= MAX_RETURN_LENGTH:
             break
         if action_process[i]["tool_status_code"] == ToolCallStatusCode.TOOL_CALL_SUCCESS and '[return]' not in ret[i]:
-            s = f'\n[{i}][return] {clip_text(raw_actions[i][1],SINGLE_ACTION_MAX_LENGTH-ret_lenght[i],False)[0]}'
+            s = f'\n[{i}][return] {clip_text(raw_actions[i][1],SINGLE_ACTION_MAX_LENGTH-ret_lenght[i])[0]}'
             if (tokens := get_token_nums(s))> MAX_RETURN_LENGTH-total_length:
                 continue
             total_length += tokens

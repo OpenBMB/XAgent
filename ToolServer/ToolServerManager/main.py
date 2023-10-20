@@ -4,7 +4,7 @@ import sqlite3
 import asyncio
 import traceback
 import datetime
-import subprocess
+import docker.types
 
 from fastapi import FastAPI, Cookie,Request,HTTPException,Response
 from fastapi.responses import JSONResponse,RedirectResponse
@@ -98,8 +98,9 @@ async def read_cookie_info():
     response.headers["Server"] = "ToolServerManager/" + CONFIG['version']
     
     # create a docker container
-    container = docker_client.containers.run(CONFIG['node']['image'],detach=True,network=CONFIG['node']['network'],
-                                             privileged=CONFIG['node']['privileged'],)
+    container = docker_client.containers.run(
+        device_requests=[docker.types.DeviceRequest(**req) for req in CONFIG['node']['device_requests']] if CONFIG['node']['device_requests'] else None,
+        **(CONFIG['node']['creation_kwargs']),)
     logger.info("Node created: " + container.id)
     response.set_cookie(key="node_id", value=container.id)
     container.reload()
@@ -110,7 +111,7 @@ async def read_cookie_info():
             (container.id,
             container.short_id,
             container.attrs["State"]["Status"],
-            container.attrs["NetworkSettings"]["Networks"][CONFIG['node']['network']]["IPAddress"],
+            container.attrs["NetworkSettings"]["Networks"][CONFIG['node']['creation_kwargs']['network']]["IPAddress"],
             datetime.datetime.utcnow().isoformat()),
             container.attrs['State']['Health']['Status'])
         db.commit()
@@ -120,7 +121,7 @@ async def read_cookie_info():
             'node_id':container.id,
             'node_short_id':container.short_id,
             'node_status':container.attrs["State"]["Status"],
-            'node_ip':container.attrs["NetworkSettings"]["Networks"][CONFIG['node']['network']]["IPAddress"],
+            'node_ip':container.attrs["NetworkSettings"]["Networks"][CONFIG['node']['creation_kwargs']['network']]["IPAddress"],
             'node_last_req_time':datetime.datetime.utcnow().isoformat(),
             'node_health':container.attrs['State']['Health']['Status']
         })

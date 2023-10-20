@@ -53,6 +53,9 @@ const sendMessage = (val: string) => {
     });
   } else {
     historyTalkStore.setCurrentInput(val)
+    console.log("这是一个新建的对话")
+    console.log(uuid)
+    
     router.push({
       name: 'NewTalk',
       params: {

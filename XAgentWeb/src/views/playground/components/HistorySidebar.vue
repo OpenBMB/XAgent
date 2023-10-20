@@ -500,4 +500,8 @@ const clearHistory = () => {
   width: 212px !important;
 }
 
+.el-dropdown-link {
+  user-select: none;
+}
+
 </style>

@@ -69,7 +69,8 @@ def summarize_action(action_process:list[dict], task:str,)->(list[str],str):
                 f'[{k}] {v}' for k,v in action['thoughts']['properties'].items()
             ] + [
                 f"[tool_status_code] {action['tool_status_code']}",
-                f"\n [tool calling] {raw_actions[index][0]} => "
+                f"[tool calling] {raw_actions[index][0]}",
+                f"[return] "
             ])
             raw_actions_des += clip_text(raw_actions[index][1],MAX_RETURN_LENGTH-get_token_nums(raw_actions_des))[0]
             

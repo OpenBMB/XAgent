@@ -79,7 +79,7 @@ class PythonNotebook(BaseEnv):
         # code = self._fix_escape(code)
         if reset or not await self._running():
             await self._reset()
-        if cell_index is None or cell_index == len(self.nb.cells):
+        if cell_index is None or cell_index == len(self.nb.cells) or len(self.nb.cells) == 0:
             self.nb.cells.append(nbformat.v4.new_code_cell(code))
             cell_index = len(self.nb.cells)-1
         else:

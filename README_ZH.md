@@ -124,6 +124,7 @@ npm run dev
 我们将使用一个简单的数据集`iris.zip`上传到XAgent，然后让XAgent分析数据集并生成一个报告。
 XAgent将任务分解为4个子任务：（1）数据理解，（2）验证Python环境，（3）编写数据分析代码，（4）编写报告。
 这里是XAgent绘制的一张图：
+
 ![Data Statics by XAgent](assets/readme/statistics.png)
 
 ## 案例2. 推荐：展示与人类的合作

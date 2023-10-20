@@ -9,7 +9,7 @@ openai_keys:
   
 default_completion_kwargs:
   model: gpt-3.5-turbo-16k
-  temperature: 0.5
+  temperature: 0.2
   request_timeout: 60
 
 enable_summary: true

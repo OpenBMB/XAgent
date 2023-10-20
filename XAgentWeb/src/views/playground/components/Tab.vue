@@ -35,7 +35,7 @@
               <img
                 v-if="currentSubtaskIndex === index && !isTaskCompleted"
                 class="complete-icon spinning"
-                src="/@/assets/images/playground/tabLoading.svg"
+                src="@/assets/images/playground/tabLoading.svg"
               />
             </div>
             <span className="subtask-name">{{ name }}</span>
@@ -91,7 +91,7 @@
                 <span class="intro">🔧 Tool Recommendations：</span>
                 <span class="sub-intro">success quote for ol...</span>
               </div>
-              <img class="extendBtn" @click="changeShow" src="/@/assets/images/playground/extend.svg" alt="show" />
+              <img class="extendBtn" @click="changeShow" src="@/assets/images/playground/extend.svg" alt="show" />
             </div> -->
 
         <div

@@ -22,7 +22,7 @@
           class="history-item conversations-list-item-card"
           :class="{ active: item.interaction_id === route.query.id }"
         >
-          <!-- <img src="/@/assets/images/playground/qp.svg" alt="" class="icon" draggable="false"/> -->
+          <!-- <img src="@/assets/images/playground/qp.svg" alt="" class="icon" draggable="false"/> -->
           <div class="header-info-row">
             <span class="order-info">
               {{ item.agent || "-" }} / {{ item.mode || "-" }}

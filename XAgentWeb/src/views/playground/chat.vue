@@ -10,7 +10,7 @@
           tag="div"
           >
           <div v-if="role === 'USER'" class="input flex-row">
-            <img src="/@/assets/images/playground/userAvatar.svg" alt="message" />
+            <img src="@/assets/images/playground/userAvatar.svg" alt="message" />
             <div class="user-content-border">
               <span> {{ content }} </span>
             </div>
@@ -19,7 +19,7 @@
           <div  v-else-if="role === 'AI'" class="result typed-box flex-row">
             <img class="avatar  round-corner-logo"  alt="logo"
               width="52" height="52" 
-              src="/@/assets/images/playground/main-logo-avatar.png"/>
+              src="@/assets/images/playground/main-logo-avatar.png"/>
             <div class="content">
               <Tab 
                 :ref="tabchildList"
@@ -58,7 +58,7 @@
           disabled
           >
               <img class="refresh-icon"
-                src ="/@/assets/images/playground/refreshNew.svg"
+                src ="@/assets/images/playground/refreshNew.svg"
                 alt="refresh" />
               Regenerate
         </el-button>

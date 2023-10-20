@@ -1,4 +1,4 @@
-import { sensitive } from '/@/assets/data/data.js'
+import { sensitive } from '@/assets/data/data.js'
 
 const generateSensitiveMap = (wordList: string[]): any => {
   const sensitiveMap = new Map()

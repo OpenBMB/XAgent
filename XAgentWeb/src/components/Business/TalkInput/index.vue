@@ -29,7 +29,7 @@
         <img 
           alt="" 
           v-show="!isProgress"
-          src="/@/assets/images/playground/send.svg" 
+          src="@/assets/images/playground/send.svg" 
         />
         <LoadingDot v-show="isProgress" />
       </el-button>
@@ -41,8 +41,8 @@
 
       <span class="tip">Shift+Enter键换行</span>
       <div class="btn flex-row flex-center" :class="{ disabled: input.length <= 0 }">
-        <img src="/@/assets/images/playground/clear.svg" alt="" @click="clearMessage" />
-        <img v-show="!isProgress" src="/@/assets/images/playground/send.svg" alt="" @click="sendMessage" />
+        <img src="@/assets/images/playground/clear.svg" alt="" @click="clearMessage" />
+        <img v-show="!isProgress" src="@/assets/images/playground/send.svg" alt="" @click="sendMessage" />
 
         <LoadingDot v-show="isProgress" />
       </div>
@@ -50,7 +50,7 @@
 
     <!-- <div class="word-sensitive-wrapper">
       <div class="word-sensitive flex-row flex-center">
-        <img src="/@/assets/images/playground/warning.svg" />
+        <img src="@/assets/images/playground/warning.svg" />
         <span>根据相关安全规定，您的内容无法显示。</span>
       </div>
     </div> -->

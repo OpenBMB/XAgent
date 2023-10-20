@@ -2,7 +2,7 @@
   <section class="exception flex-column">
     <div class="bg-text">
       404
-      <img src="/@/assets/images/404_images/404.svg" alt="" />
+      <img src="@/assets/images/404_images/404.svg" alt="" />
     </div>
     <span class="error-tip">
       Error： The page you are visiting does not exist

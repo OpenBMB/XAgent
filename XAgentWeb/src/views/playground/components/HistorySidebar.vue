@@ -2,10 +2,10 @@
   <section class="sidebar">
     <div class="logo_name_border flex-column">
       <img class="logo" alt="" draggable="false"
-        src="/@/assets/images/playground/main-logo-6-5.png" 
+        src="@/assets/images/playground/main-logo-6-5.png" 
           width="144" height="120"
         />
-      <img class="name" src="/@/assets/images/playground/name-logo.png" draggable="false"
+      <img class="name" src="@/assets/images/playground/name-logo.png" draggable="false"
         alt="" width="128" height="35"/>
     </div>
     <div 
@@ -23,7 +23,7 @@
         class="history-item flex-row"
         :class="{ active: item.interaction_id === route.query.id }"
       >
-        <img src="/@/assets/images/playground/qp.svg" alt="" class="icon" />
+        <img src="@/assets/images/playground/qp.svg" alt="" class="icon" />
         <span class="ellipsis"
                @click="switchToConversation(item)">
             {{ item.description }}
@@ -56,7 +56,7 @@
       </div>
 
       <div v-if="historyTalkArr.length <= 0 && !loading" class="no-data flex-column flex-center">
-        <img src="/@/assets/images/playground/no-history.svg" alt="" />
+        <img src="@/assets/images/playground/no-history.svg" alt="" />
         <span>
           No content for now
         </span>

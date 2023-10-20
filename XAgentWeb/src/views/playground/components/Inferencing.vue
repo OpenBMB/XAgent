@@ -23,7 +23,7 @@
                   v-model="dataObj[keyName]"
                 >
                 <template #suffix>
-                  <img @click="resetInput(keyName)" class="reset-icon" src="/@/assets/images/playground/icon_reset.svg" />
+                  <img @click="resetInput(keyName)" class="reset-icon" src="@/assets/images/playground/icon_reset.svg" />
                 </template>
               </el-input>
 
@@ -42,7 +42,7 @@
         <div class="detail-row-left">
           <img /> <span>🔧 using Tools:</span><span>success quote for olato quotes</span>
         </div>
-        <img src="/@/assets/images/playground/eyes.svg" alt="showDetail" class="showMoreIcon" @click="showModal" />
+        <img src="@/assets/images/playground/eyes.svg" alt="showDetail" class="showMoreIcon" @click="showModal" />
       </el-row> -->
 
       <el-row
@@ -54,7 +54,7 @@
           <span>🔧 Using Tools:</span>
           <span>success quote for olato quotes</span>
         </div>
-        <img src="/@/assets/images/playground/eyes.svg" alt="showDetail" class="showMoreIcon" @click="showModal" />
+        <img src="@/assets/images/playground/eyes.svg" alt="showDetail" class="showMoreIcon" @click="showModal" />
       </el-row>
 
       <el-row :gutter="0" justify="end" v-show="!isFreezed">
@@ -68,7 +68,7 @@
           :class="{ disable: data.complete || data.unClickbel}"
           @click="runToNextNode(data.complete || data.unClickbel)"
           >RUN</el-button>
-        <!-- <img v-if="runLoading" src="/@/assets/images/playground/refreshNew.svg"/> -->
+        <!-- <img v-if="runLoading" src="@/assets/images/playground/refreshNew.svg"/> -->
         <!-- <el-button plain type="primary" @click="runActive(data.complete || data.unClickbel)" :loading="runLoading" :disabled="data.complete || data.unClickbel">RUN</el-button> -->
       </el-row>
 

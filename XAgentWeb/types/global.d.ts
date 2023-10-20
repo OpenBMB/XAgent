@@ -18,7 +18,7 @@ declare global {
   }
 }
 
-declare module '/@/assets/data/data.js'
+declare module '@/assets/data/data.js'
 
 declare module 'vue' {
   export type JSXComponent<Props = any> = { new (): ComponentPublicInstance<Props> } | FunctionalComponent<Props>

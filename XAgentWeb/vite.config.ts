@@ -30,6 +30,7 @@ const config: UserConfigExport = {
     alias: [
       { find: /\/@\//, replacement: pathResolve('src') + '/' },
       { find: /\/#\//, replacement: pathResolve('types') + '/' },
+      { find: /@\//, replacement: pathResolve('src') + '/' },
     ],
   },
   plugins: [

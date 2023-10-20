@@ -208,7 +208,6 @@ class PlanAgent():
                     function_call=function_call,
                     additional_messages=additional_message_list,
                     additional_insert_index=-1,
-                    restrict_cache_query = (try_times > 0),
                 )
                 # print(new_message)
                 if not "function_call" in new_message.keys():

@@ -36,16 +36,8 @@ def _chat_completion_request(messages, functions=None,function_call=None, model=
     
     # Yujia: maybe temperature == 0 is more stable? Not rigrously tested.
     # json_data.update({"temperature": 0.1})
-    response = recorder.query_llm_inout(restrict_cache_query=restrict_cache_query,
-                                        messages=messages, 
-                                        functions=functions, 
-                                        function_call=function_call, 
-                                        model = model,
-                                        stop = stop,
-                                        other_args = kwargs)
-
-    if response is None:
-        response = openai_chatcompletion_request(**json_data)
+    logger.debug("from _chat_completion_request")
+    response = openai_chatcompletion_request(**json_data)
 
     return response
 

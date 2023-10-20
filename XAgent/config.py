@@ -18,8 +18,13 @@ class XAgentConfig(dict):
             del self[key]
         else:
             raise AttributeError(f"'DotDict' object has no attribute '{key}'")
-    def to_dict(self):
-        return self
+    def to_dict(self, safe=False):
+        if safe:
+            right_value = deepcopy(self)
+            right_value.pop("openai_keys","")
+            return right_value
+        else:
+            return self
     
     def reload(self,config_file='config.yml'):
         self.__init__(**yaml.load(open(config_file, 'r'), Loader=yaml.FullLoader))

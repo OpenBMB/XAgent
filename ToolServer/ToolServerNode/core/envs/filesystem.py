@@ -163,7 +163,8 @@ class FileSystemEnv(BaseEnv):
         if not filepath.startswith(self.work_directory):
             filepath = filepath.strip('/')
             full_path = os.path.join(self.work_directory, filepath)
-        
+        else:
+            full_path = filepath
         if not self._is_path_within_workspace(full_path) or  self._check_ignorement(full_path):
             raise ValueError(f"File {filepath} is not within workspace.")
         

@@ -136,10 +136,13 @@ class ToolServerInterface():
         }
         cache_output = recorder.query_tool_server_cache(url,payload)
         try:
-            response = requests.post(url, json=payload, timeout=20, cookies=self.cookies)
-            response = response.json()
-            if not isinstance(response, dict):
-                response = json.loads(response)
+            if cache_output != None:
+                response = cache_output
+            else:
+                response = requests.post(url, json=payload, timeout=20, cookies=self.cookies)
+                response = response.json()
+                if not isinstance(response, dict):
+                    response = json.loads(response)
             recorder.regist_tool_server(url=url,
                                     payload=payload,
                                     output=response)
@@ -307,7 +310,7 @@ class FunctionHandler():
         available_tools:list = output['available_tools']
         openai_function_jsons:dict = output['tools_json']
         
-        black_list = set(['FileSystemEnv_print_filesys_struture',])
+        black_list = set(config.tool_blacklist)
         for item in black_list:
             try:
                 available_tools.remove(item)

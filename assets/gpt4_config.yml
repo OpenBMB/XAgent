@@ -37,3 +37,8 @@ max_plan_length: 1536
 rapidapi_retrieve_tool_count: 0
 
 enable_ask_human_for_help: False
+
+tool_blacklist:
+  - FileSystemEnv_print_filesys_struture
+
+record_dir:

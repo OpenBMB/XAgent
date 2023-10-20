@@ -1,12 +1,13 @@
 import os
 import time
 import json
+import yaml
 import uuid
+import logging
 from colorama import Fore, Style
 from XAgent.loggers.logs import logger
 from XAgent.workflow.base_query import AutoGPTQuery
-from XAgent.config import XAgentConfig
-
+from XAgent.config import XAgentConfig, CONFIG
 
 def dump_common_things(object):
     if type(object) in [str, int, float, bool]:
@@ -34,7 +35,6 @@ class RunningRecoder():
 
         self.newly_start = True  
 
-        self.llm_interface_id = 0
         self.tool_server_interface_id = 0
 
         self.tool_call_id = 0
@@ -65,8 +65,8 @@ class RunningRecoder():
 
         self.plan_refine_id += 1
 
-    def regist_llm_inout(self, messages, functions, function_call, model, stop, other_args, output_data):
-        with open(os.path.join(self.record_root_dir, "LLM_inout_pair", f"{self.llm_interface_id:05d}.json"),
+    def regist_llm_inout(self, llm_query_id, messages, functions, function_call, model, stop, other_args, output_data):
+        with open(os.path.join(self.record_root_dir, "LLM_inout_pair", f"{llm_query_id:05d}.json"),
                   "w") as writer:
             llm_inout_record = {
                 "input": {
@@ -78,14 +78,14 @@ class RunningRecoder():
                     "other_args": dump_common_things(other_args),
                 },
                 "output": dump_common_things(output_data),
-                "llm_interface_id": self.llm_interface_id,
+                "llm_interface_id": llm_query_id,
             }
             json.dump(llm_inout_record, writer, indent=2, ensure_ascii=False)
             self.llm_server_cache.append(llm_inout_record)
+            logger.typewriter_log("LLM inout registed:",Fore.RED, f"query-id={llm_query_id}",level=logging.DEBUG)
 
-        self.llm_interface_id += 1
 
-    def query_llm_inout(self, restrict_cache_query, messages, functions, function_call, model, stop, other_args):
+    def query_llm_inout(self, llm_query_id, messages, functions, function_call, model, stop, other_args):
         if self.newly_start:
             return None
         input_data = {
@@ -96,17 +96,20 @@ class RunningRecoder():
             "stop": dump_common_things(stop),
             "other_args": dump_common_things(other_args),
         }
-        for cache in self.llm_server_cache:
-            if input_data == cache["input"]:
-                if restrict_cache_query and self.llm_interface_id != cache["llm_interface_id"]:
-                    continue
-                logger.typewriter_log(
-                    "get a llm_server response from Record",
-                    Fore.RED,
-                )
-                # import pdb; pdb.set_trace()
-                return cache["output"]
-        return None
+        if llm_query_id >= len(self.llm_server_cache):
+            logger.typewriter_log("Reach the max length of record: exit!!")
+            exit()
+        cache = self.llm_server_cache[llm_query_id]
+        # import pdb; pdb.set_trace()
+        if input_data == cache["input"]:
+            logger.typewriter_log(
+                "get a llm_server response from Record",
+                Fore.BLUE,
+                f"query-id={llm_query_id}"
+            )
+            return cache["output"]
+        assert False, f"{llm_query_id} didn't find output"
+
 
     def regist_tool_call(self, tool_name, tool_input, tool_output, tool_status_code, thought_data=None):
         os.makedirs(os.path.join(self.record_root_dir, self.now_subtask_id), exist_ok=True)
@@ -139,47 +142,56 @@ class RunningRecoder():
     def query_tool_server_cache(self, url, payload):
         if self.newly_start:
             return None
-        for cache in self.tool_server_cache:
-            # import pdb; pdb.set_trace()
-            if cache["url"] == url.split("/")[-1] and cache["payload"] == dump_common_things(payload):
-                logger.typewriter_log(
-                    "get a tool_server response from Record",
-                    Fore.RED,
-                    cache["url"],
-                )
-                return cache["tool_output"]
+        assert self.tool_server_interface_id < len(self.tool_server_cache), "Running Exists Record Saved Region"
+        cache = self.tool_server_cache[self.tool_server_interface_id]
+        # import pdb; pdb.set_trace()
+        if cache["url"] == url.split("/")[-1] and cache["payload"] == dump_common_things(payload):
+            logger.typewriter_log(
+                "get a tool_server response from Record",
+                Fore.BLUE,
+                cache["url"],
+            )
+            return cache["tool_output"]
 
-        return None
+        assert False
 
     def regist_query(self, query):
         with open(os.path.join(self.record_root_dir, f"query.json"), "w") as writer:
             json.dump(query.to_json(), writer, indent=2, ensure_ascii=False)
 
+
     def get_query(self):
         logger.typewriter_log(
             "load a query from Record",
-            Fore.RED,
+            Fore.BLUE,
         )
         return self.query
 
     def regist_config(self, config: XAgentConfig):
-        with open(os.path.join(self.record_root_dir, f"config.json"), "w") as writer:
-            json.dump(config.to_dict(), writer, indent=2, ensure_ascii=False)
+        with open(os.path.join(self.record_root_dir, f"config.yml"), "w") as writer:
+            writer.write(yaml.safe_dump(dict(config.to_dict(safe=True)), allow_unicode=True))
 
     def get_config(self):
         logger.typewriter_log(
             "load a config from Record",
-            Fore.RED,
+            Fore.BLUE,
         )
         return self.config
 
+    def regist_father_info(self, record_dir):
+        with open(os.path.join(self.record_root_dir, f"This-Is-A-Reload-Run.yml"), "w") as writer:
+            writer.write(yaml.safe_dump({
+                "load_record_dir": record_dir,
+            }, allow_unicode=True))
+
+
     def load_from_disk(self, record_dir):
         logger.typewriter_log(
-            "load from a disk record",
-            Fore.RED,
+            "load from a disk record, overwrite all the existing config-info",
+            Fore.BLUE,
             record_dir,
         )
-
+        self.regist_father_info(record_dir)
         self.newly_start = False
 
         for dir_name in os.listdir(record_dir):
@@ -187,22 +199,33 @@ class RunningRecoder():
                 with open(os.path.join(record_dir, dir_name), "r") as reader:
                     self.query_json = json.load(reader)
                     self.query = AutoGPTQuery.from_json(self.query_json)
-            elif dir_name == "config.json":
-                with open(os.path.join(record_dir, dir_name), "r") as reader:
-                    self.config_json = json.load(reader)
-                    self.config = XAgentConfig()
-                    self.config.merge_from_dict(self.config_json)
+            elif dir_name == "config.yml":
+                CONFIG.reload(os.path.join(record_dir, dir_name))
             elif dir_name == "LLM_inout_pair":
+                inout_count = len(os.listdir(os.path.join(record_dir, dir_name)))
+                self.llm_server_cache = [None]*inout_count
                 for file_name in os.listdir(os.path.join(record_dir, dir_name)):
+                    inout_id = int(file_name.split(".")[0])
                     with open(os.path.join(record_dir, dir_name, file_name), "r") as reader:
                         llm_pair = json.load(reader)
-                        self.llm_server_cache.append(llm_pair)
+                        self.llm_server_cache[inout_id] = llm_pair
+                logger.typewriter_log(
+                    f"Record contain {inout_count} LLM inout",
+                    Fore.BLUE,
+                )
             elif dir_name == "tool_server_pair":
+                inout_count = len(os.listdir(os.path.join(record_dir, dir_name)))
+                self.tool_server_cache = [None]*inout_count
                 for file_name in os.listdir(os.path.join(record_dir, dir_name)):
+                    inout_id = int(file_name.split(".")[0])
                     with open(os.path.join(record_dir, dir_name, file_name), "r") as reader:
                         tool_pair = json.load(reader)
-                        self.tool_server_cache.append(tool_pair)
-            else:
+                        self.tool_server_cache[inout_id] = tool_pair
+                logger.typewriter_log(
+                    f"Record contain {len(os.listdir(os.path.join(record_dir, dir_name)))} Tool call",
+                    Fore.BLUE,
+                )
+            elif os.path.isdir(os.path.join(record_dir, dir_name)):
                 for file_name in os.listdir(os.path.join(record_dir, dir_name)):
                     if file_name.startswith("plan_refine"):
                         with open(os.path.join(record_dir, dir_name, file_name)) as reader:

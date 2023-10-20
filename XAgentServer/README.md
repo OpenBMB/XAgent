@@ -34,7 +34,7 @@ Navigate to the frontend folder:
 cd XAgentWeb
 ```
 
-Install Dependencies(Recommend Node.js >= 20.0)
+Install Dependencies(Recommend Node.js >= 20.0，  at least 16.0)
 
 ```bash
 npm install

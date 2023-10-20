@@ -22,30 +22,15 @@ docker-compose up
 ```
 This will start an instance of XAgent-Server listening to port `8090` on the local machine. The configuration details can be found in the `XAgentServer/docker-compose.yml` file.
 
+After completing the image compilation and startup, you need to start the nginx service. Execute the following command on another command line:
+
+```
+docker exec XAgent-Server systemctl start nginx
+```
+
 When you see the following output, it means the image has been successfully compiled and launched:
 
 ![XAgent-Server成功示例](https://gitee.com/sailaoda/pic2/raw/master/2023/202309272123424.png)
-
-## Starting the Frontend Service
-
-Navigate to the frontend folder:
-
-```bash
-cd XAgentWeb
-```
-
-Install Dependencies(Recommend Node.js >= 20.0，  at least 16.0)
-
-```bash
-npm install
-```
-
-Run the service:
-
-```bash
-npm run dev 
-```
-
 
 
 ## Using XAgent-Server

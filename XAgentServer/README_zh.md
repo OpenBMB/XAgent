@@ -22,30 +22,15 @@ docker-compose up
 ```
 这将启动一个XAgent-Server实例，监听本机`8090`端口，配置信息在`XAgentServer/docker-compose.yml`文件中。
 
+完成镜像编译和启动后还需启动nginx服务，在另一个命令行执行如下命令：
+
+```
+docker exec XAgent-Server systemctl start nginx
+```
+
 出现如下输出，就是镜像编译与启动成功了：
 
 ![XAgent-Server成功示例](https://gitee.com/sailaoda/pic2/raw/master/2023/202309272123424.png)
-
-## 启动前端服务
-
-进入前端文件夹
-
-```bash
-cd XAgentWeb
-```
-
-Install Dependencies  安装依赖(建议使用Node.js 20.0及版本以上)
-
-```bash
-npm install
-```
-
-Run  运行
-
-```bash
-npm run dev 
-```
-
 
 
 ## 使用 XAgent-Server

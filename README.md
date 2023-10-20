@@ -97,6 +97,8 @@ If you want to load from a existing record, set `record_dir` in config,default t
 ```bash
 cd XAgentServer
 docker-compose up
+# run nginx in docker
+docker exec XAgent-Server systemctl start nginx
 
 # also, you can start with python
 # python3.10+ is required
@@ -104,7 +106,6 @@ cd XAgentServer
 pip install -r requirements.txt
 cd ..
 python start_server.py
-
 # you can run web page with following command as well:
 cd ../XAgentWeb
 npm install

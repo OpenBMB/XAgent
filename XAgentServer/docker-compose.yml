@@ -1,20 +1,21 @@
-# /AIAgentServer/docker-compose.yml
+# /XAgentServer/docker-compose.yml
 
 version: '3'
 
 services:
-
-  app:
-    image: xagent-server:0.1
+  XAgentServer:
+    image: xagent-server:0.2
     build:
       context: ..
       dockerfile: ./XAgentServer/dockerfiles/Dockerfile
-    ports:
-      - "8090:8090"
     networks:
-      - default
-    container_name: XAgent-Server  
+      -  web-server-network
+    container_name: XAgent-Server
+    ports:
+      - "5173:5173"
+      - "8090:8090"
+
 
 networks:
-  default:
+  web-server-network:
     driver: bridge

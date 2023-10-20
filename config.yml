@@ -47,3 +47,5 @@ max_plan_length: 8192
 rapidapi_retrieve_tool_count: 0
 
 enable_ask_human_for_help: False
+
+record_dir:

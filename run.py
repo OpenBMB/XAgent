@@ -11,6 +11,7 @@ def parse_args():
                         help="task description",required=True)
     parser.add_argument("--upload_files", nargs='+',
                         help="upload files")
+    parser.add_argument("--record_dir", type=str, default=None,)
     parser.add_argument("--model", type=str, default=None,)
     parser.add_argument("--mode", type=str, default="auto",
                         help="mode, only support auto and manual, if you choose manual, you need to press enter to continue in each step")
@@ -40,6 +41,8 @@ if __name__ == '__main__':
     CONFIG.max_plan_tree_width = args.max_plan_tree_width
     CONFIG.max_retry_times = args.max_retry_times   
     
+
+
     cmd = CommandLine(XAgentServerEnv)
     if args.quiet:
         original_stdout = sys.stdout
@@ -50,6 +53,7 @@ if __name__ == '__main__':
         role="Assistant",
         mode=args.mode,
         upload_files=args.upload_files,
+        record_dir=CONFIG.record_dir,
     )
     if args.quiet:
         sys.stdout.close()

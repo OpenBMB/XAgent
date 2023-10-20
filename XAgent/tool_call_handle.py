@@ -136,10 +136,13 @@ class ToolServerInterface():
         }
         cache_output = recorder.query_tool_server_cache(url,payload)
         try:
-            response = requests.post(url, json=payload, timeout=20, cookies=self.cookies)
-            response = response.json()
-            if not isinstance(response, dict):
-                response = json.loads(response)
+            if cache_output != None:
+                response = cache_output
+            else:
+                response = requests.post(url, json=payload, timeout=20, cookies=self.cookies)
+                response = response.json()
+                if not isinstance(response, dict):
+                    response = json.loads(response)
             recorder.regist_tool_server(url=url,
                                     payload=payload,
                                     output=response)
@@ -306,6 +309,18 @@ class FunctionHandler():
 
         available_tools = output['available_tools']
         openai_function_jsons = output['tools_json']
+        for tool_name in config.tool_blacklist:
+            for k in range(len(available_tools)):
+                # import pdb; pdb.set_trace()
+                if available_tools[k] == tool_name:
+                    available_tools = available_tools[:k] + available_tools[k+1:]
+                    openai_function_jsons = openai_function_jsons[:k] + openai_function_jsons[k+1:]
+                    logger.typewriter_log(
+                        "tool been masked",
+                        Fore.YELLOW,
+                        tool_name,
+                    )
+                    break
 
         self.tool_names = available_tools
         self.change_subtask_handle_function_enum(available_tools)

@@ -32,6 +32,7 @@ class XAgentServer:
         from XAgent.workflow.working_memory import WorkingMemoryAgent
 
         # args
+        # import pdb; pdb.set_trace()
         args = interaction.parameter.args
         if interaction.base.recorder_root_dir:
             if not os.path.exists(interaction.base.recorder_root_dir):

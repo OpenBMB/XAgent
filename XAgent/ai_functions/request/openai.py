@@ -17,6 +17,8 @@ class FunctionCallSchemaError(Exception):
     pass
 
 
+
+
 def dynamic_json_fixs(args,function_schema,messages:list=[],error_message:str=None):
     logger.typewriter_log(f'Schema Validation for Function call {function_schema["name"]} failed, trying to fix it...',Fore.YELLOW)
     repair_req = deepcopy(CONFIG.default_completion_kwargs)
@@ -70,51 +72,71 @@ def load_args_with_schema_validation(function_schema:dict,args:str,messages:list
         return arguments
 
 
+LLM_query_count = 0 #motex lock
 
-@retry(retry=retry_if_not_exception_type((AuthenticationError, PermissionError, InvalidRequestError)),stop=stop_after_attempt(CONFIG.max_retry_times+6),wait=wait_chain(*[wait_none() for _ in range(6)]+[wait_exponential(min=113, max=293)]),reraise=True)
-def openai_chatcompletion_request(*,function_call_check=True,**kwargs):
+@retry(retry=retry_if_not_exception_type((AuthenticationError, PermissionError, InvalidRequestError,AssertionError)),stop=stop_after_attempt(CONFIG.max_retry_times+6),wait=wait_chain(*[wait_none() for _ in range(6)]+[wait_exponential(min=113, max=293)]),reraise=True)
+def openai_chatcompletion_request(*,function_call_check=True,record_query_response=None,**kwargs):
+    global LLM_query_count
+    regist_kwargs = deepcopy(kwargs)
+    query_kwargs = deepcopy(kwargs)
     model_name = get_openai_model_name(kwargs.pop('model', 'gpt-3.5-turbo-16k'))
-    print("using " + model_name)
+    logger.info("openai_chatcompletion_request: using " + model_name)
     
     chatcompletion_kwargs = get_apiconfig_by_model(model_name)
     chatcompletion_kwargs.update(kwargs)
     chatcompletion_kwargs.pop('schema_error_retry',None)
-    
-    try:
-        response = openai.ChatCompletion.create(**chatcompletion_kwargs)
-        if response['choices'][0]['finish_reason'] == 'length':
-            raise InvalidRequestError('maximum context length exceeded',None)
-    except InvalidRequestError as e:
-        if 'maximum context length' in e._message:
-            if model_name == 'gpt-4':
-                if 'gpt-4-32k' in CONFIG.openai_keys:
-                    model_name = 'gpt-4-32k'
-                else:
+    llm_query_id = deepcopy(LLM_query_count) #motex lock
+    LLM_query_count += 1
+    record_query_response = recorder.query_llm_inout(llm_query_id = llm_query_id,
+                                        messages=query_kwargs.pop("messages",None), 
+                                        functions=query_kwargs.pop("functions",None), 
+                                        function_call=query_kwargs.pop("function_call",None), 
+                                        model = query_kwargs.pop("model",None),
+                                        stop = query_kwargs.pop("stop",None),
+                                        other_args = query_kwargs)
+    if record_query_response != None:
+        response = record_query_response
+    else:
+        try:
+            response = openai.ChatCompletion.create(**chatcompletion_kwargs)
+            response = json5.loads(str(response))
+            if response['choices'][0]['finish_reason'] == 'length':
+                raise InvalidRequestError('maximum context length exceeded',None)
+        except InvalidRequestError as e:
+            logger.info(e)
+            if 'maximum context length' in e._message:
+                if model_name == 'gpt-4':
+                    if 'gpt-4-32k' in CONFIG.openai_keys:
+                        model_name = 'gpt-4-32k'
+                    else:
+                        model_name = 'gpt-3.5-turbo-16k'
+                elif model_name == 'gpt-3.5-turbo':
                     model_name = 'gpt-3.5-turbo-16k'
-            elif model_name == 'gpt-3.5-turbo':
-                model_name = 'gpt-3.5-turbo-16k'
+                else:
+                    raise e
+                print("max context length reached, retrying with " + model_name)
+                chatcompletion_kwargs = get_apiconfig_by_model(model_name)
+                chatcompletion_kwargs.update(kwargs)
+                chatcompletion_kwargs.pop('schema_error_retry',None)
+                
+                response = openai.ChatCompletion.create(**chatcompletion_kwargs)
+                response = json5.loads(str(response))
             else:
                 raise e
-            print("max context length reached, retrying with " + model_name)
-            chatcompletion_kwargs = get_apiconfig_by_model(model_name)
-            chatcompletion_kwargs.update(kwargs)
-            chatcompletion_kwargs.pop('schema_error_retry',None)
-            
-            response = openai.ChatCompletion.create(**chatcompletion_kwargs)
-        else:
-            raise e
                     
     # register the request and response
-    _kwargs = deepcopy(kwargs)
-    recorder.regist_llm_inout(messages=_kwargs.pop('messages',None), 
-                        functions=_kwargs.pop('functions',None), 
-                        function_call=_kwargs.pop('function_call',None), 
-                        model = _kwargs.get('model',None),
-                        stop = _kwargs.get('stop',None),
-                        other_args = _kwargs,
-                        output_data = json5.loads(str(response)))
+    # import pdb; pdb.set_trace()
+    recorder.regist_llm_inout(llm_query_id = llm_query_id,
+                        messages=regist_kwargs.pop('messages',None), 
+                        functions=regist_kwargs.pop('functions',None), 
+                        function_call=regist_kwargs.pop('function_call',None), 
+                        model = regist_kwargs.pop('model',None),
+                        stop = regist_kwargs.pop('stop',None),
+                        other_args = regist_kwargs,
+                        output_data = response)
     if function_call_check:
         if  'function_call' not in response['choices'][0]['message']:
+            logger.info("FunctionCallSchemaError")
             raise FunctionCallSchemaError(f"No function call found in the response: {response['choices'][0]['message']} ")  
         # verify the schema of the function call if exists
         function_schema = None
@@ -133,10 +155,10 @@ def openai_chatcompletion_request(*,function_call_check=True,**kwargs):
             else:
                 kwargs['messages'][-1]['content'] = function_schema_error
 
-                
+            logger.info("not found in the provided functions")
             raise FunctionCallSchemaError(f"Function {response['choices'][0]['message']['function_call']['name']} not found in the provided functions: {list(map(lambda x:x['name'],kwargs['functions']))}")
         
         arguments,response = load_args_with_schema_validation(function_schema,response['choices'][0]['message']['function_call']['arguments'],kwargs['messages'],return_response=True,response=response)
-    
+
 
     return response

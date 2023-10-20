@@ -141,10 +141,13 @@ const createNewTalk = () => {
 }
 
 const history = ref<{ title: string; convID: string; accountID: number }[]>([])
-onMounted(() => queryHistoryData())
+onMounted(() => {
+    // queryHistoryData()
+});
 
 const queryHistoryData = () => {
   loading.value = true
+  
   useHistoryListRequest().then((res) => {
       const list = res?.data?.rows || []
       chatMsgInfoStore.setHistoryArr(list);
@@ -195,7 +198,7 @@ const deleteHistory = async (item: any , index: number) => {
   await useDeleteHistoryRequest({
     interaction_id: item.interaction_id
   });
-  queryHistoryData()
+  // queryHistoryData()
 }
 
 const playbackItem = (item: any, index: number) => {

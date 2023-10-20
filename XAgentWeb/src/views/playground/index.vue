@@ -51,11 +51,11 @@ const sendMessage = (val: string) => {
       message: 'Please input message',
       type: 'warning'
     });
+    nextTick(() => {
+      input.value = val;
+    })
   } else {
     historyTalkStore.setCurrentInput(val)
-    console.log("这是一个新建的对话")
-    console.log(uuid)
-    
     router.push({
       name: 'NewTalk',
       params: {

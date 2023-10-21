@@ -16,7 +16,7 @@ Your contributions can take many forms:
 
 To get started with your contributions, follow these steps:
 
-1. **Fork the [XAgent repository](https://github.com/0Armaan025/XAgent)** by clicking the "Fork" button in the top-right corner of the repository page.
+1. **Fork the [XAgent repository](https://github.com/OpenBMB/XAgent)** by clicking the "Fork" button in the top-right corner of the repository page.
 
 2. **Clone your forked repository** to your local machine:
 
@@ -46,7 +46,7 @@ With your environment set up, you're ready to make your contributions:
    git push origin feature/your-feature
    ```
 
-3. Create a **pull request (PR)** by navigating to the [XAgent repository](https://github.com/0Armaan025/XAgent) and clicking the "New Pull Request" button.
+3. Create a **pull request (PR)** by navigating to the [XAgent repository](https://github.com/OpenBMB/XAgent) and clicking the "New Pull Request" button.
 
 4. Provide a **descriptive title and details** in the PR, and make sure to **link your PR to any relevant issues**.
 
@@ -54,7 +54,7 @@ With your environment set up, you're ready to make your contributions:
 
 ## Code of Conduct 📜
 
-Please adhere to our [Code of Conduct](LICENSE.md) while contributing to this project.
+Please adhere to our [Code of Conduct](LICENSE) while contributing to this project.
 
 We sincerely appreciate your contributions, and we look forward to working together to make XAgent even better for everyone!
 

@@ -106,6 +106,7 @@ class RunningRecoder():
                 f"query-id={llm_query_id}"
             )
             return cache["output"]
+        # import pdb; pdb.set_trace()
         assert False, f"{llm_query_id} didn't find output"
 
 
@@ -124,12 +125,13 @@ class RunningRecoder():
 
         self.tool_call_id += 1
 
-    def regist_tool_server(self, url, payload, output):
+    def regist_tool_server(self, url, payload, tool_output,  response_status_code):
         with open(os.path.join(self.record_root_dir, "tool_server_pair", f"{self.tool_server_interface_id:05d}.json"),"w",encoding="utf-8",) as writer:
             tool_record = {
                 "url": dump_common_things(url.split("/")[-1]),
                 "payload": dump_common_things(payload),
-                "tool_output": dump_common_things(output),
+                "response_status_code": dump_common_things(response_status_code),
+                "tool_output": dump_common_things(tool_output),
             }
             json.dump(tool_record, writer, indent=2, ensure_ascii=False)
 
@@ -147,7 +149,10 @@ class RunningRecoder():
                 Fore.BLUE,
                 cache["url"],
             )
-            return cache["tool_output"]
+            return {
+                "tool_output": cache["tool_output"], 
+                "response_status_code": cache["response_status_code"]
+            }
 
         assert False
 

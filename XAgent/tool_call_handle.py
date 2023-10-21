@@ -112,17 +112,21 @@ class ToolServerInterface():
         cache_output = recorder.query_tool_server_cache(url,payload)
         try:
             if cache_output != None:
-                # import pdb; pdb.set_trace()
-                response = cache_output
+                
+                response = cache_output["tool_output"]
+                status_code = cache_output["response_status_code"]
             else:
                 response = requests.post(url, json=payload, timeout=10, cookies=self.cookies)
+                status_code = response.status_code
                 response.raise_for_status()
                 response = response.json()
                 if not isinstance(response, dict):
                     response = json.loads(response)
+
             recorder.regist_tool_server(url=url,
                                     payload=payload,
-                                    output=response)
+                                    tool_output=response,
+                                    response_status_code=status_code)
             return response
         except Exception as e:
             raise Exception(f"Error when fetching available tools: {e}")
@@ -137,15 +141,18 @@ class ToolServerInterface():
         cache_output = recorder.query_tool_server_cache(url,payload)
         try:
             if cache_output != None:
-                response = cache_output
+                response = cache_output["tool_output"]
+                status_code = cache_output["tool_output_status_code"]
             else:
                 response = requests.post(url, json=payload, timeout=20, cookies=self.cookies)
+                status_code = response.status_code
                 response = response.json()
                 if not isinstance(response, dict):
                     response = json.loads(response)
             recorder.regist_tool_server(url=url,
                                     payload=payload,
-                                    output=response)
+                                    tool_output=response,
+                                    response_status_code=status_code)
             retrieved_tools = response["retrieved_tools"]
             tools_json = response["tools_json"]
             for tool_json in tools_json:
@@ -169,9 +176,11 @@ class ToolServerInterface():
         cache_output = recorder.query_tool_server_cache(url,payload)
         try:
             if cache_output != None:
-                response = cache_output
+                response = cache_output["tool_output"]
+                status_code=cache_output["tool_output_status_code"]
             else:
                 response = requests.post(url, json=payload, timeout=10, cookies=self.cookies)
+                status_code = response.status_code
                 response = response.json()
                 if not isinstance(response, dict):
                     try:
@@ -180,7 +189,8 @@ class ToolServerInterface():
                         pass
             recorder.regist_tool_server(url=url,
                                     payload=payload,
-                                    output=response)
+                                    tool_output=response,
+                                    response_status_code=status_code)
             function_manager.register_function(response)
             return response
 
@@ -210,10 +220,12 @@ class ToolServerInterface():
         }
         cache_output = recorder.query_tool_server_cache(url,payload)
         if cache_output != None:
-            command_result = cache_output
-            tool_output_status_code = ToolCallStatusCode.TOOL_CALL_SUCCESS
+            command_result = cache_output["tool_output"]
+            response_status_code = cache_output["response_status_code"]
         else:
             response = requests.post(url, json=payload, cookies=self.cookies)
+            response_status_code = response.status_code
+            # import pdb; pdb.set_trace()
             # print(response.json())
 
             if response.status_code == 200 or response.status_code == 450:
@@ -222,27 +234,29 @@ class ToolServerInterface():
             else:
                 command_result = response.text
 
-            # setting tool_output_status_code according to status_code
-            if response.status_code == 200:
-                tool_output_status_code = ToolCallStatusCode.TOOL_CALL_SUCCESS
-            elif response.status_code == 404:
-                tool_output_status_code = ToolCallStatusCode.HALLUCINATE_NAME
-            elif response.status_code == 422:
-                tool_output_status_code = ToolCallStatusCode.FORMAT_ERROR
-            elif response.status_code == 450:
-                tool_output_status_code = ToolCallStatusCode.TIMEOUT_ERROR
-            elif response.status_code == 500:
-                tool_output_status_code = ToolCallStatusCode.TOOL_CALL_FAILED
-            elif response.status_code == 503:
-                tool_output_status_code = ToolCallStatusCode.SERVER_ERROR
-                raise Exception("Server Error: "+ command_result)
-            else:
-                tool_output_status_code = ToolCallStatusCode.OTHER_ERROR
-
-
         recorder.regist_tool_server(url=url,
-                                payload=payload,
-                                output=command_result)
+                                    payload=payload,
+                                    tool_output=command_result,
+                                    response_status_code=response_status_code)
+
+        # setting tool_output_status_code according to status_code
+        if response_status_code == 200:
+            tool_output_status_code = ToolCallStatusCode.TOOL_CALL_SUCCESS
+        elif response_status_code == 404:
+            tool_output_status_code = ToolCallStatusCode.HALLUCINATE_NAME
+        elif response_status_code == 422:
+            tool_output_status_code = ToolCallStatusCode.FORMAT_ERROR
+        elif response_status_code == 450:
+            tool_output_status_code = ToolCallStatusCode.TIMEOUT_ERROR
+        elif response_status_code == 500:
+            tool_output_status_code = ToolCallStatusCode.TOOL_CALL_FAILED
+        elif response_status_code == 503:
+            tool_output_status_code = ToolCallStatusCode.SERVER_ERROR
+            raise Exception("Server Error: "+ command_result)
+        else:
+            tool_output_status_code = ToolCallStatusCode.OTHER_ERROR
+
+
 
         return command_result, tool_output_status_code
 
@@ -467,8 +481,23 @@ class FunctionHandler():
             Fore.RED,
             "You must give some suggestions, please type in your feedback and then press 'Enter' to send and continue the loop"
         )
-        human_suggestion = input()
-        command_result = json.dumps({"output":f"{human_suggestion}"}, ensure_ascii=False)
+        url = "ask_human"
+        payload = arguments
+        tool_cache = recorder.query_tool_server_cache(url=url,payload=payload)
+        if tool_cache != None:
+            command_result = tool_cache["tool_output"]
+            status_code = tool_cache["response_status_code"]
+        else:
+            human_suggestion = input()
+            command_result = json.dumps({"output":f"{human_suggestion}"}, ensure_ascii=False)
+            status_code = "human has no status :)"
+        recorder.regist_tool_server(
+            url=url,
+            payload=payload,
+            tool_output=command_result,
+            response_status_code=status_code,
+        )
+        
         plan_refine = False
         return plan_refine, ToolCallStatusCode.TOOL_CALL_SUCCESS, command_result
     

@@ -12,7 +12,7 @@ def parse_args():
     parser.add_argument("--upload_files", nargs='+',
                         help="upload files")
     parser.add_argument("--model", type=str, default=CONFIG.default_completion_kwargs['model'],)
-    parser.add_argument("--record_dir", type=str, default=CONFIG.record_dir,)
+    parser.add_argument("--record_dir", type=str, default=None)
     parser.add_argument("--mode", type=str, default="auto",
                         help="mode, only support auto and manual, if you choose manual, you need to press enter to continue in each step")
     parser.add_argument("--quiet", action="store_true",default=False)
@@ -39,7 +39,7 @@ if __name__ == '__main__':
     CONFIG.max_plan_tree_depth = args.max_plan_tree_depth
     CONFIG.max_plan_tree_width = args.max_plan_tree_width
     CONFIG.max_retry_times = args.max_retry_times   
-    CONFIG.record_dir = args.record_dir
+
 
 
     cmd = CommandLine(XAgentServerEnv)

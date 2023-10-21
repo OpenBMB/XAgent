@@ -70,7 +70,7 @@ Current Subtask: {{subtask_id}}
 File System Structure: {{workspace_files}}
 
 --- Available Operations ---
-- Make a normal tool call to handle the subtask and interact with real world.
+- Use tools to handle the subtask and interact with real world.
 - Use "subtask_submit" only when you achieve all milestones of the subtask or you make sure it's impossible with the given tools. Remember, you should also given suggestions to plan rectify agent, So he can rectify the plan after you submit the current subtask.
 
 *** Important Notice ***

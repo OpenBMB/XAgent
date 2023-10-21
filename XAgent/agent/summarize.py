@@ -57,7 +57,6 @@ def summarize_action(action_process:list[dict], task:str,)->(list[str],str):
             raw_action[1] = str(action['tool_output'])
             
         raw_actions[index] = raw_action
-        
     valid_index = list(raw_actions.keys())
     valid_index.sort()
     

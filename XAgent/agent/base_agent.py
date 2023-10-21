@@ -3,7 +3,6 @@ import json5
 from typing import List
 from colorama import Fore
 from copy import deepcopy
-from tenacity import retry, stop_after_attempt
 
 from XAgent.config import CONFIG
 from XAgent.utils import LLMStatusCode, RequiredAbilities
@@ -49,7 +48,6 @@ class BaseAgent(metaclass=abc.ABCMeta):
         return filled_messages
     
     
-    @retry(stop=stop_after_attempt(CONFIG.max_retry_times),reraise=True)
     def generate(self,
                  messages:list[dict]|list[Message],
                  arguments:dict=None,

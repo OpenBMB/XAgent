@@ -3,6 +3,7 @@ import json5
 import jsonschema
 from typing import List
 from colorama import Fore
+from tenacity import retry, stop_after_attempt
 
 from XAgent.agent.base_agent import BaseAgent
 from XAgent.utils import RequiredAbilities
@@ -15,6 +16,8 @@ from XAgent.config import CONFIG
 class ToolAgent(BaseAgent):
     abilities = set([RequiredAbilities.tool_tree_search])
     
+    
+    @retry(stop=stop_after_attempt(CONFIG.max_retry_times),reraise=True)
     def parse(
         self,
         placeholders: dict = {},
@@ -28,17 +31,20 @@ class ToolAgent(BaseAgent):
         **kwargs
     ):
         prompt_messages = self.fill_in_placeholders(placeholders)
-        
+        messages = prompt_messages[:additional_insert_index] + additional_messages + prompt_messages[additional_insert_index:]
+
         # Temporarily disable the arguments for openai
         if self.config.default_request_type == 'openai':
             arguments = None
+            functions = list(filter(lambda x: x['name'] not in ['subtask_submit','subtask_handle'],functions))
             if CONFIG.enable_ask_human_for_help:
                 functions += [function_manager.get_function_schema('ask_human_for_help')]
-            prompt_messages[0].content += '\n--- Avaliable Tools ---\n{}'.format(json.dumps(functions,indent=2))
+            prompt_messages[0].content += '\n--- Avaliable Tools ---\nYou are allowed to use tools in the "subtask_handle.tool_call" function field.\nRemember the "subtask_handle.tool_call.tool_input" field should always in JSON, as following described:\n{}'.format(json.dumps(functions,indent=2))
+            prompt_messages[-1].content = prompt_messages[-1].content.replace('Use tools to handle the subtask','Use "subtask_handle" to make a normal tool call to handle the subtask')
             functions = [function_manager.get_function_schema('subtask_submit'),
                          function_manager.get_function_schema('subtask_handle')]
             
-        messages = prompt_messages[:additional_insert_index] + additional_messages + prompt_messages[additional_insert_index:]
+            
 
         message,tokens = self.generate(
             messages=messages,
@@ -73,7 +79,8 @@ class ToolAgent(BaseAgent):
                     messages=messages,
                     error_message=str(e))["choices"][0]["message"]["function_call"]["arguments"]
                 validate()
-                function_call_args['tool_call']['tool_input'] = tool_call_args
+            
+            function_call_args['tool_call']['tool_input'] = tool_call_args
             
             message['function_call'] = function_call_args.pop('tool_call')
             message['function_call']['name'] = message['function_call'].pop('tool_name')

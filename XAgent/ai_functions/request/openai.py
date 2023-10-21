@@ -1,4 +1,4 @@
-import json5
+import json
 import openai
 
 from copy import deepcopy
@@ -27,8 +27,9 @@ def chatcompletion_request(**kwargs):
         response = record_query_response
     else:
         try:
+            # print(json.dumps(chatcompletion_kwargs))
             response = openai.ChatCompletion.create(**chatcompletion_kwargs)
-            response = json5.loads(str(response))
+            response = json.loads(str(response))
             if response['choices'][0]['finish_reason'] == 'length':
                 raise InvalidRequestError('maximum context length exceeded',None)
         except InvalidRequestError as e:
@@ -49,7 +50,7 @@ def chatcompletion_request(**kwargs):
                 chatcompletion_kwargs.pop('schema_error_retry',None)
                 
                 response = openai.ChatCompletion.create(**chatcompletion_kwargs)
-                response = json5.loads(str(response))
+                response = json.loads(str(response))
             else:
                 raise e
                     

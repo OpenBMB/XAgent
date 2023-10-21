@@ -4,9 +4,7 @@ import yaml
 import json5
 
 from typing import Optional, Tuple
-from tenacity import retry, stop_after_attempt,retry_if_not_exception_type
 from colorama import Fore
-from openai.error import AuthenticationError, PermissionError, InvalidRequestError
 
 from XAgent.config import CONFIG
 from XAgent.logs import logger
@@ -40,7 +38,6 @@ class FunctionManager:
             return
         self.function_cfgs[function_schema['name']] = function_schema
         
-    @retry(retry=retry_if_not_exception_type((AuthenticationError, PermissionError, InvalidRequestError)),stop=stop_after_attempt(CONFIG.max_retry_times),reraise=True)
     def execute(self,function_name:str,return_generation_usage:bool=False,function_cfg:dict=None,**kwargs,)->Tuple[dict,Optional[dict]]:
         if function_cfg is None and function_name in self.function_cfgs:
             function_cfg = self.function_cfgs.get(function_name)

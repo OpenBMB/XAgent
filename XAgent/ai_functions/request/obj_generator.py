@@ -20,11 +20,11 @@ class OBJGenerator:
     def __init__(self,):        
         self.chatcompletion_request_funcs = {}
         
-    # @retry(
-    #     retry=retry_if_not_exception_type((AuthenticationError, PermissionError, InvalidRequestError, AssertionError)),
-    #     stop=stop_after_attempt(CONFIG.max_retry_times+3), 
-    #     wait=wait_chain(*[wait_none() for _ in range(3)]+[wait_exponential(min=113, max=293)]),
-    #     reraise=True)
+    @retry(
+        retry=retry_if_not_exception_type((AuthenticationError, PermissionError, InvalidRequestError, AssertionError)),
+        stop=stop_after_attempt(CONFIG.max_retry_times+3), 
+        wait=wait_chain(*[wait_none() for _ in range(3)]+[wait_exponential(min=113, max=293)]),
+        reraise=True)
     def chatcompletion(self,**kwargs):
         model_name = get_model_name(kwargs.pop('model',CONFIG.default_completion_kwargs['model']))
         kwargs['model'] = model_name

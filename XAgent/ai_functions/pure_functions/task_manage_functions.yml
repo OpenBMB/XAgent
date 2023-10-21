@@ -34,9 +34,6 @@ functions:
     parameters:
       type: object
       properties:
-        thought:
-          type: string
-          description: "Why you choose this operation, and what you want to do next?"
         target_subtask_id:
           type: string
           description: "Which subtask do you want to modify. This must be a inter split by '.', like '1.2' '2.3.3' or '4'. You must ensure this subtask exists and is a FAIL task"
@@ -44,15 +41,12 @@ functions:
           type: array
           description: "Max 4 items, min 2 items. Array of the splited subtasks, length of 2-4"
           items: *task_item
-      required: ["thought", "target_subtask_id", "subtasks"]
+      required: ["target_subtask_id", "subtasks"]
   - name: subtask_operations
     description: "Change subtasks, including split, add, modify"
     parameters:
       type: object
       properties:
-        thought:
-          type: string
-          description: "reason for your operation choice and what you want to do next."
         operation:
           type: string
           enum: ["split", "add", "delete", "exit"]
@@ -63,4 +57,4 @@ functions:
           type: array
           description: "Don't add or splite task into subtasks that have been sovled. Max 2 items. Array of new subtasks. Useless for operation 'delete'. Make sure do not exceed the max width of the plan tree."
           items: *task_item
-      required: ["thought", "operation", "target_subtask_id", "subtasks"]
+      required: ["operation", "target_subtask_id", "subtasks"]

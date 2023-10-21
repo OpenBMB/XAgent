@@ -1,0 +1,298 @@
+2023-10-22 01:09:47,341 INFO Constructing an AgentDispatcher: XAgentDispatcher
+2023-10-22 01:12:56,230 INFO Constructing an AgentDispatcher: XAgentDispatcher
+2023-10-22 01:12:56,396 INFO ToolServer connected in http://localhost:8080
+2023-10-22 01:13:30,492 INFO Constructing an AgentDispatcher: XAgentDispatcher
+2023-10-22 01:13:30,633 INFO ToolServer connected in http://localhost:8080
+2023-10-22 01:14:50,831 INFO Constructing an AgentDispatcher: XAgentDispatcher
+2023-10-22 01:14:50,973 INFO ToolServer connected in http://localhost:8080
+2023-10-22 01:14:53,891 INFO -=-=-=-=-=-=-= BEGIN QUERY SOVLING -=-=-=-=-=-=-= 
+2023-10-22 01:14:54,094 INFO Role Assistant
+2023-10-22 01:14:54,174 INFO Task write a python code say hello!
+2023-10-22 01:14:54,337 INFO -=-=-=-=-=-=-= GENERATE INITIAL_PLAN -=-=-=-=-=-=-= 
+2023-10-22 01:14:54,451 INFO Constructing an Agent: PlanGenerateAgent
+2023-10-22 01:14:54,577 INFO Warning: arguments is not none for openai request, unexpected behavior may occur! 
+2023-10-22 01:14:54,839 INFO Warning: arguments is not none for openai request, unexpected behavior may occur! 
+2023-10-22 01:14:55,049 INFO Warning: arguments is not none for openai request, unexpected behavior may occur! 
+2023-10-22 01:15:36,566 INFO Constructing an AgentDispatcher: XAgentDispatcher
+2023-10-22 01:15:36,729 INFO ToolServer connected in http://localhost:8080
+2023-10-22 01:15:39,653 INFO -=-=-=-=-=-=-= BEGIN QUERY SOVLING -=-=-=-=-=-=-= 
+2023-10-22 01:15:39,828 INFO Role Assistant
+2023-10-22 01:15:39,925 INFO Task write a python code say hello!
+2023-10-22 01:15:40,073 INFO -=-=-=-=-=-=-= GENERATE INITIAL_PLAN -=-=-=-=-=-=-= 
+2023-10-22 01:15:40,247 INFO Constructing an Agent: PlanGenerateAgent
+2023-10-22 01:15:40,384 INFO Warning: arguments is not none for openai request, unexpected behavior may occur! 
+2023-10-22 01:15:40,689 INFO Warning: arguments is not none for openai request, unexpected behavior may occur! 
+2023-10-22 01:15:40,976 INFO Warning: arguments is not none for openai request, unexpected behavior may occur! 
+2023-10-22 01:18:49,608 INFO Constructing an AgentDispatcher: XAgentDispatcher
+2023-10-22 01:18:49,743 INFO ToolServer connected in http://localhost:8080
+2023-10-22 01:18:52,662 INFO -=-=-=-=-=-=-= BEGIN QUERY SOVLING -=-=-=-=-=-=-= 
+2023-10-22 01:18:52,825 INFO Role Assistant
+2023-10-22 01:18:52,898 INFO Task write a python code say hello!
+2023-10-22 01:18:53,103 INFO -=-=-=-=-=-=-= GENERATE INITIAL_PLAN -=-=-=-=-=-=-= 
+2023-10-22 01:18:53,252 INFO Constructing an Agent: PlanGenerateAgent
+2023-10-22 01:19:19,994 INFO Constructing an AgentDispatcher: XAgentDispatcher
+2023-10-22 01:19:20,140 INFO ToolServer connected in http://localhost:8080
+2023-10-22 01:19:23,082 INFO -=-=-=-=-=-=-= BEGIN QUERY SOVLING -=-=-=-=-=-=-= 
+2023-10-22 01:19:23,219 INFO Role Assistant
+2023-10-22 01:19:23,288 INFO Task write a python code say hello!
+2023-10-22 01:19:23,516 INFO -=-=-=-=-=-=-= GENERATE INITIAL_PLAN -=-=-=-=-=-=-= 
+2023-10-22 01:19:23,678 INFO Constructing an Agent: PlanGenerateAgent
+2023-10-22 01:22:06,737 INFO Constructing an AgentDispatcher: XAgentDispatcher
+2023-10-22 01:22:06,845 INFO ToolServer connected in http://localhost:8080
+2023-10-22 01:22:09,795 INFO -=-=-=-=-=-=-= BEGIN QUERY SOVLING -=-=-=-=-=-=-= 
+2023-10-22 01:22:09,919 INFO Role Assistant
+2023-10-22 01:22:09,989 INFO Task write a python code say hello!
+2023-10-22 01:22:10,160 INFO -=-=-=-=-=-=-= GENERATE INITIAL_PLAN -=-=-=-=-=-=-= 
+2023-10-22 01:22:10,244 INFO Constructing an Agent: PlanGenerateAgent
+2023-10-22 01:25:19,560 INFO Constructing an AgentDispatcher: XAgentDispatcher
+2023-10-22 01:25:19,695 INFO ToolServer connected in http://localhost:8080
+2023-10-22 01:25:22,620 INFO -=-=-=-=-=-=-= BEGIN QUERY SOVLING -=-=-=-=-=-=-= 
+2023-10-22 01:25:22,770 INFO Role Assistant
+2023-10-22 01:25:22,832 INFO Task write a python code say hello!
+2023-10-22 01:25:23,054 INFO -=-=-=-=-=-=-= GENERATE INITIAL_PLAN -=-=-=-=-=-=-= 
+2023-10-22 01:25:23,160 INFO Constructing an Agent: PlanGenerateAgent
+2023-10-22 01:25:23,255 DEBUG  chatcompletion: using gpt-3.5-turbo-16k
+2023-10-22 01:25:23,256 DEBUG  chatcompletion: using gpt-3.5-turbo-16k
+2023-10-22 01:25:23,256 DEBUG  chatcompletion: using gpt-3.5-turbo-16k
+2023-10-22 01:25:23,256 DEBUG  chatcompletion: using gpt-3.5-turbo-16k
+2023-10-22 01:25:55,181 INFO Constructing an AgentDispatcher: XAgentDispatcher
+2023-10-22 01:25:55,313 INFO ToolServer connected in http://localhost:8080
+2023-10-22 01:25:58,244 INFO -=-=-=-=-=-=-= BEGIN QUERY SOVLING -=-=-=-=-=-=-= 
+2023-10-22 01:25:58,397 INFO Role Assistant
+2023-10-22 01:25:58,438 INFO Task write a python code say hello!
+2023-10-22 01:25:58,652 INFO -=-=-=-=-=-=-= GENERATE INITIAL_PLAN -=-=-=-=-=-=-= 
+2023-10-22 01:25:58,791 INFO Constructing an Agent: PlanGenerateAgent
+2023-10-22 01:25:58,957 DEBUG  chatcompletion: using gpt-4-32k
+2023-10-22 01:25:58,957 DEBUG  chatcompletion: using gpt-4-32k
+2023-10-22 01:25:58,958 DEBUG  chatcompletion: using gpt-4-32k
+2023-10-22 01:25:58,958 DEBUG  chatcompletion: using gpt-4-32k
+2023-10-22 01:26:23,212 INFO Constructing an AgentDispatcher: XAgentDispatcher
+2023-10-22 01:26:23,323 INFO ToolServer connected in http://localhost:8080
+2023-10-22 01:26:26,273 INFO -=-=-=-=-=-=-= BEGIN QUERY SOVLING -=-=-=-=-=-=-= 
+2023-10-22 01:26:26,396 INFO Role Assistant
+2023-10-22 01:26:26,451 INFO Task write a python code say hello!
+2023-10-22 01:26:26,641 INFO -=-=-=-=-=-=-= GENERATE INITIAL_PLAN -=-=-=-=-=-=-= 
+2023-10-22 01:26:26,804 INFO Constructing an Agent: PlanGenerateAgent
+2023-10-22 01:26:26,956 DEBUG  chatcompletion: using gpt-4-32k
+2023-10-22 01:26:26,956 DEBUG  chatcompletion: using gpt-4-32k
+2023-10-22 01:26:26,956 DEBUG  chatcompletion: using gpt-4-32k
+2023-10-22 01:31:31,415 INFO Constructing an AgentDispatcher: XAgentDispatcher
+2023-10-22 01:31:31,536 INFO ToolServer connected in http://localhost:8080
+2023-10-22 01:31:34,435 INFO -=-=-=-=-=-=-= BEGIN QUERY SOVLING -=-=-=-=-=-=-= 
+2023-10-22 01:31:34,646 INFO Role Assistant
+2023-10-22 01:31:34,749 INFO Task write a python code say hello!
+2023-10-22 01:31:34,936 INFO -=-=-=-=-=-=-= GENERATE INITIAL_PLAN -=-=-=-=-=-=-= 
+2023-10-22 01:31:35,111 INFO Constructing an Agent: PlanGenerateAgent
+2023-10-22 01:31:35,275 DEBUG  chatcompletion: using gpt-4-32k
+2023-10-22 01:31:49,868 INFO Constructing an AgentDispatcher: XAgentDispatcher
+2023-10-22 01:31:50,014 INFO ToolServer connected in http://localhost:8080
+2023-10-22 01:31:53,011 INFO -=-=-=-=-=-=-= BEGIN QUERY SOVLING -=-=-=-=-=-=-= 
+2023-10-22 01:31:53,181 INFO Role Assistant
+2023-10-22 01:31:53,286 INFO Task write a python code say hello!
+2023-10-22 01:31:53,480 INFO -=-=-=-=-=-=-= GENERATE INITIAL_PLAN -=-=-=-=-=-=-= 
+2023-10-22 01:31:53,569 INFO Constructing an Agent: PlanGenerateAgent
+2023-10-22 01:31:53,689 DEBUG  chatcompletion: using gpt-3.5-turbo-16k
+2023-10-22 01:31:57,014 DEBUG LLM inout registed: query-id=0
+2023-10-22 01:32:08,133 INFO Constructing an AgentDispatcher: XAgentDispatcher
+2023-10-22 01:32:08,251 INFO ToolServer connected in http://localhost:8080
+2023-10-22 01:32:11,213 INFO -=-=-=-=-=-=-= BEGIN QUERY SOVLING -=-=-=-=-=-=-= 
+2023-10-22 01:32:11,374 INFO Role Assistant
+2023-10-22 01:32:11,451 INFO Task write a python code say hello!
+2023-10-22 01:32:11,668 INFO -=-=-=-=-=-=-= GENERATE INITIAL_PLAN -=-=-=-=-=-=-= 
+2023-10-22 01:32:11,764 INFO Constructing an Agent: PlanGenerateAgent
+2023-10-22 01:32:11,898 DEBUG  chatcompletion: using gpt-3.5-turbo-16k
+2023-10-22 01:32:14,112 DEBUG LLM inout registed: query-id=0
+2023-10-22 01:32:14,139 INFO -=-=-=-=-=-=-= ITERATIVELY REFINE PLAN BASED ON MEMORY SYSTEM -=-=-=-=-=-=-= 
+2023-10-22 01:32:14,380 INFO -=-=-=-=-=-=-= Performing Task 1.1 (Write Python code): Begin -=-=-=-=-=-=-= 
+2023-10-22 01:32:14,677 INFO Task Name: Write Python code
+2023-10-22 01:32:14,839 INFO Task Goal: Write a Python code.
+2023-10-22 01:32:15,031 INFO Task Prior-Criticism: The code may have errors and need to be tested.
+2023-10-22 01:32:15,297 INFO Task Milestones: 
+2023-10-22 01:32:15,380 INFO -  Write the code
+2023-10-22 01:32:15,489 INFO -  Test the code
+2023-10-22 01:32:15,589 INFO Task Status: TODO
+2023-10-22 01:32:15,698 INFO Constructing an Agent: ToolAgent
+2023-10-22 01:32:50,675 INFO Constructing an AgentDispatcher: XAgentDispatcher
+2023-10-22 01:32:50,830 INFO ToolServer connected in http://localhost:8080
+2023-10-22 01:32:53,824 INFO -=-=-=-=-=-=-= BEGIN QUERY SOVLING -=-=-=-=-=-=-= 
+2023-10-22 01:32:53,989 INFO Role Assistant
+2023-10-22 01:32:54,099 INFO Task write a python code say hello!
+2023-10-22 01:32:54,269 INFO -=-=-=-=-=-=-= GENERATE INITIAL_PLAN -=-=-=-=-=-=-= 
+2023-10-22 01:32:54,436 INFO Constructing an Agent: PlanGenerateAgent
+2023-10-22 01:32:54,590 DEBUG  chatcompletion: using gpt-3.5-turbo-16k
+2023-10-22 01:32:57,159 DEBUG LLM inout registed: query-id=0
+2023-10-22 01:32:57,187 INFO -=-=-=-=-=-=-= ITERATIVELY REFINE PLAN BASED ON MEMORY SYSTEM -=-=-=-=-=-=-= 
+2023-10-22 01:32:57,434 INFO -=-=-=-=-=-=-= Performing Task 1.1 (Create python file): Begin -=-=-=-=-=-=-= 
+2023-10-22 01:32:57,720 INFO Task Name: Create python file
+2023-10-22 01:32:57,862 INFO Task Goal: Create a new python file
+2023-10-22 01:32:58,088 INFO Task Prior-Criticism: No python file exists
+2023-10-22 01:32:58,287 INFO Task Milestones: 
+2023-10-22 01:32:58,327 INFO -  Open a text editor or IDE
+2023-10-22 01:32:58,494 INFO -  Create a new file
+2023-10-22 01:32:58,629 INFO -  Save the file with a .py extension
+2023-10-22 01:32:58,848 INFO Task Status: TODO
+2023-10-22 01:32:58,986 INFO Constructing an Agent: ToolAgent
+2023-10-22 01:32:59,149 INFO Constructing a searching method: ReACTChainSearch
+2023-10-22 01:32:59,290 INFO -=-=-=-=-=-=-= THOUGHTS, REASONING, PLAN AND CRITICISM WILL NOW BE VERIFIED BY AGENT -=-=-=-=-=-=-= 
+2023-10-22 01:55:19,050 INFO Constructing an AgentDispatcher: XAgentDispatcher
+2023-10-22 01:55:34,161 INFO Constructing an AgentDispatcher: XAgentDispatcher
+2023-10-22 01:55:34,311 INFO ToolServer connected in http://localhost:8080
+2023-10-22 01:55:37,255 INFO -=-=-=-=-=-=-= BEGIN QUERY SOVLING -=-=-=-=-=-=-= 
+2023-10-22 01:55:37,447 INFO Role Assistant
+2023-10-22 01:55:37,557 INFO Task write a python code say hello!
+2023-10-22 01:55:37,779 INFO -=-=-=-=-=-=-= GENERATE INITIAL_PLAN -=-=-=-=-=-=-= 
+2023-10-22 01:55:37,948 INFO Constructing an Agent: PlanGenerateAgent
+2023-10-22 01:55:38,065 DEBUG  chatcompletion: using gpt-3.5-turbo-16k
+2023-10-22 01:55:39,364 DEBUG LLM inout registed: query-id=0
+2023-10-22 01:55:39,381 INFO -=-=-=-=-=-=-= ITERATIVELY REFINE PLAN BASED ON MEMORY SYSTEM -=-=-=-=-=-=-= 
+2023-10-22 01:55:39,622 INFO -=-=-=-=-=-=-= Performing Task 1.1 (Write python code): Begin -=-=-=-=-=-=-= 
+2023-10-22 01:55:39,847 INFO Task Name: Write python code
+2023-10-22 01:55:39,980 INFO Task Goal: Write a python code that prints 'hello'
+2023-10-22 01:55:40,209 INFO Task Prior-Criticism: None
+2023-10-22 01:55:40,318 INFO Task Milestones: 
+2023-10-22 01:55:40,443 INFO -  Create a new Python file
+2023-10-22 01:55:40,606 INFO -  Write code to print 'hello'
+2023-10-22 01:55:40,799 INFO Task Status: TODO
+2023-10-22 01:55:40,899 INFO Constructing an Agent: ToolAgent
+2023-10-22 01:55:41,071 INFO Constructing a searching method: ReACTChainSearch
+2023-10-22 01:55:41,180 INFO -=-=-=-=-=-=-= THOUGHTS, REASONING, PLAN AND CRITICISM WILL NOW BE VERIFIED BY AGENT -=-=-=-=-=-=-= 
+2023-10-22 01:55:41,508 DEBUG  chatcompletion: using gpt-3.5-turbo-16k
+2023-10-22 01:55:41,652 DEBUG  chatcompletion: using gpt-3.5-turbo-16k
+2023-10-22 01:55:41,792 DEBUG  chatcompletion: using gpt-3.5-turbo-16k
+2023-10-22 02:12:16,940 INFO Constructing an AgentDispatcher: XAgentDispatcher
+2023-10-22 02:12:17,085 INFO ToolServer connected in http://localhost:8080
+2023-10-22 02:12:20,163 INFO -=-=-=-=-=-=-= BEGIN QUERY SOVLING -=-=-=-=-=-=-= 
+2023-10-22 02:12:20,303 INFO Role Assistant
+2023-10-22 02:12:20,378 INFO Task write a python code say hello!
+2023-10-22 02:12:20,583 INFO -=-=-=-=-=-=-= GENERATE INITIAL_PLAN -=-=-=-=-=-=-= 
+2023-10-22 02:12:20,751 INFO Constructing an Agent: PlanGenerateAgent
+2023-10-22 02:12:20,872 DEBUG  chatcompletion: using gpt-3.5-turbo-16k
+2023-10-22 02:12:24,848 DEBUG LLM inout registed: query-id=0
+2023-10-22 02:12:24,879 INFO -=-=-=-=-=-=-= ITERATIVELY REFINE PLAN BASED ON MEMORY SYSTEM -=-=-=-=-=-=-= 
+2023-10-22 02:12:25,133 INFO -=-=-=-=-=-=-= Performing Task 1.1 (Write Python code): Begin -=-=-=-=-=-=-= 
+2023-10-22 02:12:25,395 INFO Task Name: Write Python code
+2023-10-22 02:12:25,558 INFO Task Goal: Write a Python code to say hello
+2023-10-22 02:12:25,795 INFO Task Prior-Criticism: Lack of knowledge in Python programming
+2023-10-22 02:12:26,060 INFO Task Milestones: 
+2023-10-22 02:12:26,164 INFO -  Research and understand basic Python syntax
+2023-10-22 02:12:26,356 INFO -  Create a new Python file
+2023-10-22 02:12:26,537 INFO -  Write Python code to print 'Hello world!'
+2023-10-22 02:12:26,776 INFO Task Status: TODO
+2023-10-22 02:12:26,904 INFO Constructing an Agent: ToolAgent
+2023-10-22 02:12:27,018 INFO Constructing a searching method: ReACTChainSearch
+2023-10-22 02:12:27,162 INFO -=-=-=-=-=-=-= THOUGHTS, REASONING, PLAN AND CRITICISM WILL NOW BE VERIFIED BY AGENT -=-=-=-=-=-=-= 
+2023-10-22 02:12:46,185 INFO Constructing an AgentDispatcher: XAgentDispatcher
+2023-10-22 02:12:46,329 INFO ToolServer connected in http://localhost:8080
+2023-10-22 02:12:49,294 INFO -=-=-=-=-=-=-= BEGIN QUERY SOVLING -=-=-=-=-=-=-= 
+2023-10-22 02:12:49,431 INFO Role Assistant
+2023-10-22 02:12:49,502 INFO Task write a python code say hello!
+2023-10-22 02:12:49,691 INFO -=-=-=-=-=-=-= GENERATE INITIAL_PLAN -=-=-=-=-=-=-= 
+2023-10-22 02:12:49,805 INFO Constructing an Agent: PlanGenerateAgent
+2023-10-22 02:12:49,970 DEBUG  chatcompletion: using gpt-3.5-turbo-16k
+2023-10-22 02:12:51,295 DEBUG LLM inout registed: query-id=0
+2023-10-22 02:12:51,312 INFO -=-=-=-=-=-=-= ITERATIVELY REFINE PLAN BASED ON MEMORY SYSTEM -=-=-=-=-=-=-= 
+2023-10-22 02:12:51,527 INFO -=-=-=-=-=-=-= Performing Task 1.1 (Write Python code): Begin -=-=-=-=-=-=-= 
+2023-10-22 02:12:51,723 INFO Task Name: Write Python code
+2023-10-22 02:12:51,869 INFO Task Goal: Write a Python code that says hello
+2023-10-22 02:12:52,115 INFO Task Prior-Criticism: No criticism
+2023-10-22 02:12:52,258 INFO Task Milestones: 
+2023-10-22 02:12:52,337 INFO -  Create a new Python file
+2023-10-22 02:12:52,535 INFO -  Write code to print 'Hello, World!'
+2023-10-22 02:12:52,737 INFO Task Status: TODO
+2023-10-22 02:12:52,840 INFO Constructing an Agent: ToolAgent
+2023-10-22 02:12:52,983 INFO Constructing a searching method: ReACTChainSearch
+2023-10-22 02:12:53,179 INFO -=-=-=-=-=-=-= THOUGHTS, REASONING, PLAN AND CRITICISM WILL NOW BE VERIFIED BY AGENT -=-=-=-=-=-=-= 
+2023-10-22 02:12:53,526 DEBUG  chatcompletion: using gpt-3.5-turbo-16k
+2023-10-22 02:12:53,748 DEBUG  chatcompletion: using gpt-3.5-turbo-16k
+2023-10-22 02:12:53,917 DEBUG  chatcompletion: using gpt-3.5-turbo-16k
+2023-10-22 02:14:44,606 INFO Constructing an AgentDispatcher: XAgentDispatcher
+2023-10-22 02:14:44,698 INFO ToolServer connected in http://localhost:8080
+2023-10-22 02:14:47,665 INFO -=-=-=-=-=-=-= BEGIN QUERY SOVLING -=-=-=-=-=-=-= 
+2023-10-22 02:14:47,846 INFO Role Assistant
+2023-10-22 02:14:47,954 INFO Task write a python code say hello!
+2023-10-22 02:14:48,141 INFO -=-=-=-=-=-=-= GENERATE INITIAL_PLAN -=-=-=-=-=-=-= 
+2023-10-22 02:14:48,255 INFO Constructing an Agent: PlanGenerateAgent
+2023-10-22 02:14:48,374 DEBUG  chatcompletion: using gpt-3.5-turbo-16k
+2023-10-22 02:14:50,727 DEBUG LLM inout registed: query-id=0
+2023-10-22 02:14:50,757 INFO -=-=-=-=-=-=-= ITERATIVELY REFINE PLAN BASED ON MEMORY SYSTEM -=-=-=-=-=-=-= 
+2023-10-22 02:14:51,001 INFO -=-=-=-=-=-=-= Performing Task 1.1 (Install Python): Begin -=-=-=-=-=-=-= 
+2023-10-22 02:14:51,255 INFO Task Name: Install Python
+2023-10-22 02:14:51,406 INFO Task Goal: Install Python on the system
+2023-10-22 02:14:51,608 INFO Task Prior-Criticism: The system may not have Python installed
+2023-10-22 02:14:51,864 INFO Task Milestones: 
+2023-10-22 02:14:51,990 INFO -  Check if Python is already installed
+2023-10-22 02:14:52,161 INFO -  If Python is not installed, download and install Python
+2023-10-22 02:14:52,443 INFO Task Status: TODO
+2023-10-22 02:14:52,571 INFO Constructing an Agent: ToolAgent
+2023-10-22 02:14:52,744 INFO Constructing a searching method: ReACTChainSearch
+2023-10-22 02:14:52,911 INFO -=-=-=-=-=-=-= THOUGHTS, REASONING, PLAN AND CRITICISM WILL NOW BE VERIFIED BY AGENT -=-=-=-=-=-=-= 
+2023-10-22 02:14:53,242 DEBUG  chatcompletion: using gpt-3.5-turbo-16k
+2023-10-22 02:14:53,542 DEBUG  chatcompletion: using gpt-3.5-turbo-16k
+2023-10-22 02:14:53,762 DEBUG  chatcompletion: using gpt-3.5-turbo-16k
+2023-10-22 02:16:09,015 INFO Constructing an AgentDispatcher: XAgentDispatcher
+2023-10-22 02:16:09,124 INFO ToolServer connected in http://localhost:8080
+2023-10-22 02:16:12,044 INFO -=-=-=-=-=-=-= BEGIN QUERY SOVLING -=-=-=-=-=-=-= 
+2023-10-22 02:16:12,213 INFO Role Assistant
+2023-10-22 02:16:12,302 INFO Task write a python code say hello!
+2023-10-22 02:16:12,506 INFO -=-=-=-=-=-=-= GENERATE INITIAL_PLAN -=-=-=-=-=-=-= 
+2023-10-22 02:16:12,646 INFO Constructing an Agent: PlanGenerateAgent
+2023-10-22 02:16:12,781 DEBUG  chatcompletion: using gpt-3.5-turbo-16k
+2023-10-22 02:16:12,781 DEBUG  chatcompletion: using gpt-3.5-turbo-16k
+2023-10-22 02:16:12,781 DEBUG  chatcompletion: using gpt-3.5-turbo-16k
+2023-10-22 02:16:25,693 INFO Constructing an AgentDispatcher: XAgentDispatcher
+2023-10-22 02:16:25,859 INFO ToolServer connected in http://localhost:8080
+2023-10-22 02:16:28,798 INFO -=-=-=-=-=-=-= BEGIN QUERY SOVLING -=-=-=-=-=-=-= 
+2023-10-22 02:16:28,964 INFO Role Assistant
+2023-10-22 02:16:29,063 INFO Task write a python code say hello!
+2023-10-22 02:16:29,246 INFO -=-=-=-=-=-=-= GENERATE INITIAL_PLAN -=-=-=-=-=-=-= 
+2023-10-22 02:16:29,435 INFO Constructing an Agent: PlanGenerateAgent
+2023-10-22 02:16:29,578 DEBUG  chatcompletion: using gpt-3.5-turbo-16k
+2023-10-22 02:16:31,393 DEBUG LLM inout registed: query-id=0
+2023-10-22 02:16:31,416 INFO -=-=-=-=-=-=-= ITERATIVELY REFINE PLAN BASED ON MEMORY SYSTEM -=-=-=-=-=-=-= 
+2023-10-22 02:16:31,702 INFO -=-=-=-=-=-=-= Performing Task 1.1 (Write code): Begin -=-=-=-=-=-=-= 
+2023-10-22 02:16:31,960 INFO Task Name: Write code
+2023-10-22 02:16:32,112 INFO Task Goal: Write a Python code
+2023-10-22 02:16:32,261 INFO Task Prior-Criticism: 
+2023-10-22 02:16:32,353 INFO Task Milestones: 
+2023-10-22 02:16:32,470 INFO -  Research Python syntax
+2023-10-22 02:16:32,585 INFO -  Declare a function
+2023-10-22 02:16:32,745 INFO -  Print 'Hello, world!'
+2023-10-22 02:16:32,833 INFO Task Status: TODO
+2023-10-22 02:16:32,940 INFO Constructing an Agent: ToolAgent
+2023-10-22 02:16:33,035 INFO Constructing a searching method: ReACTChainSearch
+2023-10-22 02:16:33,225 INFO -=-=-=-=-=-=-= THOUGHTS, REASONING, PLAN AND CRITICISM WILL NOW BE VERIFIED BY AGENT -=-=-=-=-=-=-= 
+2023-10-22 02:16:33,570 DEBUG  chatcompletion: using gpt-3.5-turbo-16k
+2023-10-22 02:16:34,182 DEBUG LLM inout registed: query-id=1
+2023-10-22 02:16:34,182 WARNING  FunctionCallSchemaError: Function PythonNotebook_print_notebook not found in the provided functions.
+2023-10-22 02:16:34,183 DEBUG  chatcompletion: using gpt-3.5-turbo-16k
+2023-10-22 02:16:34,819 DEBUG LLM inout registed: query-id=2
+2023-10-22 02:16:34,820 WARNING  FunctionCallSchemaError: Function PythonNotebook_execute_cell not found in the provided functions.
+2023-10-22 02:16:34,820 DEBUG  chatcompletion: using gpt-3.5-turbo-16k
+2023-10-22 02:16:35,524 DEBUG LLM inout registed: query-id=3
+2023-10-22 02:16:35,524 WARNING  FunctionCallSchemaError: Function PythonNotebook_execute_cell not found in the provided functions.
+2023-10-22 02:18:04,330 INFO Constructing an AgentDispatcher: XAgentDispatcher
+2023-10-22 02:18:04,456 INFO ToolServer connected in http://localhost:8080
+2023-10-22 02:18:07,445 INFO -=-=-=-=-=-=-= BEGIN QUERY SOVLING -=-=-=-=-=-=-= 
+2023-10-22 02:18:07,563 INFO Role Assistant
+2023-10-22 02:18:07,663 INFO Task write a python code say hello!
+2023-10-22 02:18:07,853 INFO -=-=-=-=-=-=-= GENERATE INITIAL_PLAN -=-=-=-=-=-=-= 
+2023-10-22 02:18:08,022 INFO Constructing an Agent: PlanGenerateAgent
+2023-10-22 02:18:08,175 DEBUG  chatcompletion: using gpt-3.5-turbo-16k
+2023-10-22 02:18:10,727 DEBUG LLM inout registed: query-id=0
+2023-10-22 02:18:10,767 INFO -=-=-=-=-=-=-= ITERATIVELY REFINE PLAN BASED ON MEMORY SYSTEM -=-=-=-=-=-=-= 
+2023-10-22 02:18:11,004 INFO -=-=-=-=-=-=-= Performing Task 1.1 (Write a Python script): Begin -=-=-=-=-=-=-= 
+2023-10-22 02:18:11,270 INFO Task Name: Write a Python script
+2023-10-22 02:18:11,493 INFO Task Goal: Write a Python script that prints 'Hello!'
+2023-10-22 02:18:11,728 INFO Task Prior-Criticism: Potential problems may include syntax errors or incorrect logic in the script
+2023-10-22 02:18:12,090 INFO Task Milestones: 
+2023-10-22 02:18:12,170 INFO -  Create a new Python file
+2023-10-22 02:18:12,327 INFO -  Write the code to print 'Hello!'
+2023-10-22 02:18:12,531 INFO -  Save the file
+2023-10-22 02:18:12,679 INFO Task Status: TODO
+2023-10-22 02:18:12,783 INFO Constructing an Agent: ToolAgent
+2023-10-22 02:18:12,943 INFO Constructing a searching method: ReACTChainSearch
+2023-10-22 02:18:13,080 INFO -=-=-=-=-=-=-= THOUGHTS, REASONING, PLAN AND CRITICISM WILL NOW BE VERIFIED BY AGENT -=-=-=-=-=-=-= 
+2023-10-22 02:18:13,421 DEBUG  chatcompletion: using gpt-3.5-turbo-16k
+2023-10-22 02:18:14,902 DEBUG LLM inout registed: query-id=1
+2023-10-22 02:18:14,902 WARNING  FunctionCallSchemaError: Function PythonNotebook_execute_cell not found in the provided functions.
+2023-10-22 02:18:14,902 DEBUG  chatcompletion: using gpt-3.5-turbo-16k

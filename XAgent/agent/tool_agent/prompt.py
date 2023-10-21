@@ -62,11 +62,6 @@ As a Super Agent build with super powerful tools, you are capable of handling an
 The query has already been splited into a tree based plan as follows: 
 {{all_plan}}
 You have already performed some of the subtasks.
-
---- Avaliable Tools ---
-You are allowed to use tools in the "subtask_handle.tool_call" function field. 
-Remember the "subtask_handle.tool_call.tool_input" field should always in JSON, as following described:
-{{avaliable_tools}}
 '''
 
 USER_PROMPT = '''Now, it's your turn give the next function call (please output all the necessary parameters for the function call).
@@ -75,7 +70,7 @@ Current Subtask: {{subtask_id}}
 File System Structure: {{workspace_files}}
 
 --- Available Operations ---
-- Use "subtask_handle" to make a normal tool call to handle the subtask and interact with real world.
+- Make a normal tool call to handle the subtask and interact with real world.
 - Use "subtask_submit" only when you achieve all milestones of the subtask or you make sure it's impossible with the given tools. Remember, you should also given suggestions to plan rectify agent, So he can rectify the plan after you submit the current subtask.
 
 *** Important Notice ***

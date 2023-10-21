@@ -1,15 +1,15 @@
 import re
-from typing import List
 import copy
-from XAgent.utils import LLMStatusCode
-from XAgent.agent.utils import _chat_completion_request
-from XAgent.agent.base_agent import GPT4Normal
+import json5
+from typing import List
+
 from .prompt import SYSTEM_PROMPT
-from XAgent.message_history import Message
+
 from XAgent.logs import logger
+from XAgent.message_history import Message
+from XAgent.agent.base_agent import BaseAgent
 
-
-class DispatcherAgent(GPT4Normal):
+class DispatcherAgent(BaseAgent):
     def __init__(self, config, prompt_messages: List[Message] = None):
         self.config = config
         self.prompt_messages = (
@@ -84,7 +84,7 @@ class DispatcherAgent(GPT4Normal):
         # TODO: should we consider additional messages when generating prompt?
         # currently the plan generation and refine agent are the same since we
         # don't consider the additional messages when generating prompt.
-        output = _chat_completion_request(
+        message,tokens = self.generate(
             messages=self.construct_input_messages(
                 task,
                 example_input,
@@ -93,14 +93,12 @@ class DispatcherAgent(GPT4Normal):
                 # self.retrieved_procedure(task),
                 ""  # The retrieved procedures are mostly irrelevant for now
             ),
-            model=self.config.default_completion_kwargs['model'],
             stop=stop,
             **args,
         )
-        message = output["choices"][0]["message"]
-        tokens = output["usage"]
 
-        additional_prompt = self.extract_prompts_from_response(message)
+        # additional_prompt = self.extract_prompts_from_response(message)
+        additional_prompt = message['arguments']['additional_prompt']
 
         prompt_messages = []
         if additional_prompt != "":
@@ -108,4 +106,4 @@ class DispatcherAgent(GPT4Normal):
         prompt_messages.append(Message(role="system", content=example_system_prompt))
         prompt_messages.append(Message(role="user", content=example_user_prompt))
 
-        return LLMStatusCode.SUCCESS, prompt_messages, tokens
+        return prompt_messages, tokens

@@ -13,6 +13,7 @@ from XAgent.message_history import Message
 from XAgent.tool_call_handle import function_handler, toolserver_interface
 from XAgent.utils import SearchMethodStatusCode, ToolCallStatusCode
 from XAgent.data_structure.plan import Plan
+from XAgent.ai_functions import function_manager
 NOW_SUBTASK_PROMPT = '''
 
 '''
@@ -48,20 +49,9 @@ class ReACTChainSearch(BaseSearchMethod):
 
         self.tree_list = []
 
-    def run(self, config, agent: BaseAgent, task_handler, function_list, tool_functions_description_list, max_try=1,
-            max_answer=1):
+    async def run_async(self, config, agent: BaseAgent, task_handler, arguments, functions, task_id, max_try=1, max_answer=1):
         for _attempt_id in range(max_try):
-            self.generate_chain(config, agent, task_handler,
-                                function_list, tool_functions_description_list, )
-
-        if self.status == SearchMethodStatusCode.HAVE_AT_LEAST_ONE_ANSWER:
-            self.status = SearchMethodStatusCode.SUCCESS
-        else:
-            self.status = SearchMethodStatusCode.FAIL
-
-    async def run_async(self, config, agent: BaseAgent, task_handler, function_list, tool_functions_description_list, task_id, max_try=1, max_answer=1):
-        for _attempt_id in range(max_try):
-            await self.generate_chain_async(config, agent, task_handler, function_list, tool_functions_description_list, task_id)
+            await self.generate_chain_async(config, agent, task_handler, arguments,functions, task_id)
 
         if self.status == SearchMethodStatusCode.HAVE_AT_LEAST_ONE_ANSWER:
             self.status = SearchMethodStatusCode.SUCCESS
@@ -70,100 +60,6 @@ class ReACTChainSearch(BaseSearchMethod):
 
     def get_finish_node(self):
         return self.finish_node
-
-    def generate_chain(self, config, agent: BaseAgent, task_handler, function_list, tool_functions_description_list, ):
-        self.tree_list.append(TaskSearchTree())
-        now_attempt_tree = self.tree_list[-1]
-        now_node = now_attempt_tree.root
-        # now_node.workspace_hash_id = start_workspace_hashid
-
-        while now_node.get_depth() < config.max_subtask_chain_length:
-            logger.typewriter_log(
-                "-=-=-=-=-=-=-= THOUGHTS, REASONING, PLAN AND CRITICISM WILL NOW BE VERIFIED BY AGENT -=-=-=-=-=-=-=",
-                Fore.GREEN,
-                "",
-            )
-            message_sequence = make_message(now_node=now_node,
-                                            task_handler=task_handler,
-                                            max_length=config.max_subtask_chain_length,
-                                            config=config)
-
-            
-            function_call = None
-            if now_node.get_depth() == config.max_subtask_chain_length - 1:
-                function_call = {"name": "subtask_submit"}
-
-            file_archi, _, = toolserver_interface.execute_command_client(
-                "FileSystemEnv_print_filesys_struture", {"return_root":True})
-            file_archi,length = clip_text(file_archi,1000,clip_end=True)
-            human_prompt = ""
-            if config.enable_ask_human_for_help:
-                human_prompt = "- Use 'ask_human_for_help' when you need help, remember to be specific to your requirement to help user to understand your problem."
-            else:
-                human_prompt = "- Human is not avaliable for help. You are not allowed to ask human for help in any form or channel. Solve the problem by yourself. If information is not enough, try your best to use default value."
-            
-            
-            all_plan = task_handler.plan_agent.latest_plan.to_json()
-            if config.enable_summary:
-                all_plan = summarize_plan(all_plan)
-            else:
-                all_plan = json.dumps(all_plan, indent=2, ensure_ascii=False)
-            
-            
-            LLM_code, new_message, tokens = agent.parse(
-                placeholders={
-                    "system": {
-                        "avaliable_tools": json.dumps(tool_functions_description_list, indent=2, ensure_ascii=False),
-                        "all_plan": all_plan
-                    },
-                    "user": {
-                        "workspace_files": file_archi,
-                        "subtask_id": task_handler.now_dealing_task.get_subtask_id(to_str=True),
-                        "max_length": config.max_subtask_chain_length,
-                        "step_num": str(now_node.get_depth() + 1),
-                        "human_help_prompt": human_prompt,
-                    }
-                },
-                functions=function_list,
-                function_call=function_call,
-                additional_messages=message_sequence,
-                additional_insert_index=-1
-            )
-            new_tree_node = agent.message_to_tool_node(new_message)
-
-            # new_tree_node.history = deepcopy(now_node.history)
-
-            # new_tree_node.history.add("user",DEFAULT_TRIGGERING_PROMPT)
-
-            if "content" in new_message.keys():
-                content = new_message["content"]
-            else:
-                content = ""
-
-            # if "function_call" in new_message.keys():
-            #     new_tree_node.history.add("assistant", content, "ai_response", dict(new_message["function_call"]))
-            # else:
-            #     new_tree_node.history.add("assistant", content, "ai_response")
-            print_assistant_thoughts(
-                new_tree_node.data, False
-            )
-
-            tool_output, tool_output_status_code, need_for_plan_refine, using_tools = function_handler.handle_tool_call(
-                new_tree_node, task_handler)
-            self.need_for_plan_refine = need_for_plan_refine
-
-            now_attempt_tree.make_father_relation(now_node, new_tree_node)
-
-            now_node = new_tree_node
-
-            if tool_output_status_code == ToolCallStatusCode.SUBMIT_AS_SUCCESS:
-
-                self.status = SearchMethodStatusCode.HAVE_AT_LEAST_ONE_ANSWER
-                break
-            elif tool_output_status_code == ToolCallStatusCode.SUBMIT_AS_FAILED:
-                break
-
-        self.finish_node = now_node
 
     def get_origin_data(self, data):
         assistant_thoughts_reasoning = None
@@ -222,20 +118,11 @@ class ReACTChainSearch(BaseSearchMethod):
                         "criticism", assistant_thoughts_criticism)
 
             return old, True
-            # if "goal" in args.keys() and "goal" in old_keys.keys():
-            #     old.data["thoughts"]["properties"]["goal"] = args.get("goal", old.data.thoughts.goal)
-            # if "reasoning" in args.keys() and "reasoning" in old_keys.keys():
-            #     old.data["thoughts"]["properties"]["reasoning"] = args.get("reasoning", old.data.thoughts.reasoning)
-            # if "plan" in args.keys() and "plan" in old_keys.keys():
-            #     old.data.plan = args.get("plan", old.data.thoughts.plan)
-            # if "criticism" in args.keys() and "criticism" in old_keys.keys():
-            #     old.data.criticism = args.get("criticism", old.data.thoughts.criticism)
 
-    async def generate_chain_async(self, config, agent: BaseAgent, task_handler, function_list, tool_functions_description_list, task_id):
+    async def generate_chain_async(self, config, agent: BaseAgent, task_handler, arguments,functions, task_id):
         self.tree_list.append(TaskSearchTree())
         now_attempt_tree = self.tree_list[-1]
         now_node = now_attempt_tree.root
-        # now_node.workspace_hash_id = start_workspace_hashid
 
         while now_node.get_depth() < config.max_subtask_chain_length:
             logger.typewriter_log(
@@ -267,7 +154,6 @@ class ReACTChainSearch(BaseSearchMethod):
                                             task_handler=task_handler,
                                             max_length=config.max_subtask_chain_length,
                                             config=config)
-
             
             function_call = None
             if now_node.get_depth() == config.max_subtask_chain_length - 1:
@@ -276,12 +162,12 @@ class ReACTChainSearch(BaseSearchMethod):
             file_archi, _, = toolserver_interface.execute_command_client(
                 "FileSystemEnv_print_filesys_struture",{"return_root":True})
             file_archi,length = clip_text(file_archi,1000,clip_end=True)
-            if length > 1000:
-                file_archi = file_archi+'`...wrapped...`'
                 
             human_prompt = ""
             if config.enable_ask_human_for_help:
                 human_prompt = "- Use 'ask_human_for_help' when you need help, remember to be specific to your requirement to help user to understand your problem."
+            else:
+                human_prompt = "- Human is not avaliable for help. You are not allowed to ask human for help in any form or channel. Solve the problem by yourself. If information is not enough, try your best to use default value."
 
             all_plan = task_handler.plan_agent.latest_plan.to_json()
             if config.enable_summary:
@@ -289,11 +175,9 @@ class ReACTChainSearch(BaseSearchMethod):
             else:
                 all_plan = json.dumps(all_plan, indent=2, ensure_ascii=False)
             
-            # BACK - Yujia：parse出来的结果就是要推到前端的信息
-            LLM_code, new_message, tokens = agent.parse(
+            new_message, tokens = agent.parse(
                 placeholders={
                     "system": {
-                        "avaliable_tools": json.dumps(tool_functions_description_list, indent=2, ensure_ascii=False),
                         "all_plan": all_plan
                     },
                     "user": {
@@ -304,26 +188,14 @@ class ReACTChainSearch(BaseSearchMethod):
                         "human_help_prompt": human_prompt,
                     }
                 },
-                functions=function_list,
+                arguments=arguments,
+                functions=functions,
                 function_call=function_call,
                 additional_messages=message_sequence,
                 additional_insert_index=-1
             )
             new_tree_node = agent.message_to_tool_node(new_message)
 
-            # new_tree_node.history = deepcopy(now_node.history)
-
-            # new_tree_node.history.add("user",DEFAULT_TRIGGERING_PROMPT)
-
-            if "content" in new_message.keys():
-                content = new_message["content"]
-            else:
-                content = ""
-
-            # if "function_call" in new_message.keys():
-            #     new_tree_node.history.add("assistant", content, "ai_response", dict(new_message["function_call"]))
-            # else:
-            #     new_tree_node.history.add("assistant", content, "ai_response")
             print_data = print_assistant_thoughts(
                 new_tree_node.data, False
             )

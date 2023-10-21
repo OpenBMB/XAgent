@@ -1,0 +1,2 @@
+class FunctionCallSchemaError(Exception):
+    pass

@@ -53,16 +53,7 @@ class PlanRefineChain():
         init_message =  Message("user", f"""The initial plan and the execution status is:\n'''\n{init_message}\n'''\n\n""")
         output_list = [init_message]
         for k, (function, output_plan) in enumerate(zip(self.functions, self.plans[1:])):
-            operation_message = Message("user", f"""For the {k+1}\'th step, You made the following operation:
-function_name: {function["name"]}
-'''
-{json.dumps(function["input"],indent=2,ensure_ascii=False)}
-'''
-
-Then get the operation result:
-{function["output"]}
-
-""")
+            operation_message = Message("user", f"""For the {k+1}\'th step, You made the following operation:\nfunction_name: {function["name"]}\n'''\n{json.dumps(function["input"],indent=2,ensure_ascii=False)}\n'''\nThen get the operation result:\n{function["output"]}\n""")
             output_list.append(operation_message)
         if len(self.plans) > 1:
             if flag_changed:
@@ -102,7 +93,6 @@ class PlanAgent():
 
 
         split_functions = deepcopy(function_manager.get_function_schema('subtask_split_operation'))
-        # split_functions["parameters"]["properties"]["subtasks"]["items"]["properties"]["expected_tools"]["items"]["properties"]["tool_name"]["enum"] = [cont["name"] for cont in self.avaliable_tools_description_list]
 
         agent = agent_dispatcher.dispatch(
             RequiredAbilities.plan_generation,
@@ -111,7 +101,7 @@ class PlanAgent():
         )
 
         # TODO: not robust. dispatcher generated prompt may not contain these specified placeholders?
-        _, new_message , _ = agent.parse(
+        new_message , _ = agent.parse(
             placeholders={
                 "system": {
                     # "avaliable_tool_descriptions": json.dumps(self.avaliable_tools_description_list, indent=2, ensure_ascii=False),
@@ -121,8 +111,8 @@ class PlanAgent():
                     "query": self.plan.data.raw
                 }
             },
+            arguments=deepcopy(function_manager.get_function_schema('simple_thought')['parameters']),
             functions=[split_functions], 
-            function_call={"name":"subtask_split_operation"},
         )
         
         subtasks = json5.loads(new_message["function_call"]["arguments"])
@@ -179,44 +169,32 @@ class PlanAgent():
             
             additional_message_list = self.refine_chains[-1].parse_to_message_list(flag_changed)
 
-            function_call = None
             functions=[deepcopy(function_manager.get_function_schema('subtask_operations'))]
-            function_call = {"name":"subtask_operations"}
-            # print(message_list)
-            try_times = 0
-
-
-            while True:
-                _,new_message , _ = agent.parse(
-                    placeholders={
-                        "system": {
-                            # "avaliable_tool_descriptions": json.dumps(self.avaliable_tools_description_list, indent=2, ensure_ascii=False),
-                            "avaliable_tool_names": str([cont["name"] for cont in self.avaliable_tools_description_list]),
-                            "max_plan_tree_width": self.config.max_plan_tree_width,
-                            "max_plan_tree_depth": self.config.max_plan_tree_depth,
-                        },
-                        "user": {
-                            "subtask_id": subtask_id,
-                            "max_step": max_step,
-                            "modify_steps": modify_steps,
-                            "max_plan_tree_depth": self.config.max_plan_tree_depth,
-                            "workspace_files": workspace_files,
-                            "refine_node_message":refine_node_message,
-                        }
-                    }, 
-                    functions=functions, 
-                    function_call=function_call,
-                    additional_messages=additional_message_list,
-                    additional_insert_index=-1,
-                )
-                # print(new_message)
-                if not "function_call" in new_message.keys():
-                    print("function_call not found, continue to call the LLM API for a new function_call")
-                    try_times += 1
-                    continue
-                function_name = new_message["function_call"]["name"]
-                function_input = json5.loads(new_message["function_call"]["arguments"])
-                break
+            
+            new_message , _ = agent.parse(
+                placeholders={
+                    "system": {
+                        # "avaliable_tool_descriptions": json.dumps(self.avaliable_tools_description_list, indent=2, ensure_ascii=False),
+                        "avaliable_tool_names": str([cont["name"] for cont in self.avaliable_tools_description_list]),
+                        "max_plan_tree_width": self.config.max_plan_tree_width,
+                        "max_plan_tree_depth": self.config.max_plan_tree_depth,
+                    },
+                    "user": {
+                        "subtask_id": subtask_id,
+                        "max_step": max_step,
+                        "modify_steps": modify_steps,
+                        "max_plan_tree_depth": self.config.max_plan_tree_depth,
+                        "workspace_files": workspace_files,
+                        "refine_node_message":refine_node_message,
+                    }
+                }, 
+                arguments=deepcopy(function_manager.get_function_schema('simple_thought')['parameters']),
+                functions=functions, 
+                additional_messages=additional_message_list,
+                additional_insert_index=-1,
+            )
+            function_name = new_message["function_call"]["name"]
+            function_input = json5.loads(new_message["function_call"]["arguments"])
 
             if function_input['operation'] == 'split':
                 # modify function_input here

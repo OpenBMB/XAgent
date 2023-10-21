@@ -4,6 +4,7 @@ import json
 import yaml
 import uuid
 import logging
+from copy import deepcopy
 from colorama import Fore, Style
 from XAgent.logs import logger
 from XAgent.workflow.base_query import AutoGPTQuery
@@ -45,6 +46,12 @@ class RunningRecoder():
         self.tool_call_cache = []
         self.plan_refine_cache = []
 
+        self.query_count = 0
+    def get_query_id(self):
+        query_id = deepcopy(self.query_count)
+        self.query_count += 1
+        return query_id
+    
     def change_now_task(self, new_subtask_id):
         self.now_subtask_id = new_subtask_id
         self.tool_call_id = 0

@@ -90,9 +90,8 @@ python run.py --task "put your task here" --model "gpt-4"
 
 - 使用GUI运行XAgent
 ```bash
-cd XAgentServer
-docker-compose up
-# 新开一个命令行，开启docker中的 nginx
+# 在ToolServer docker 时已经开启web ui docker了
+# 只需新开一个命令行，开启docker中的 nginx
 docker exec XAgent-Server systemctl start nginx
 
 # 当然，您也可以通过下面的命令启动后端服务

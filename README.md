@@ -103,8 +103,7 @@ python run.py --task "put your task here" --model "gpt-4"
 
 - Run XAgent with GUI
 ```bash
-cd XAgentServer
-docker-compose up
+# we ran the web ui docker when build ToolServer network
 # run nginx in docker
 docker exec XAgent-Server systemctl start nginx
 

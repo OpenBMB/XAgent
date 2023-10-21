@@ -1,7 +1,7 @@
 import abc
 from colorama import Fore
 
-from XAgent.loggers.logs import logger
+from XAgent.logs import logger
 from XAgent.utils import SearchMethodStatusCode
 from XAgent.data_structure.node import ToolNode
 

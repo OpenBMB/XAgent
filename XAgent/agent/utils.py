@@ -13,7 +13,7 @@ from tenacity import retry, stop_after_attempt,retry_if_not_exception_type
 
 from XAgent.utils import TaskSaveItem, LLMStatusCode
 from XAgent.message_history import Message
-from XAgent.loggers.logs import logger
+from XAgent.logs import logger
 from XAgent.config import CONFIG
 from XAgent.running_recorder import recorder
 from XAgent.ai_functions.request import openai_chatcompletion_request

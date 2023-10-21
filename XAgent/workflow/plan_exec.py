@@ -5,7 +5,7 @@ from typing import List
 from colorama import Fore, Style
 from copy import deepcopy
 
-from XAgent.loggers.logs import logger
+from XAgent.logs import logger
 from XAgent.workflow.base_query import BaseQuery
 from XAgent.global_vars import agent_dispatcher
 from XAgent.utils import TaskSaveItem, RequiredAbilities, PlanOperationStatusCode, TaskStatusCode

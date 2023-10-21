@@ -6,7 +6,7 @@ from XAgent.agent.utils import _chat_completion_request
 from XAgent.agent.base_agent import GPT4Normal
 from .prompt import SYSTEM_PROMPT
 from XAgent.message_history import Message
-from XAgent.loggers.logs import logger
+from XAgent.logs import logger
 
 
 class DispatcherAgent(GPT4Normal):

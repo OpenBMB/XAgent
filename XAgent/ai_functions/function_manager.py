@@ -9,7 +9,7 @@ from colorama import Fore
 from openai.error import AuthenticationError, PermissionError, InvalidRequestError
 from .request import openai_chatcompletion_request
 from XAgent.config import CONFIG
-from XAgent.loggers.logs import logger
+from XAgent.logs import logger
 
 class FunctionManager:
     def __init__(self,

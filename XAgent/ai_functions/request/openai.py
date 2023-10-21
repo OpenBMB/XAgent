@@ -8,7 +8,7 @@ from colorama import Fore
 from openai.error import AuthenticationError, PermissionError, InvalidRequestError
 from tenacity import retry, stop_after_attempt, wait_exponential,retry_if_not_exception_type, wait_chain, wait_none
 
-from XAgent.loggers.logs import logger
+from XAgent.logs import logger
 from XAgent.config import CONFIG,get_openai_model_name,get_apiconfig_by_model
 from XAgent.running_recorder import recorder
 

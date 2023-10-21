@@ -11,7 +11,7 @@ from colorama import Fore
 from jsonschema import Draft7Validator
 import os
 import json5
-from XAgent.loggers.logs import logger
+from XAgent.logs import logger
 
 # CFG = Config()
 

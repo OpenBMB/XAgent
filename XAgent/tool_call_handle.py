@@ -10,7 +10,7 @@ from typing import List
 from colorama import Fore, Style
 from concurrent.futures import ThreadPoolExecutor
 
-from XAgent.loggers.logs import logger
+from XAgent.logs import logger
 from XAgent.data_structure.node import ToolNode
 from XAgent.utils import ToolCallStatusCode
 from XAgent.running_recorder import recorder

@@ -2,7 +2,7 @@
 from colorama import Fore, Style
 from typing import List, Dict
 
-from XAgent.loggers.logs import logger, print_task_save_items
+from XAgent.logs import logger, print_task_save_items
 from XAgent.ai_functions import function_manager
 
 class WorkingMemoryAgent():

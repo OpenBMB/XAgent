@@ -26,6 +26,8 @@ summary:
 
 use_selfhost_toolserver: true
 selfhost_toolserver_url: http://localhost:8080
+use_xagentllm: true 
+xagentllm_url: http://localhost:7218
 
 max_retry_times: 3
 max_subtask_chain_length: 7

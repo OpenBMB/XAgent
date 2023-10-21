@@ -8,7 +8,7 @@ from XAgent.agent.summarize import summarize_action,summarize_plan,clip_text,get
 from XAgent.data_structure.node import ToolNode
 from XAgent.data_structure.tree import TaskSearchTree
 from XAgent.inner_loop_search_algorithms.base_search import BaseSearchMethod
-from XAgent.loggers.logs import logger, print_assistant_thoughts
+from XAgent.logs import logger, print_assistant_thoughts
 from XAgent.message_history import Message
 from XAgent.tool_call_handle import function_handler, toolserver_interface
 from XAgent.utils import SearchMethodStatusCode, ToolCallStatusCode

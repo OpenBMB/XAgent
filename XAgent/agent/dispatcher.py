@@ -4,7 +4,7 @@ from colorama import Fore, Style
 
 from XAgent.agent.base_agent import BaseAgent
 from XAgent.utils import RequiredAbilities, TaskSaveItem, AgentRole
-from XAgent.loggers.logs import logger
+from XAgent.logs import logger
 from XAgent.agent.dispatcher_agent import DispatcherAgent
 from XAgent.message_history import Message
 

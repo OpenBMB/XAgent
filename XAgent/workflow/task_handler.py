@@ -7,7 +7,7 @@ from colorama import Fore
 # , working_memory_agent, vector_db_interface
 from XAgent.global_vars import agent_dispatcher
 from XAgent.inner_loop_search_algorithms.ReACT import ReACTChainSearch
-from XAgent.loggers.logs import logger, print_task_save_items
+from XAgent.logs import logger, print_task_save_items
 from XAgent.running_recorder import recorder
 from XAgent.tool_call_handle import function_handler, toolserver_interface
 from XAgent.agent.summarize import summarize_plan 

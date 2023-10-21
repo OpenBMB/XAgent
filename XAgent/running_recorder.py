@@ -5,7 +5,7 @@ import yaml
 import uuid
 import logging
 from colorama import Fore, Style
-from XAgent.loggers.logs import logger
+from XAgent.logs import logger
 from XAgent.workflow.base_query import AutoGPTQuery
 from XAgent.config import XAgentConfig, CONFIG
 

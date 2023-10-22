@@ -154,6 +154,10 @@ XAgent 不仅能处理琐碎任务，还可以在复杂任务中提供宝贵的�
 # 🖌️ 博客
 我们的官方博客在[这里](https://blog.x-agent.net/)！
 
+# 🌟 星标历史
+
+[![Star History Chart](https://api.star-history.com/svg?repos=openbmb/xagent&type=Date)](https://star-history.com/#openbmb/xagent&Date)
+
 # 引用
 如果您发现我们的仓库对您有帮助，请引用我们的论文：
 ```angular2

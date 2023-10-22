@@ -171,6 +171,10 @@ Our blog is available at [here](https://blog.x-agent.net/)!
 
 <div><a id="Citation"></a></div>
 
+# 🌟 Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=openbmb/xagent&type=Date)](https://star-history.com/#openbmb/xagent&Date)
+
 # Citation
 If you find our repo useful, please kindly consider citing:
 ```angular2

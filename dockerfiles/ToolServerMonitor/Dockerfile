@@ -6,14 +6,14 @@ EXPOSE 8180
 
 WORKDIR /app
 
-COPY ToolServerMonitor/requirements.txt .
+COPY ToolServer/ToolServerMonitor/requirements.txt .
 
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY ToolServerMonitor .
+COPY ToolServer/ToolServerMonitor .
 
 RUN mkdir -p assets
 
-COPY config/monitor.yml ./assets/config.yml
+COPY assets/config/monitor.yml ./assets/config.yml
 
 ENTRYPOINT [ "python", "main.py"]

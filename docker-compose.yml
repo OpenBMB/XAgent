@@ -4,8 +4,8 @@ services:
   ToolServerManager:
     image: tool-server-manager:0.2
     build:
-      context: .
-      dockerfile: ./dockerfiles/ToolServerManager/Dockerfile
+      context: ./
+      dockerfile: dockerfiles/ToolServerManager/Dockerfile
     ports:
       - 8080:8080
     volumes:
@@ -18,21 +18,22 @@ services:
      DB_COLLECTION: ${DB_COLLECTION}
     depends_on:
       - db
-    command: ["--workers","8","-t","600"]
+    command: ["--workers","4","-t","600"]
 
+  # This will create a test node that will nerver be used by XAgent
   ToolServerNode:
     image: tool-server-node:0.2
     build:
-      context: .
-      dockerfile: ./dockerfiles/ToolServerNode/Dockerfile
+      context: ./
+      dockerfile: dockerfiles/ToolServerNode/Dockerfile
     entrypoint: /bin/sh -c 'echo "Build complete. Exiting..." && exit 0'
     command: echo "Build complete. Exiting..."
 
   ToolServerMonitor:
     image: tool-server-monitor:0.1
     build:
-      context: .
-      dockerfile: ./dockerfiles/ToolServerMonitor/Dockerfile
+      context: ./
+      dockerfile: dockerfiles/ToolServerMonitor/Dockerfile
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
@@ -58,9 +59,12 @@ services:
   XAgentServer:
     image: xagent-server:0.3
     build:
-      context: ..
-      dockerfile: ./XAgentServer/dockerfiles/Dockerfile
+      context: ./
+      dockerfile: dockerfiles/XAgentServer/Dockerfile
     container_name: XAgent-Server
+    environment:
+      - TOOLSERVER_URL=${TOOLSERVER_URL}
+      - CONFIG_FILE=${CONFIG_FILE}
     ports:
       - "5173:5173"
       - "8090:8090"

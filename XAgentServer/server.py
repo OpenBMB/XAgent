@@ -30,7 +30,7 @@ class XAgentServer:
         from XAgent.workflow.base_query import AutoGPTQuery
         from XAgent.workflow.task_handler import TaskHandler
         from XAgent.workflow.working_memory import WorkingMemoryAgent
-
+        config.reload()
         # args
         args = interaction.parameter.args
         if interaction.base.recorder_root_dir:

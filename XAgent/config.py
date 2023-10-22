@@ -1,3 +1,4 @@
+import os
 import yaml
 from copy import deepcopy
 
@@ -26,11 +27,13 @@ class XAgentConfig(dict):
         else:
             return self
     
-    def reload(self,config_file='config.yml'):
+    def reload(self,config_file='assets/config.yml'):
+        config_file = os.getenv('CONFIG_FILE', config_file)
         self.__init__(**yaml.load(open(config_file, 'r'), Loader=yaml.FullLoader))
-    
+        # check environment variables
+        self['selfhost_toolserver_url'] = os.getenv('TOOLSERVER_URL', self['selfhost_toolserver_url'])
     @staticmethod
-    def get_default_config(config_file='config.yml'):
+    def get_default_config(config_file='assets/config.yml'):
         try:
             cfg = yaml.load(open(config_file, 'r'), Loader=yaml.FullLoader)
         except:
@@ -39,7 +42,9 @@ class XAgentConfig(dict):
 
 CONFIG = XAgentConfig.get_default_config()
 
-def get_model_name(model_name:str=CONFIG.default_completion_kwargs['model']):
+def get_model_name(model_name:str=None):
+    if model_name is None:
+        model_name = CONFIG.default_completion_kwargs['model']
     normalized_model_name = ''
     match model_name.lower():
         case 'gpt-4':

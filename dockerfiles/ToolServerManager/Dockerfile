@@ -6,15 +6,15 @@ EXPOSE 8080
 
 WORKDIR /app
 
-COPY ToolServerManager/requirements.txt .
+COPY ToolServer/ToolServerManager/requirements.txt .
 
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY ToolServerManager .
+COPY ToolServer/ToolServerManager .
 
 RUN mkdir -p assets
 
-COPY config/manager.yml ./assets/config.yml
+COPY assets/config/manager.yml ./assets/config.yml
 
 HEALTHCHECK --interval=30s --timeout=5s --start-period=1s --retries=3 CMD ["bash", "-c", "curl -sS 'http://localhost:8080/alive' || exit 1"]
 

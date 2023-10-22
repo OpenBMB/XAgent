@@ -24,14 +24,21 @@ def parse_args():
     parser.add_argument("--max_plan_tree_depth", type=int, default=CONFIG.max_plan_tree_depth)
     parser.add_argument("--max_plan_tree_width", type=int, default=CONFIG.max_plan_tree_width)
     parser.add_argument("--max_retry_times", type=int, default=CONFIG.max_retry_times)
-    parser.add_argument("--config_file",type=str,default="config.yml")
+    parser.add_argument("--config_file",type=str,default="assets/config.yml")
 
     args = parser.parse_args()
     return args
 
 if __name__ == '__main__':
     args = parse_args()
-    CONFIG.reload(args.config_file)
+    os.environ['CONFIG_FILE'] = args.config_file
+
+    cmd = CommandLine(XAgentServerEnv)
+    if args.quiet:
+        original_stdout = sys.stdout
+        from XAgent.running_recorder import recorder
+        sys.stdout = open(os.path.join(recorder.record_root_dir,"command_line.ansi"),"w",encoding="utf-8")
+        
     CONFIG.record_dir = args.record_dir
     CONFIG.default_completion_kwargs['model']  = args.model
     CONFIG.enable_ask_human_for_help = args.enable_ask_human_for_help
@@ -40,14 +47,6 @@ if __name__ == '__main__':
     CONFIG.max_plan_tree_depth = args.max_plan_tree_depth
     CONFIG.max_plan_tree_width = args.max_plan_tree_width
     CONFIG.max_retry_times = args.max_retry_times   
-
-
-
-    cmd = CommandLine(XAgentServerEnv)
-    if args.quiet:
-        original_stdout = sys.stdout
-        from XAgent.running_recorder import recorder
-        sys.stdout = open(os.path.join(recorder.record_root_dir,"command_line.ansi"),"w",encoding="utf-8")
     cmd.start(
         args.task,
         role="Assistant",

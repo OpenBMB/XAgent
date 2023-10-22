@@ -1,4 +1,4 @@
-openai_keys:
+api_keys:
   gpt-3.5-turbo-16k:
     - api_key: sk-xxxxx
       api_base: https://example.com
@@ -24,6 +24,8 @@ openai_keys:
       organization: org-xxxxxx
       model: gpt-4-32k
 
+
+default_request_type: openai # or xagent
 default_completion_kwargs:
   model: gpt-4-32k
   temperature: 0.2
@@ -35,9 +37,9 @@ summary:
   max_return_length: 12384
 
 use_selfhost_toolserver: true
-selfhost_toolserver_url: http://ToolServerManager:8080
+selfhost_toolserver_url: http://localhost:8080
 
-max_retry_times: 3
+max_retry_times: 5
 max_subtask_chain_length: 15
 max_plan_refine_chain_length: 3
 max_plan_tree_depth: 3

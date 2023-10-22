@@ -16,7 +16,7 @@ ToolServer由3个部件组成：
 你也可以轻松的开发自己的工具并添加到ToolServer中，增强agents的能力。
 
 ## ⚡️ 配置ToolServer
-ToolServer的配置文件存放在`ToolServer/config/`目录下，你可以修改配置文件并重新构建镜像以应用修改。
+ToolServer的配置文件存放在`assets/config/`目录下，你可以修改配置文件并重新构建镜像以应用修改。
 注意事项：
 - 如果你不允许XAgent在`ToolServerNode`中使用docker，请将`manager.yml`中的`node.privileged`设置为`false`。
 - 将`monitor.yml`中的`idling_close_minutes`设置为ToolServerMonitor在关闭空闲的ToolServerNode实例前等待的时间（默认30分钟）。
@@ -24,7 +24,7 @@ ToolServer的配置文件存放在`ToolServer/config/`目录下，你可以修�
 - 如果你遇到ToolServer的超时错误，请在`docker-compose.yml`中修改`services.ToolServerManager.command`中`-t`后面的值以修改ToolServer的超时时间。
 
 ## 🛠️ 编译和启动ToolServer
-所有的docker镜像构建文件都存放在`ToolServer/dockerfiles`目录下。
+所有的docker镜像构建文件都存放在`dockerfiles`目录下。
 你可以使用如下命令手动构建所有镜像：
 ```bash
 cd ToolServer

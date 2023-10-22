@@ -1,2 +1,2 @@
 from .function_manager import FunctionManager,function_manager
-from . import request
+from .request import objgenerator, OBJGenerator

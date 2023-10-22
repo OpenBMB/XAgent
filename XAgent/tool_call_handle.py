@@ -10,7 +10,8 @@ from typing import List
 from colorama import Fore, Style
 from concurrent.futures import ThreadPoolExecutor
 
-from XAgent.loggers.logs import logger
+from XAgent.config import CONFIG
+from XAgent.logs import logger
 from XAgent.data_structure.node import ToolNode
 from XAgent.utils import ToolCallStatusCode
 from XAgent.running_recorder import recorder
@@ -266,7 +267,6 @@ class FunctionHandler():
     def __init__(self):
         self.subtask_submit_function = function_manager.get_function_schema('subtask_submit')
 
-        self.subtask_handle_function = function_manager.get_function_schema('subtask_handle')
 
         # TODO: support more complex versions of human help, like collaborative debugging.
         self.ask_human_for_help_function  = function_manager.get_function_schema('ask_human_for_help')
@@ -305,18 +305,21 @@ class FunctionHandler():
         )
 
     def change_subtask_handle_function_enum(self, function_name_list: List[str]):
-        self.subtask_handle_function["parameters"]["properties"]["tool_call"]["properties"]["tool_name"]["enum"] = function_name_list
-
-        # collection_function["parameters"]["properties"]["tool_call"]["properties"]["tool_input"]["description"] = function_descriptions
+        match CONFIG.default_request_type:
+            case 'openai':
+                self.subtask_handle_function = function_manager.get_function_schema('subtask_handle')
+                self.subtask_handle_function["parameters"]["properties"]["tool_call"]["properties"]["tool_name"]["enum"] = function_name_list
+            case 'xagent':
+                pass
+            case _:
+                raise NotImplementedError(f"Request type {self.config.default_request_type} not implemented")
 
     def intrinsic_tools(self, enable_ask_human_for_help):
+        tools = [self.subtask_submit_function,]
         if enable_ask_human_for_help:
-            
-            #  self.human_interruption_function
-
-            return [self.subtask_submit_function, self.subtask_handle_function, self.ask_human_for_help_function]
-        else:
-            return [self.subtask_submit_function, self.subtask_handle_function]
+            tools.append(self.ask_human_for_help_function)
+        tools.extend(self.avaliable_tools_description_list)
+        return tools
 
     def get_functions(self, config):
         output = toolserver_interface.get_available_tools()
@@ -440,12 +443,6 @@ class FunctionHandler():
             tool_status_code = tool_output_status_code.name,
             thought_data={"thought": node.data["thoughts"], "content": node.data["content"]},
         )
-
-        # if input_hash_id == "":
-        #     input_hash_id = "root_workspace"
-        # logger.typewriter_log(
-        #     "WORKSPACE_HASH_ID: ", Fore.CYAN, f"{input_hash_id} {Fore.CYAN}->{Style.RESET_ALL} {output_hash_id}"
-        # )
 
         using_tools = {
             "tool_name": command_name,

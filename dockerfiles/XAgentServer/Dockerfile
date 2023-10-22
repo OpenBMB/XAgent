@@ -1,9 +1,9 @@
 FROM node:lts-alpine AS XAgentWeb
 EXPOSE 5173
 WORKDIR /app
-COPY ./XAgentWeb/package.json ./
+COPY XAgentWeb/package.json ./
 RUN npm config set registry https://registry.npmmirror.com/ && npm install
-COPY ./XAgentWeb .
+COPY XAgentWeb .
 RUN npm run build
 
 
@@ -14,8 +14,10 @@ RUN apt-get update --fix-missing
 RUN apt-get install -y nginx systemctl
 WORKDIR /app
 COPY --from=XAgentWeb /app/dist ./dist/
-COPY ./XAgentServer/nginx/nginx.conf /etc/nginx/nginx.conf
-COPY ./XAgentServer/requirements.txt requirements.txt
+COPY XAgentServer/nginx/nginx.conf /etc/nginx/nginx.conf
+COPY XAgentServer/requirements.txt requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
+COPY requirements.txt requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*

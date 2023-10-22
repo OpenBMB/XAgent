@@ -4,8 +4,9 @@ import json
 import yaml
 import uuid
 import logging
+from copy import deepcopy
 from colorama import Fore, Style
-from XAgent.loggers.logs import logger
+from XAgent.logs import logger
 from XAgent.workflow.base_query import AutoGPTQuery
 from XAgent.config import XAgentConfig, CONFIG
 
@@ -45,6 +46,14 @@ class RunningRecoder():
         self.tool_call_cache = []
         self.plan_refine_cache = []
 
+        self.query_count = 0
+    def get_query_id(self):
+        query_id = deepcopy(self.query_count)
+        self.query_count += 1
+        return query_id
+    def decrease_query_id(self):
+        self.query_count -= 1
+    
     def change_now_task(self, new_subtask_id):
         self.now_subtask_id = new_subtask_id
         self.tool_call_id = 0
@@ -64,7 +73,7 @@ class RunningRecoder():
 
         self.plan_refine_id += 1
 
-    def regist_llm_inout(self, llm_query_id, messages, functions, function_call, model, stop, other_args, output_data):
+    def regist_llm_inout(self, llm_query_id, messages, functions=None, function_call=None, model=None, stop=None, output_data=None,**other_args):
         with open(os.path.join(self.record_root_dir, "LLM_inout_pair", f"{llm_query_id:05d}.json"),"w",encoding="utf-8") as writer:
             llm_inout_record = {
                 "input": {
@@ -83,7 +92,7 @@ class RunningRecoder():
             logger.typewriter_log("LLM inout registed:",Fore.RED, f"query-id={llm_query_id}",level=logging.DEBUG)
 
 
-    def query_llm_inout(self, llm_query_id, messages, functions, function_call, model, stop, other_args):
+    def query_llm_inout(self, llm_query_id, messages, functions=None, function_call=None, model=None, stop=None, **other_args):
         if self.newly_start:
             return None
         input_data = {
@@ -95,10 +104,9 @@ class RunningRecoder():
             "other_args": dump_common_things(other_args),
         }
         if llm_query_id >= len(self.llm_server_cache):
-            logger.typewriter_log("Reach the max length of record: exit!!")
-            exit()
+            logger.typewriter_log("Reach the max length of record")
+            return None
         cache = self.llm_server_cache[llm_query_id]
-        # import pdb; pdb.set_trace()
         if input_data == cache["input"]:
             logger.typewriter_log(
                 "get a llm_server response from Record",
@@ -106,8 +114,8 @@ class RunningRecoder():
                 f"query-id={llm_query_id}"
             )
             return cache["output"]
-        # import pdb; pdb.set_trace()
-        assert False, f"{llm_query_id} didn't find output"
+        # assert False, f"{llm_query_id} didn't find output"
+        return None
 
 
     def regist_tool_call(self, tool_name, tool_input, tool_output, tool_status_code, thought_data=None):
@@ -140,7 +148,9 @@ class RunningRecoder():
     def query_tool_server_cache(self, url, payload):
         if self.newly_start:
             return None
-        assert self.tool_server_interface_id < len(self.tool_server_cache), "Running Exists Record Saved Region"
+        if self.tool_server_interface_id >= len(self.tool_server_cache):
+            return None
+        # assert self.tool_server_interface_id < len(self.tool_server_cache), "Running Exists Record Saved Region"
         cache = self.tool_server_cache[self.tool_server_interface_id]
         # import pdb; pdb.set_trace()
         if cache["url"] == url.split("/")[-1] and cache["payload"] == dump_common_things(payload):
@@ -154,7 +164,7 @@ class RunningRecoder():
                 "response_status_code": cache["response_status_code"]
             }
 
-        assert False
+        return None
 
     def regist_query(self, query):
         with open(os.path.join(self.record_root_dir, f"query.json"), "w",encoding="utf-8",) as writer:

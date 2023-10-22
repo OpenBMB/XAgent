@@ -2,7 +2,7 @@ from colorama import Fore
 from XAgent.utils import ToolCallStatusCode,get_token_nums,clip_text
 from XAgent.ai_functions import function_manager
 from XAgent.config import CONFIG
-from XAgent.loggers.logs import logger
+from XAgent.logs import logger
 
 SINGLE_ACTION_MAX_LENGTH = CONFIG.summary['single_action_max_length']
 MAX_RETURN_LENGTH = CONFIG.summary['max_return_length']
@@ -57,7 +57,6 @@ def summarize_action(action_process:list[dict], task:str,)->(list[str],str):
             raw_action[1] = str(action['tool_output'])
             
         raw_actions[index] = raw_action
-        
     valid_index = list(raw_actions.keys())
     valid_index.sort()
     

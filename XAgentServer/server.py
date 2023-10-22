@@ -30,7 +30,7 @@ class XAgentServer:
         from XAgent.workflow.base_query import AutoGPTQuery
         from XAgent.workflow.task_handler import TaskHandler
         from XAgent.workflow.working_memory import WorkingMemoryAgent
-
+        config.reload()
         # args
         args = interaction.parameter.args
         if interaction.base.recorder_root_dir:
@@ -43,7 +43,7 @@ class XAgentServer:
                 f"server is running, the start recorder_root_dir is {interaction.base.recorder_root_dir}")
         else:
             query = AutoGPTQuery(
-                role_name=args.get('role_name', ''),
+                role_name=args.get('role_name', 'Assistant'),
                 task=args.get('goal', ''),
                 plan=args.get('plan', [
                 ]),

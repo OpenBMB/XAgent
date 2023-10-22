@@ -6,7 +6,7 @@ from dataclasses import dataclass, field
 from typing import TYPE_CHECKING
 from typing import List, Literal, TypedDict
 
-from XAgent.loggers.logs import logger
+from XAgent.logs import logger
 
 
 MessageRole = Literal["system", "user", "assistant","function"]

@@ -2,7 +2,7 @@ import abc
 from colorama import Fore, Style
 
 
-from XAgent.loggers.logs import logger
+from XAgent.logs import logger
 
 
 class BaseQuery(metaclass = abc.ABCMeta):

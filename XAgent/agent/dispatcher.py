@@ -1,10 +1,11 @@
-from typing import List
 import abc
+from typing import List
 from colorama import Fore, Style
+from XAgent.config import CONFIG
 
 from XAgent.agent.base_agent import BaseAgent
 from XAgent.utils import RequiredAbilities, TaskSaveItem, AgentRole
-from XAgent.loggers.logs import logger
+from XAgent.logs import logger
 from XAgent.agent.dispatcher_agent import DispatcherAgent
 from XAgent.message_history import Message
 
@@ -112,3 +113,7 @@ class XAgentDispatcher(AgentDispatcher):
             ]
         agent = self.build_agent(ability_type, self.config, prompt_messages, *args, **kwargs)
         return agent
+
+
+
+agent_dispatcher = XAgentDispatcher(CONFIG, enable=False)

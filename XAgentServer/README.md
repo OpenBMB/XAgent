@@ -2,24 +2,11 @@
 
 This is a demo of the XAgent-Server frontend and backend. The backend communication is mainly implemented using fastapi's `websocket`, supplemented with essential restful APIs. The frontend service is deployed locally.
 
-## Build the Image
-
-The code for XAgent-Server is located in the `XAgentServer/` directory. Every time the code is modified, the image needs to be rebuilt using the following command:
-
-```bash
-cd XAgentServer
-docker-compose build
-```
 
 ## Launching XAgent-Server
 
-First, navigate to the demo service folder `XAgentServer/`. Then, to launch the XAgent-Server, execute the following command:
+First, we ran web ui docker when build ToolServer network.
 
-```bash
-# XAgentServer/
-cd XAgentServer
-docker-compose up
-```
 This will start an instance of XAgent-Server listening to port `8090` on the local machine. The configuration details can be found in the `XAgentServer/docker-compose.yml` file.
 
 After completing the image compilation and startup, you need to start the nginx service. Execute the following command on another command line:

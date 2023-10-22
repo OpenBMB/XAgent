@@ -26,7 +26,7 @@ summary:
   max_return_length: 2048
 
 use_selfhost_toolserver: true
-selfhost_toolserver_url: http://localhost:8080
+selfhost_toolserver_url: http://ToolServerManager:8080
 
 max_retry_times: 3
 max_subtask_chain_length: 7

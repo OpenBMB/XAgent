@@ -2,24 +2,11 @@
 
 XAgent-Server 前后端 Demo，后端通信部分主要由fastapi的`websocket`实现，辅以必要的restful接口；前端服务进行本地部署。
 
-## 编译镜像
-
-XAgent-Server的代码在`XAgentServer/`路径下，每次修改代码后，需要重新编译镜像，执行如下命令：
-
-```bash
-cd XAgentServer
-docker-compose build
-```
 
 ## 启动 XAgent-Server
 
-首先需要进入demo服务文件夹`XAgentServer/`下，之后启动 XAgent-Server，执行如下命令：
+我们已经开启了web ui的docker镜像，在之前 build ToolServer 网络的时候。
 
-```bash
-# XAgentServer/
-cd XAgentServer
-docker-compose up
-```
 这将启动一个XAgent-Server实例，监听本机`8090`端口，配置信息在`XAgentServer/docker-compose.yml`文件中。
 
 完成镜像编译和启动后还需启动nginx服务，在另一个命令行执行如下命令：

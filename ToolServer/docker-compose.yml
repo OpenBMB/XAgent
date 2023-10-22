@@ -55,6 +55,16 @@ services:
     logging:
       driver: "none"
 
+  XAgentServer:
+    image: xagent-server:0.3
+    build:
+      context: ..
+      dockerfile: ./XAgentServer/dockerfiles/Dockerfile
+    container_name: XAgent-Server
+    ports:
+      - "5173:5173"
+      - "8090:8090"
+
 volumes:
   xagentmongodb:
 

@@ -63,7 +63,7 @@ services:
       dockerfile: dockerfiles/XAgentServer/Dockerfile
     container_name: XAgent-Server
     environment:
-      - TOOLSERVER_URL=${TOOLSERVER_URL}
+      - TOOLSERVER_URL=http://ToolServerManager:8080
       - CONFIG_FILE=${CONFIG_FILE}
     ports:
       - "5173:5173"

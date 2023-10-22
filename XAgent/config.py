@@ -32,6 +32,8 @@ class XAgentConfig(dict):
         self.__init__(**yaml.load(open(config_file, 'r'), Loader=yaml.FullLoader))
         # check environment variables
         self['selfhost_toolserver_url'] = os.getenv('TOOLSERVER_URL', self['selfhost_toolserver_url'])
+        self.update(ARGS)
+        
     @staticmethod
     def get_default_config(config_file='assets/config.yml'):
         try:
@@ -41,6 +43,7 @@ class XAgentConfig(dict):
         return XAgentConfig(**cfg)
 
 CONFIG = XAgentConfig.get_default_config()
+ARGS = {}
 
 def get_model_name(model_name:str=None):
     if model_name is None:

@@ -43,7 +43,7 @@ class XAgentServer:
                 f"server is running, the start recorder_root_dir is {interaction.base.recorder_root_dir}")
         else:
             query = AutoGPTQuery(
-                role_name=args.get('role_name', ''),
+                role_name=args.get('role_name', 'Assistant'),
                 task=args.get('goal', ''),
                 plan=args.get('plan', [
                 ]),

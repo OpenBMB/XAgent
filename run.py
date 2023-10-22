@@ -1,8 +1,8 @@
 import os
 import sys
 import argparse
-
-from XAgent.config import CONFIG
+from copy import deepcopy
+from XAgent.config import CONFIG,ARGS
 from command import CommandLine,XAgentServerEnv
 
 def parse_args():
@@ -38,15 +38,18 @@ if __name__ == '__main__':
         original_stdout = sys.stdout
         from XAgent.running_recorder import recorder
         sys.stdout = open(os.path.join(recorder.record_root_dir,"command_line.ansi"),"w",encoding="utf-8")
-        
-    CONFIG.record_dir = args.record_dir
-    CONFIG.default_completion_kwargs['model']  = args.model
-    CONFIG.enable_ask_human_for_help = args.enable_ask_human_for_help
-    CONFIG.max_subtask_chain_length = args.max_subtask_chain_length
-    CONFIG.max_plan_refine_chain_length = args.max_plan_refine_chain_length
-    CONFIG.max_plan_tree_depth = args.max_plan_tree_depth
-    CONFIG.max_plan_tree_width = args.max_plan_tree_width
-    CONFIG.max_retry_times = args.max_retry_times   
+    
+    ARGS['record_dir'] = args.record_dir
+    
+    ARGS['default_completion_kwargs'] = deepcopy(CONFIG['default_completion_kwargs'])
+    ARGS['default_completion_kwargs']['model'] = args.model
+    ARGS['enable_ask_human_for_help'] = args.enable_ask_human_for_help
+    ARGS['max_subtask_chain_length'] = args.max_subtask_chain_length
+    ARGS['max_plan_refine_chain_length'] = args.max_plan_refine_chain_length
+    ARGS['max_plan_tree_depth'] = args.max_plan_tree_depth
+    ARGS['max_plan_tree_width'] = args.max_plan_tree_width
+    ARGS['max_retry_times'] = args.max_retry_times
+
     cmd.start(
         args.task,
         role="Assistant",

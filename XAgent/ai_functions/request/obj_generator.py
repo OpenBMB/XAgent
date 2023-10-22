@@ -15,7 +15,10 @@ from .error import FunctionCallSchemaError
 
 from XAgent.logs import logger
 from XAgent.config import CONFIG,get_model_name,get_apiconfig_by_model
+from XAgent.running_recorder import recorder
 
+def return_last_value(retry_state):
+    print(retry_state.outcome.result())  # 表示返回原函数的返回值
 
 class OBJGenerator:
     def __init__(self,):        
@@ -25,7 +28,8 @@ class OBJGenerator:
         retry=retry_if_not_exception_type((AuthenticationError, PermissionError, InvalidRequestError, AssertionError)),
         stop=stop_after_attempt(CONFIG.max_retry_times+3), 
         wait=wait_chain(*[wait_none() for _ in range(3)]+[wait_exponential(min=61, max=293)]),
-        reraise=True)
+        reraise=True,
+        retry_error_callback=return_last_value)
     def chatcompletion(self,**kwargs):
         model_name = get_model_name(kwargs.pop('model',CONFIG.default_completion_kwargs['model']))
         kwargs['model'] = model_name
@@ -36,8 +40,17 @@ class OBJGenerator:
             if kwargs[k] is None:
                 kwargs.pop(k)
         
-        response = self._get_chatcompletion_request_func(request_type)(**kwargs)
-        
+        llm_query_id = recorder.get_query_id()
+        try:
+            copyed_kwargs = deepcopy(kwargs)
+            if (response := recorder.query_llm_inout(llm_query_id = llm_query_id,**copyed_kwargs)) is None:
+                response = self._get_chatcompletion_request_func(request_type)(**kwargs)
+            recorder.regist_llm_inout(llm_query_id = llm_query_id,**copyed_kwargs,output_data = response)
+        except Exception as e:
+            logger.typewriter_log(f"chatcompletion error: {e}",Fore.RED)
+            recorder.decrease_query_id()
+            raise e
+
         # refine the response
         match request_type:
             case 'openai':                

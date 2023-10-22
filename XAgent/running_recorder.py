@@ -51,6 +51,8 @@ class RunningRecoder():
         query_id = deepcopy(self.query_count)
         self.query_count += 1
         return query_id
+    def decrease_query_id(self):
+        self.query_count -= 1
     
     def change_now_task(self, new_subtask_id):
         self.now_subtask_id = new_subtask_id

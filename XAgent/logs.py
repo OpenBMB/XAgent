@@ -9,6 +9,7 @@ import abc
 from logging import LogRecord
 from typing import Any
 import uuid
+from threading import Lock
 
 from colorama import Fore, Style
 
@@ -28,7 +29,6 @@ class JsonFormatter(logging.Formatter):
     def format(self, record):
         return record.msg
 
-LOG_MUTEX = 0
 
 class Logger(metaclass=Singleton):
     """
@@ -102,13 +102,14 @@ class Logger(metaclass=Singleton):
 
         self.speak_mode = False
         self.chat_plugins = []
+        self.log_lock = Lock()
+
 
     def typewriter_log(
         self, title="", title_color="", content="", speak_text=False, level=logging.INFO
     ):
         # if speak_text and self.speak_mode:
         #     say_text(f"{title}. {content}")
-        global LOG_MUTEX
         for plugin in self.chat_plugins:
             plugin.report(f"{title}. {content}")
 
@@ -117,10 +118,11 @@ class Logger(metaclass=Singleton):
                 content = " ".join(content)
         else:
             content = ""
-
+        self.log_lock.acquire()
         self.typing_logger.log(
             level, content, extra={"title": title, "color": title_color}
         )
+        self.log_lock.release()
 
     def debug(
         self,
@@ -334,11 +336,14 @@ def print_assistant_thoughts(
         assistant_thoughts_reasoning = assistant_thoughts.get("reasoning")
         assistant_thoughts_plan = assistant_thoughts.get("plan")
         assistant_thoughts_criticism = assistant_thoughts.get("criticism")
-    logger.typewriter_log(
-        f"THOUGHTS:", Fore.YELLOW, f"{assistant_thoughts_text}"
-    )
-    logger.typewriter_log("REASONING:", Fore.YELLOW, f"{assistant_thoughts_reasoning}")
-    if assistant_thoughts_plan:
+    if assistant_thoughts_text is not None and assistant_thoughts_text != "":
+        logger.typewriter_log(
+            f"THOUGHTS:", Fore.YELLOW, f"{assistant_thoughts_text}"
+        )
+    if assistant_thoughts_reasoning is not None and assistant_thoughts_reasoning != "":
+        logger.typewriter_log("REASONING:", Fore.YELLOW, f"{assistant_thoughts_reasoning}")
+        
+    if assistant_thoughts_plan is not None and len(assistant_thoughts_plan) > 0:
         logger.typewriter_log("PLAN:", Fore.YELLOW, "")
         # If it's a list, join it into a string
         if isinstance(assistant_thoughts_plan, list):
@@ -351,7 +356,9 @@ def print_assistant_thoughts(
         for line in lines:
             line = line.lstrip("- ")
             logger.typewriter_log("- ", Fore.GREEN, line.strip())
-    logger.typewriter_log("CRITICISM:", Fore.YELLOW, f"{assistant_thoughts_criticism}")
+            
+    if assistant_thoughts_criticism is not None and assistant_thoughts_criticism != "":
+        logger.typewriter_log("CRITICISM:", Fore.YELLOW, f"{assistant_thoughts_criticism}")
     return {
         "thoughts": assistant_thoughts_text,
         "reasoning": assistant_thoughts_reasoning,

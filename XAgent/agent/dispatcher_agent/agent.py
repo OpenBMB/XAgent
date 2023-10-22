@@ -67,7 +67,7 @@ class DispatcherAgent(BaseAgent):
             ][0]
         except:
             # For someone, this failed for a super secure SSL reason.
-            # Since it's not stricly necessary, let's worry about that another day. Should probably log this somehow though.
+            # Since it's not strictly necessary, let's worry about that another day. Should probably log this somehow though.
             relevant_procedures = "None"
 
         return relevant_procedures

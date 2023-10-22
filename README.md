@@ -63,7 +63,7 @@ ToolServer is where XAgent's action takes place. It is a docker container that p
 So you should install `docker` and `docker-compose` first. 
 After that, you should build the docker image for ToolServer and start the docker container.
 ```bash
-cd ToolServer
+docker-compose build
 docker-compose up
 ```
 Refer [here](ToolServer/README.md) for detailed information about our ToolServer.
@@ -77,15 +77,17 @@ pip install -r requirements.txt
 
 - Configure XAgent
 
-You should configure XAgent in `config.yml` before running it. 
-At least one OpenAI key is provided in `config.yml`, which is used to access OpenAI API.
+1. You should configure XAgent in `assets/config.yml` before running it. 
+2. At least one OpenAI key is provided in `assets/config.yml`, which is used to access OpenAI API.
 We highly recommend using `gpt-4-32k` to run XAgent; `gpt-4` is also OK for most simple tasks.
 In any case, at least one `gpt-3.5-turbo-16k` API key should be provided as a backup model.
 We do not test or recommend using `gpt-3.5-turbo` to run XAgent due to minimal context length; you should not try to run XAgent on that.
+3. If you want to change the config_file path for `XAgentServer`, you should modify the `CONFIG_FILE` value in `.env` file and restart the docker container.
+
 
 - Run XAgent
 ```bash
-python run.py --task "put your task here" --model "gpt-4"
+python run.py --task "put your task here" --model "gpt-4" --config_file "assets/config.yml"
 ```
 1. You can use the argument `--upload_files` to select the initial files you want to submit to XAgent.
 

@@ -1,7 +1,6 @@
 from typing import List
 from XAgent.agent.plan_generate_agent import PlanGenerateAgent
-from XAgent.utils import RequiredAbilities, LLMStatusCode
-from XAgent.agent.utils import _chat_completion_request
+from XAgent.utils import RequiredAbilities
 from XAgent.message_history import Message
 
 class PlanRefineAgent(PlanGenerateAgent):
@@ -10,6 +9,7 @@ class PlanRefineAgent(PlanGenerateAgent):
     def parse(
         self,
         placeholders: dict = {},
+        arguments:dict = None,
         functions=None,
         function_call=None,
         stop=None,
@@ -19,20 +19,13 @@ class PlanRefineAgent(PlanGenerateAgent):
         **kwargs
     ):
         prompt_messages = self.fill_in_placeholders(placeholders)
-        # import pdb; pdb.set_trace()
-        output = _chat_completion_request(
-            messages=prompt_messages[:additional_insert_index]
-            + additional_messages
-            + prompt_messages[additional_insert_index:],
+        messages =prompt_messages[:additional_insert_index] + additional_messages + prompt_messages[additional_insert_index:]
+        
+        return self.generate(
+            messages=messages,
+            arguments=arguments,
             functions=functions,
             function_call=function_call,
-            model=self.config.default_completion_kwargs['model'],
             stop=stop,
-            *args,
-            **kwargs
-        )
-
-        message = output["choices"][0]["message"]
-        tokens = output["usage"]
-
-        return LLMStatusCode.SUCCESS, message, tokens
+            *args,**kwargs
+        ) 

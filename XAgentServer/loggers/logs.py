@@ -11,8 +11,6 @@ from typing import Any
 
 from colorama import Fore, Style
 
-from XAgent.utils import Singleton, TaskSaveItem
-
 class JsonFileHandler(logging.FileHandler):
     def __init__(self, filename, mode="a", encoding=None, delay=False):
         super().__init__(filename, mode, encoding, delay)

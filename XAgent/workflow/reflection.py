@@ -11,11 +11,6 @@ from XAgent.agent.summarize import summarize_action,summarize_plan
 from XAgent.ai_functions import function_manager
 
 def get_posterior_knowledge(all_plan: Plan, terminal_plan: Plan, finish_node: ToolNode, tool_functions_description_list: List[dict], config):
-    posterior_knowledge_function = function_manager.get_function_schema('generate_posterior_knowledge')
-
-    # message_list = [
-    #     Message("system",system_prompt),
-    # ]
 
     agent = agent_dispatcher.dispatch(
         RequiredAbilities.reflection,
@@ -32,7 +27,7 @@ def get_posterior_knowledge(all_plan: Plan, terminal_plan: Plan, finish_node: To
         all_plan = json.dumps(all_plan, indent=2, ensure_ascii=False)
         terminal_plan = json.dumps(terminal_plan, indent=2, ensure_ascii=False)
         
-    _,new_message,_ = agent.parse(
+    new_message,_ = agent.parse(
         placeholders={
             "system": {
                 "all_plan": all_plan,
@@ -41,11 +36,10 @@ def get_posterior_knowledge(all_plan: Plan, terminal_plan: Plan, finish_node: To
                 "action_process": action_process
             }
         },
-        functions=[posterior_knowledge_function],
-        function_call={"name":"generate_posterior_knowledge"}
+        arguments=function_manager.get_function_schema('generate_posterior_knowledge')['parameters']
     )
 
-    data = json5.loads(new_message["function_call"]["arguments"])
+    data = json5.loads(new_message["arguments"])
     # print(data)
 
     return data

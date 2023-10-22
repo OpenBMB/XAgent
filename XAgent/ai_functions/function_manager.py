@@ -1,15 +1,14 @@
 import os
 import glob
 import yaml
-import json5 as json
+import json5
 
 from typing import Optional, Tuple
-from tenacity import retry, stop_after_attempt,retry_if_not_exception_type
 from colorama import Fore
-from openai.error import AuthenticationError, PermissionError, InvalidRequestError
-from .request import openai_chatcompletion_request
+
 from XAgent.config import CONFIG
-from XAgent.loggers.logs import logger
+from XAgent.logs import logger
+from .request import objgenerator
 
 class FunctionManager:
     def __init__(self,
@@ -39,31 +38,37 @@ class FunctionManager:
             return
         self.function_cfgs[function_schema['name']] = function_schema
         
-    @retry(retry=retry_if_not_exception_type((AuthenticationError, PermissionError, InvalidRequestError)),stop=stop_after_attempt(CONFIG.max_retry_times),reraise=True)
     def execute(self,function_name:str,return_generation_usage:bool=False,function_cfg:dict=None,**kwargs,)->Tuple[dict,Optional[dict]]:
         if function_cfg is None and function_name in self.function_cfgs:
             function_cfg = self.function_cfgs.get(function_name)
         else:
             raise KeyError(f'Configure for function {function_name} not found.')
         
-        completions_kwargs:dict = function_cfg.get('completions_kwargs',self.default_completion_kwargs)
-        # print(function_cfg['function_prompt'],kwargs)
-        function_prompt = str(function_cfg['function_prompt'])
-        # print(kwargs)
-        function_prompt = function_prompt.format(**kwargs)
-        # print(function_prompt)
-        messages = [{'role':'user','content':function_prompt}]
-        functions = [function_cfg['function']]
-        function_call = {'name':function_cfg['function']['name']}
+        
         logger.typewriter_log(f'Executing AI Function: {function_name}', Fore.YELLOW)
-        response = openai_chatcompletion_request(
-            messages=messages,
-            functions=functions,
-            function_call=function_call,
-            function_call_check=True,
-            **completions_kwargs
-        )
-        returns = json.loads(response['choices'][0]['message']['function_call']['arguments'])
+
+        completions_kwargs:dict = function_cfg.get('completions_kwargs',self.default_completion_kwargs)
+        function_prompt = str(function_cfg['function_prompt'])
+        function_prompt = function_prompt.format(**kwargs)
+        messages = [{'role':'user','content':function_prompt}]
+        
+        match CONFIG.default_request_type:
+            case 'openai':                
+                response = objgenerator.chatcompletion(
+                    messages=messages,
+                    functions=[function_cfg['function']],
+                    function_call={'name':function_cfg['function']['name']},
+                    **completions_kwargs
+                )
+                returns = json5.loads(response['choices'][0]['message']['function_call']['arguments'])
+            case 'xagent':
+                arguments = function_cfg['function']['parameters']
+                response = objgenerator.chatcompletion(
+                    messages=messages,
+                    arguments=arguments,
+                    **completions_kwargs
+                )
+                returns = json5.loads(response['choices'][0]['message']['content'])['arguments']
         
         if return_generation_usage:
             return returns, response['usage']

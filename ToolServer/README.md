@@ -1,38 +1,38 @@
 # 🧰 ToolServer
 
-ToolServer is the server provide XAgent with powerful and safe tools to solve tasks. It is a docker container that provides a safe environment for XAgent to run.
+ToolServer is the server that provides XAgent with powerful and safe tools to solve tasks. It is a Docker container that provides a safe environment for XAgent to run.
 
 ToolServer is composed of three parts:
 - **ToolServerManager** is responsible for creating and managing ToolServerNode instances.
-- **ToolServerMonitor** is responsible for monitoring the status of ToolServerNode instances. Automatic detect instances status and removing the instances that are not working properly.
-- **ToolServerNode** is responsible for providing tools to solve tasks. It is a docker container that provides a safe environment for XAgent to run.
+- **ToolServerMonitor** is responsible for monitoring the status of ToolServerNode instances. Automatic detection of instance status and removing instances that are not working properly.
+- **ToolServerNode** is responsible for providing tools to solve tasks. It is a Docker container that provides a safe environment for XAgent to run.
 
 Currently, ToolServer provides the following tools:
 - **📝 File Editor** provide a text editing tool that can write, read, and modify files.
-- **📘 Python Notebook** provide a interactive python notebook that can run python code to validate ideas, draw figures, etc.
-- **🌏 Web Browser** provide a web browser that can search and visit webpages.
-- **🖥️ Shell** provide a bash shell tool that can execute any shell commands, even install programs and host services.
-- **🧩 Rapid API** provide a tool to retrieve apis from Rapid API and calling them, which provides a wide range of apis for XAgent to use. See [ToolBench](https://github.com/OpenBMB/ToolBench) to get more information about the Rapid API collections.
+- **📘 Python Notebook** provides an interactive Python notebook that can run Python code to validate ideas, draw figures, etc.
+- **🌏 Web Browser** provides a web browser that can search and visit webpages.
+- **🖥️ Shell** provides a bash shell tool that can execute any shell commands, even install programs and host services.
+- **🧩 Rapid API** provides a tool to retrieve APIs from Rapid API and calling them, which provides a wide range of APIs for XAgent to use. See [ToolBench](https://github.com/OpenBMB/ToolBench) to get more information about the Rapid API collections.
 You can also easily add new tools to ToolServer to enhance agent's abilities.
 
 ## ⚡️ Configurations
 Configurations for ToolServer are stored in `ToolServer/config/`. You can change them and rebuild images to apply the changes.
 Notes:
-- Change `node.privileged` to `false` in `manager.yml` if you don't want to used docker in ToolServerNode. This will disable the ability to run docker commands in ToolServerNode.
+- Change `node.privileged` to `false` in `manager.yml` if you don't want to use Docker in ToolServerNode. This will disable the ability to run Docker commands in ToolServerNode.
 - Change `idling_close_minutes` in `monitor.yml` to change the time that ToolServerMonitor will wait before closing idle ToolServerNode instances.
-- Add your api keys in `node.yml` to enable bing search (or use backup search duckduckgo) and rapid api.
-- Change api timeout for Toolserver in `docker-compose.yml` by altering values after `-t` in `services.ToolServerManager.command` if you encounter timeout error of ToolServer.
+- Add your API keys in `node.yml` to enable Bing search (or use backup search DuckDuckGo) and rapid API.
+- Change the API timeout for Toolserver in `docker-compose.yml` by altering the values after `-t` in `services.ToolServerManager.command` if you encounter a timeout error of ToolServer.
 
 ## 🛠️ Build and Setup ToolServer
-All docker image build files are stored in `ToolServer/dockerfiles`.
-You can build them manually with following command:
+All Docker image build files are stored in `ToolServer/dockerfiles`.
+You can build them manually with the following command:
 ```bash
 cd ToolServer
 docker-compose build
 ```
-This will build all the docker images for ToolServerManager, ToolServerMonitor and ToolServerNode.
+This will build all the Docker images for ToolServerManager, ToolServerMonitor and ToolServerNode.
 
-After building the docker images, you can start the docker container with following command:
+After building the Docker images, you can start the Docker container with following command:
 ```bash
 cd ToolServer
 docker-compose up
@@ -52,12 +52,12 @@ This path will return all registered tools in ToolServerNode, together with thei
         {
             "name":"env1",
             "description":"description1",
-            "tools":["tool1","tool2"] //at most 50 tools, the rest will not be returned
+            "tools":["tool1","tool2"] //at most 50 tools, the rest will not be returned.
         },
     ],
     "available_tools":[
         "tool1",
-        "tool2", //hidden tools will not be returned
+        "tool2", //hidden tools will not be returned.
     ],
     "tools_json":[
         {
@@ -110,7 +110,7 @@ Return:
 ```
 
 ### /get_json_schema_for_tools
-Return the json schema for the given tools.
+Return the JSON schema for the given tools.
 Arguments:
 ```JSON
 {
@@ -135,7 +135,7 @@ Return:
 ```
 
 ### /get_json_schema_for_envs
-Return the json schema for the given envs.
+Return the JSON schema for the given environments/envs.
 Arguments:
 ```JSON
 {
@@ -171,8 +171,8 @@ Arguments:
 }
 ```
 Return is dependent on the tool.
-The return http code 450 standfor need further calling to finish tool execution.
-When return http code 450, the return value will be like:
+The return http code 450 stands for need further calling to finish tool execution.
+When returning the http code 450, the return value will be like:
 ```JSON
 {
     "detail":{
@@ -187,4 +187,4 @@ When return http code 450, the return value will be like:
 Close the ToolServerNode instance.
 
 ### /release_session
-Close and delete ToolServerNode instance.
+Close and delete the ToolServerNode instance.

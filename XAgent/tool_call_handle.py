@@ -277,7 +277,7 @@ class FunctionHandler():
     def log_task_submit(self, arguments):
         # assert arguments["name"] == "subtask_submit"
         logger.typewriter_log(
-            f"-=-=-=-=-=-=-= SUBTASK SUBMITED -=-=-=-=-=-=-=",
+            f"-=-=-=-=-=-=-= SUBTASK SUBMITTED -=-=-=-=-=-=-=",
             Fore.YELLOW,
             "",
         )

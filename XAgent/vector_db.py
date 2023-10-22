@@ -80,7 +80,7 @@ class VectorDBInterface():
                 print(e)
                 print("Warning: Fail to insert", sentence)
         else:
-            print("Warning: Failed to generate embeding for ", sentence)
+            print("Warning: Failed to generate embedding for ", sentence)
 
     def search_similar_sentences(self, query_sentence:str, namespace="", top_k=1):
         
@@ -101,7 +101,7 @@ class VectorDBInterface():
                 print(e)
                 print("Warning: Fail to search similar sentences")
         else:
-            print("Warning: Fail to generate embeding")
+            print("Warning: Fail to generate embedding")
 
 
 if __name__ == "__main__":

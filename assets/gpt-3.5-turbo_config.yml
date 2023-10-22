@@ -7,7 +7,7 @@ api_keys:
       organization: org-xxxxxx
       model: gpt-3.5-turbo-16k
 
-default_request_type: xagent # or openai
+default_request_type: openai
 default_completion_kwargs:
   model: gpt-3.5-turbo-16k
   temperature: 0.2

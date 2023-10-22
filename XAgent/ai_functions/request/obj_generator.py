@@ -2,7 +2,7 @@ import orjson
 import json5
 import jsonschema
 import importlib
-
+import traceback
 
 from copy import deepcopy
 from colorama import Fore
@@ -17,8 +17,6 @@ from XAgent.logs import logger
 from XAgent.config import CONFIG,get_model_name,get_apiconfig_by_model
 from XAgent.running_recorder import recorder
 
-def return_last_value(retry_state):
-    print(retry_state.outcome.result())  # 表示返回原函数的返回值
 
 class OBJGenerator:
     def __init__(self,):        
@@ -28,8 +26,7 @@ class OBJGenerator:
         retry=retry_if_not_exception_type((AuthenticationError, PermissionError, InvalidRequestError, AssertionError)),
         stop=stop_after_attempt(CONFIG.max_retry_times+3), 
         wait=wait_chain(*[wait_none() for _ in range(3)]+[wait_exponential(min=61, max=293)]),
-        reraise=True,
-        retry_error_callback=return_last_value)
+        reraise=True,)
     def chatcompletion(self,**kwargs):
         model_name = get_model_name(kwargs.pop('model',CONFIG.default_completion_kwargs['model']))
         kwargs['model'] = model_name
@@ -47,6 +44,7 @@ class OBJGenerator:
                 response = self._get_chatcompletion_request_func(request_type)(**kwargs)
             recorder.regist_llm_inout(llm_query_id = llm_query_id,**copyed_kwargs,output_data = response)
         except Exception as e:
+            traceback.print_exc()
             logger.typewriter_log(f"chatcompletion error: {e}",Fore.RED)
             recorder.decrease_query_id()
             raise e

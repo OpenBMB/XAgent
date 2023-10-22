@@ -25,7 +25,7 @@ api_keys:
       model: gpt-4-32k
 
 
-default_request_type: xagent # or openai
+default_request_type: openai # or xagent
 default_completion_kwargs:
   model: gpt-4-32k
   temperature: 0.2

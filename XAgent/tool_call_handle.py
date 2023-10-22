@@ -207,7 +207,7 @@ class ToolServerInterface():
             arguments={},
             # input_hash_id,
         ):
-        # return "sorry, the server is not avaliable now", ToolCallStatusCode.SERVER_ERROR, input_hash_id
+        # return "sorry, the server is not available now", ToolCallStatusCode.SERVER_ERROR, input_hash_id
         url  = f"{self.url}/execute_tool"
         if isinstance(arguments, str):
             try:

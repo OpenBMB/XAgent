@@ -71,7 +71,7 @@ class RunningRecoder():
 
         self.plan_refine_id += 1
 
-    def regist_llm_inout(self, llm_query_id, messages, functions, function_call, model, stop, other_args, output_data):
+    def regist_llm_inout(self, llm_query_id, messages, functions=None, function_call=None, model=None, stop=None, output_data=None,**other_args):
         with open(os.path.join(self.record_root_dir, "LLM_inout_pair", f"{llm_query_id:05d}.json"),"w",encoding="utf-8") as writer:
             llm_inout_record = {
                 "input": {
@@ -90,7 +90,7 @@ class RunningRecoder():
             logger.typewriter_log("LLM inout registed:",Fore.RED, f"query-id={llm_query_id}",level=logging.DEBUG)
 
 
-    def query_llm_inout(self, llm_query_id, messages, functions, function_call, model, stop, other_args):
+    def query_llm_inout(self, llm_query_id, messages, functions=None, function_call=None, model=None, stop=None, **other_args):
         if self.newly_start:
             return None
         input_data = {

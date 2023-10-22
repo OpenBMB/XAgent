@@ -1,3 +1,4 @@
+import orjson
 import json5
 import jsonschema
 import importlib
@@ -23,7 +24,7 @@ class OBJGenerator:
     @retry(
         retry=retry_if_not_exception_type((AuthenticationError, PermissionError, InvalidRequestError, AssertionError)),
         stop=stop_after_attempt(CONFIG.max_retry_times+3), 
-        wait=wait_chain(*[wait_none() for _ in range(3)]+[wait_exponential(min=113, max=293)]),
+        wait=wait_chain(*[wait_none() for _ in range(3)]+[wait_exponential(min=61, max=293)]),
         reraise=True)
     def chatcompletion(self,**kwargs):
         model_name = get_model_name(kwargs.pop('model',CONFIG.default_completion_kwargs['model']))
@@ -105,7 +106,7 @@ class OBJGenerator:
         
     def function_call_refine(self,req_kwargs,response):
         if  'function_call' not in response['choices'][0]['message']:
-            logger.warn("FunctionCallSchemaError: No function call found in the response")
+            logger.typewriter_log("FunctionCallSchemaError: No function call found in the response",Fore.RED)
             raise FunctionCallSchemaError(f"No function call found in the response: {response['choices'][0]['message']} ")
         
         # verify the schema of the function call if exists
@@ -113,9 +114,20 @@ class OBJGenerator:
         function_schema = None if len(function_schema) == 0 else function_schema[0]
         
         if function_schema is None:
+            if '"{}"'.format(response['choices'][0]['message']['function_call']['name']) in req_kwargs['messages'][0]['content']:
+                # Temporal fix for tool call without reasoning
+                logger.typewriter_log("Warning: Detect tool call without reasoning",Fore.YELLOW)
+                response['choices'][0]['message']['function_call']['arguments'] = orjson.dumps({
+                    'tool_call':{
+                        'tool_name':response['choices'][0]['message']['function_call']['name'],
+                        'tool_input':response['choices'][0]['message']['function_call']['arguments']
+                    }
+                })
+                return response            
+            
             error_message = {
                 'role':'system',
-                'content': f"Your last function calling call function {response['choices'][0]['message']['function_call']['name']} that is not in the provided functions. Make sure function name in list: {list(map(lambda x:x['name'],req_kwargs['functions']))}"
+                'content': f"Error: Your last function calling call function {response['choices'][0]['message']['function_call']['name']} that is not in the provided functions. Make sure function name in list: {list(map(lambda x:x['name'],req_kwargs['functions']))}"
             }
             
             if req_kwargs['messages'][-1]['role'] != 'system' and 'Your last function calling call function' not in req_kwargs['messages'][-1]['content']:
@@ -123,7 +135,7 @@ class OBJGenerator:
             elif req_kwargs['messages'][-1]['role'] == 'system' and 'Your last function calling call function' in req_kwargs['messages'][-1]['content']:
                 req_kwargs['messages'][-1] = error_message
                 
-            logger.warn(f"FunctionCallSchemaError: Function {response['choices'][0]['message']['function_call']['name']} not found in the provided functions.")
+            logger.typewriter_log(f"FunctionCallSchemaError: Function {response['choices'][0]['message']['function_call']['name']} not found in the provided functions.",Fore.RED)
             raise FunctionCallSchemaError(f"Function {response['choices'][0]['message']['function_call']['name']} not found in the provided functions: {list(map(lambda x:x['name'],req_kwargs['functions']))}")
             
         arguments,response = self.load_args_with_schema_validation(function_schema,response['choices'][0]['message']['function_call']['arguments'],req_kwargs['messages'],return_response=True,response=response)

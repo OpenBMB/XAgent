@@ -57,12 +57,12 @@ class BaseAgent(metaclass=abc.ABCMeta):
                  *args,**kwargs):
         if isinstance(messages[0],Message):
             messages = [message.raw() for message in messages]
-        if len(functions) == 1 and function_call is None:
+        if functions is not None and len(functions) == 1 and function_call is None:
             function_call = {'name':functions[0]['name']} # must call at least one function
         match CONFIG.default_request_type:
             case 'openai':
                 if arguments is not None:
-                    if len(functions) == 0:
+                    if functions is None or len(functions) == 0:
                         functions = [{
                             'name':'reasoning',
                             'parameters':arguments
@@ -91,10 +91,11 @@ class BaseAgent(metaclass=abc.ABCMeta):
                         k: function_call_args.pop(k)
                         for k in arguments['properties'].keys() if k in function_call_args
                     }
-                message['function_call'] = {
-                    'name': response['choices'][0]['message']['function_call']['name'],
-                    'arguments': function_call_args
-                }
+                if len(function_call_args) > 0:
+                    message['function_call'] = {
+                        'name': response['choices'][0]['message']['function_call']['name'],
+                        'arguments': function_call_args
+                    }
 
             case 'xagent':
                 response = objgenerator.chatcompletion(

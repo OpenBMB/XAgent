@@ -16,13 +16,7 @@ def chatcompletion_request(**kwargs):
     chatcompletion_kwargs = get_apiconfig_by_model(model_name)
     chatcompletion_kwargs.update(kwargs)
     llm_query_id = recorder.get_query_id()
-    record_query_response = recorder.query_llm_inout(llm_query_id = llm_query_id,
-                                        messages=query_kwargs.pop("messages",None), 
-                                        functions=query_kwargs.pop("functions",None), 
-                                        function_call=query_kwargs.pop("function_call",None), 
-                                        model = query_kwargs.pop("model",None),
-                                        stop = query_kwargs.pop("stop",None),
-                                        other_args = query_kwargs)
+    record_query_response = recorder.query_llm_inout(llm_query_id = llm_query_id,**query_kwargs)
     if record_query_response != None:
         response = record_query_response
     else:
@@ -55,12 +49,5 @@ def chatcompletion_request(**kwargs):
                 raise e
                     
     # register the request and response
-    recorder.regist_llm_inout(llm_query_id = llm_query_id,
-                        messages=regist_kwargs.pop('messages',None), 
-                        functions=regist_kwargs.pop('functions',None), 
-                        function_call=regist_kwargs.pop('function_call',None), 
-                        model = regist_kwargs.pop('model',None),
-                        stop = regist_kwargs.pop('stop',None),
-                        other_args = regist_kwargs,
-                        output_data = response)
+    recorder.regist_llm_inout(llm_query_id = llm_query_id,**regist_kwargs,output_data = response)
     return response

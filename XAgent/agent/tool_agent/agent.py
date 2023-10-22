@@ -31,7 +31,6 @@ class ToolAgent(BaseAgent):
         **kwargs
     ):
         prompt_messages = self.fill_in_placeholders(placeholders)
-        messages = prompt_messages[:additional_insert_index] + additional_messages + prompt_messages[additional_insert_index:]
 
         # Temporarily disable the arguments for openai
         if self.config.default_request_type == 'openai':
@@ -40,12 +39,26 @@ class ToolAgent(BaseAgent):
             if CONFIG.enable_ask_human_for_help:
                 functions += [function_manager.get_function_schema('ask_human_for_help')]
             prompt_messages[0].content += '\n--- Avaliable Tools ---\nYou are allowed to use tools in the "subtask_handle.tool_call" function field.\nRemember the "subtask_handle.tool_call.tool_input" field should always in JSON, as following described:\n{}'.format(json.dumps(functions,indent=2))
-            prompt_messages[-1].content = prompt_messages[-1].content.replace('Use tools to handle the subtask','Use "subtask_handle" to make a normal tool call to handle the subtask')
+            
+            def change_tool_call_description(message:Message,reverse:bool=False):
+                des_pairs = [('Use tools to handle the subtask',
+                              'Use "subtask_handle" to make a normal tool call to handle the subtask'),
+                             ('5.1  Please remember to generate the function call field after the "criticism" field.\n  5.2  Please check all content is in json format carefully.',
+                              '5.1. Please remember to generate the "tool_call" field after the "criticism" field.\n  5.2. Please remember to generate comma if the "tool_call" field is after the "criticism" field.\n  5.3. Please check whether the **"tool_call"** field is in the function call json carefully.'),
+                             ('After decide the action, use "subtask_handle" functions to apply action.',
+                              'After decide the action, call functions to apply action.')]
+                
+                for pair in des_pairs:
+                    message.content = message.content.replace(pair[0],pair[1]) if reverse else message.content.replace(pair[1],pair[0])
+                    
+                return message
+            
+            prompt_messages[0] = change_tool_call_description(prompt_messages[0])
             functions = [function_manager.get_function_schema('subtask_submit'),
                          function_manager.get_function_schema('subtask_handle')]
             
             
-
+        messages = prompt_messages[:additional_insert_index] + additional_messages + prompt_messages[additional_insert_index:]
         message,tokens = self.generate(
             messages=messages,
             arguments=arguments,
@@ -69,10 +82,11 @@ class ToolAgent(BaseAgent):
                 if isinstance(tool_call_args,str):
                     tool_call_args = {} if tool_call_args == '' else json5.loads(tool_call_args)
                 jsonschema.validate(instance=tool_call_args, schema=tool_schema['parameters'])
-                    
+            
             try:
                 validate()
             except Exception as e:  
+                messages[0] = change_tool_call_description(messages[0],reverse=True)
                 tool_call_args = objgenerator.dynamic_json_fixs(
                     broken_json=tool_call_args,
                     function_schema=tool_schema,

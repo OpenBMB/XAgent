@@ -28,6 +28,8 @@ class JsonFormatter(logging.Formatter):
     def format(self, record):
         return record.msg
 
+LOG_MUTEX = 0
+
 class Logger(metaclass=Singleton):
     """
     Logger that handle titles in different colors.
@@ -106,7 +108,7 @@ class Logger(metaclass=Singleton):
     ):
         # if speak_text and self.speak_mode:
         #     say_text(f"{title}. {content}")
-
+        global LOG_MUTEX
         for plugin in self.chat_plugins:
             plugin.report(f"{title}. {content}")
 

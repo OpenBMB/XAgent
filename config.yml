@@ -39,7 +39,7 @@ summary:
 use_selfhost_toolserver: true
 selfhost_toolserver_url: http://localhost:8080
 
-max_retry_times: 3
+max_retry_times: 5
 max_subtask_chain_length: 15
 max_plan_refine_chain_length: 3
 max_plan_tree_depth: 3

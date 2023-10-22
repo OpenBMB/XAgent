@@ -31,16 +31,18 @@ class ToolAgent(BaseAgent):
         **kwargs
     ):
         prompt_messages = self.fill_in_placeholders(placeholders)
-
+        messages = prompt_messages[:additional_insert_index] + additional_messages + prompt_messages[additional_insert_index:]
+        messages = [message.raw() for message in messages]
+        
         # Temporarily disable the arguments for openai
         if self.config.default_request_type == 'openai':
             arguments = None
             functions = list(filter(lambda x: x['name'] not in ['subtask_submit','subtask_handle'],functions))
             if CONFIG.enable_ask_human_for_help:
                 functions += [function_manager.get_function_schema('ask_human_for_help')]
-            prompt_messages[0].content += '\n--- Avaliable Tools ---\nYou are allowed to use tools in the "subtask_handle.tool_call" function field.\nRemember the "subtask_handle.tool_call.tool_input" field should always in JSON, as following described:\n{}'.format(json.dumps(functions,indent=2))
+            messages[0]['content'] += '\n--- Avaliable Tools ---\nYou are allowed to use tools in the "subtask_handle.tool_call" function field.\nRemember the "subtask_handle.tool_call.tool_input" field should always in JSON, as following described:\n{}'.format(json.dumps(functions,indent=2))
             
-            def change_tool_call_description(message:Message,reverse:bool=False):
+            def change_tool_call_description(message:dict,reverse:bool=False):
                 des_pairs = [('Use tools to handle the subtask',
                               'Use "subtask_handle" to make a normal tool call to handle the subtask'),
                              ('5.1  Please remember to generate the function call field after the "criticism" field.\n  5.2  Please check all content is in json format carefully.',
@@ -49,16 +51,14 @@ class ToolAgent(BaseAgent):
                               'After decide the action, call functions to apply action.')]
                 
                 for pair in des_pairs:
-                    message.content = message.content.replace(pair[0],pair[1]) if reverse else message.content.replace(pair[1],pair[0])
+                    message['content'] = message['content'].replace(pair[0],pair[1]) if reverse else message['content'].replace(pair[1],pair[0])
                     
                 return message
             
-            prompt_messages[0] = change_tool_call_description(prompt_messages[0])
+            messages[0] = change_tool_call_description(messages[0])
             functions = [function_manager.get_function_schema('subtask_submit'),
                          function_manager.get_function_schema('subtask_handle')]
-            
-            
-        messages = prompt_messages[:additional_insert_index] + additional_messages + prompt_messages[additional_insert_index:]
+
         message,tokens = self.generate(
             messages=messages,
             arguments=arguments,

@@ -104,10 +104,9 @@ class RunningRecoder():
             "other_args": dump_common_things(other_args),
         }
         if llm_query_id >= len(self.llm_server_cache):
-            logger.typewriter_log("Reach the max length of record: exit!!")
-            exit()
+            logger.typewriter_log("Reach the max length of record")
+            return None
         cache = self.llm_server_cache[llm_query_id]
-        # import pdb; pdb.set_trace()
         if input_data == cache["input"]:
             logger.typewriter_log(
                 "get a llm_server response from Record",
@@ -115,8 +114,8 @@ class RunningRecoder():
                 f"query-id={llm_query_id}"
             )
             return cache["output"]
-        # import pdb; pdb.set_trace()
-        assert False, f"{llm_query_id} didn't find output"
+        # assert False, f"{llm_query_id} didn't find output"
+        return None
 
 
     def regist_tool_call(self, tool_name, tool_input, tool_output, tool_status_code, thought_data=None):
@@ -149,7 +148,9 @@ class RunningRecoder():
     def query_tool_server_cache(self, url, payload):
         if self.newly_start:
             return None
-        assert self.tool_server_interface_id < len(self.tool_server_cache), "Running Exists Record Saved Region"
+        if self.tool_server_interface_id >= len(self.tool_server_cache):
+            return None
+        # assert self.tool_server_interface_id < len(self.tool_server_cache), "Running Exists Record Saved Region"
         cache = self.tool_server_cache[self.tool_server_interface_id]
         # import pdb; pdb.set_trace()
         if cache["url"] == url.split("/")[-1] and cache["payload"] == dump_common_things(payload):
@@ -163,7 +164,7 @@ class RunningRecoder():
                 "response_status_code": cache["response_status_code"]
             }
 
-        assert False
+        return None
 
     def regist_query(self, query):
         with open(os.path.join(self.record_root_dir, f"query.json"), "w",encoding="utf-8",) as writer:

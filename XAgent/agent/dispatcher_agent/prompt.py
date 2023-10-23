@@ -18,7 +18,7 @@
 # USER PROMPT:
 # {{example_user_prompt}}
 
-# Now, please generate additional content that the agent should pay attention to when dealing with the incoming task. Note your generated content will help the agent to avoid some mistakes and more effectively solve the target task. You should only generate the additional content and avoid those unnessesary words.
+# Now, please generate additional content that the agent should pay attention to when dealing with the incoming task. Note your generated content will help the agent to avoid some mistakes and more effectively solve the target task. You should only generate the additional content and avoid those unnecessary words.
 
 # Here are some prompts (resources) that maybe helpful for the given task, you could consider them. But they are irrelevant to the upcoming task, please just ignore it:
 # {{retrieved_procedure}}
@@ -42,7 +42,7 @@ USER PROMPT:
 
 Now, please generate additional content that the agent should pay attention to when dealing with the incoming task. Your generated content should help the agent to avoid some mistakes and more effectively solve the target task. 
 
-You should only generate the ADDITIONAL user prompts, do not include the existing content. Make your additonal prompt concise and informative. When responding, you should follow the following response format:
+You should only generate the ADDITIONAL user prompts, do not include the existing content. Make your additional prompt concise and informative. When responding, you should follow the following response format:
 ADDITIONAL USER PROMPT:
 ```
 Write your additional user prompt here. If there is nothing to add, just set it to a special token "[NONE]".

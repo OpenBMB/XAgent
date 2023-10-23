@@ -5,7 +5,6 @@
             class="flex-row row" v-for="(keyName, index) in dataObjKeys"
             :key="keyName">
               <span class="key-name-label">{{ keyName }}:</span>
-
               
               <div class="read-only-input" 
                   v-if="data.complete">
@@ -23,7 +22,8 @@
                   v-model="dataObj[keyName]"
                 >
                 <template #suffix>
-                  <img @click="resetInput(keyName)" class="reset-icon" src="@/assets/images/playground/icon_reset.svg" />
+                  <img @click="resetInput(keyName)" class="reset-icon"
+                    src="@/assets/images/playground/icon_reset.svg" />
                 </template>
               </el-input>
 

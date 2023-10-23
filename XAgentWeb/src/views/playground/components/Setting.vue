@@ -179,6 +179,9 @@
     })
   })
 
+  const handleRecord = () => {
+  }
+
 </script>
 
 <style scoped lang="scss">

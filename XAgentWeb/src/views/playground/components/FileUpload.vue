@@ -112,8 +112,18 @@ const uploadFile = (param: any) => {
       const _file = res.data.data.file_list as string[];
       configStore.addFiles(_file);
       uploadFinished.value = true;
+      ElMessage({ 
+        type: 'success',
+        grouping: true,
+        message: "upload successful!"
+    });
     }
   }).catch((err) => {
+    ElMessage({ 
+        type: 'error',
+        grouping: true,
+        message: "upload failed"
+    });
     console.log(err);
   })
 }

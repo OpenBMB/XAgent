@@ -20,7 +20,7 @@ services:
       - db
     command: ["--workers","4","-t","600"]
 
-  # This will create a test node that will nerver be used by XAgent
+  # This will create a test node that will never be used by XAgent
   ToolServerNode:
     image: tool-server-node:0.2
     build:

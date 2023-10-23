@@ -32,6 +32,7 @@ class XAgentConfig(dict):
         self.__init__(**yaml.load(open(config_file, 'r'), Loader=yaml.FullLoader))
         # check environment variables
         self['selfhost_toolserver_url'] = os.getenv('TOOLSERVER_URL', self['selfhost_toolserver_url'])
+        print('---args---\n'+str(ARGS))
         self.update(ARGS)
         
     @staticmethod

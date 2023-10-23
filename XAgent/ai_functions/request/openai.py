@@ -19,7 +19,6 @@ def chatcompletion_request(**kwargs):
         if response['choices'][0]['finish_reason'] == 'length':
             raise InvalidRequestError('maximum context length exceeded',None)
     except InvalidRequestError as e:
-        logger.info(e)
         if 'maximum context length' in e._message:
             if model_name == 'gpt-4':
                 if 'gpt-4-32k' in CONFIG.api_keys:

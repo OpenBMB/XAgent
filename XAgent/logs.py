@@ -261,7 +261,10 @@ class RecordFormatter(logging.Formatter):
 
 def remove_color_codes(s: str) -> str:
     if not isinstance(s,str):
-        s = json.dumps(s)
+        try:
+            s = json.dumps(s)
+        except:
+            s = str(s)
     ansi_escape = re.compile(r"\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])")
     return ansi_escape.sub("", s)
 

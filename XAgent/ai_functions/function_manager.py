@@ -16,7 +16,6 @@ class FunctionManager:
                  pure_function_cfg_dir=os.path.join(os.path.dirname(__file__),'pure_functions'),):
         self.function_cfg_dir = function_cfg_dir
         self.pure_function_cfg_dir = pure_function_cfg_dir
-        self.default_completion_kwargs = CONFIG.default_completion_kwargs
         self.function_cfgs = {}
         
         for cfg_file in glob.glob(os.path.join(self.function_cfg_dir,'*.yaml')) + glob.glob(os.path.join(self.function_cfg_dir,'*.yml')):
@@ -47,7 +46,7 @@ class FunctionManager:
         
         logger.typewriter_log(f'Executing AI Function: {function_name}', Fore.YELLOW)
 
-        completions_kwargs:dict = function_cfg.get('completions_kwargs',self.default_completion_kwargs)
+        completions_kwargs:dict = function_cfg.get('completions_kwargs',CONFIG.default_completion_kwargs)
         function_prompt = str(function_cfg['function_prompt'])
         function_prompt = function_prompt.format(**kwargs)
         messages = [{'role':'user','content':function_prompt}]

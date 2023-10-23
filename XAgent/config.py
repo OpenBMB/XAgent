@@ -29,6 +29,7 @@ class XAgentConfig(dict):
     
     def reload(self,config_file='assets/config.yml'):
         config_file = os.getenv('CONFIG_FILE', config_file)
+        print('---config file---\n'+str(config_file))
         self.__init__(**yaml.load(open(config_file, 'r'), Loader=yaml.FullLoader))
         # check environment variables
         self['selfhost_toolserver_url'] = os.getenv('TOOLSERVER_URL', self['selfhost_toolserver_url'])
@@ -38,6 +39,7 @@ class XAgentConfig(dict):
     @staticmethod
     def get_default_config(config_file='assets/config.yml'):
         try:
+            config_file = os.getenv('CONFIG_FILE', config_file)
             cfg = yaml.load(open(config_file, 'r'), Loader=yaml.FullLoader)
         except:
             cfg = {}

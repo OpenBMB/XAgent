@@ -24,7 +24,7 @@ def parse_args():
     parser.add_argument("--max_plan_tree_depth", type=int, default=CONFIG.max_plan_tree_depth)
     parser.add_argument("--max_plan_tree_width", type=int, default=CONFIG.max_plan_tree_width)
     parser.add_argument("--max_retry_times", type=int, default=CONFIG.max_retry_times)
-    parser.add_argument("--config_file",type=str,default="assets/config.yml")
+    parser.add_argument("--config_file",type=str,default=os.getenv('CONFIG_FILE', 'assets/config.yml'))
 
     args = parser.parse_args()
     return args

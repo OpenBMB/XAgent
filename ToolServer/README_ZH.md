@@ -27,10 +27,9 @@ ToolServer的配置文件存放在`assets/config/`目录下，你可以修改配
 所有的docker镜像构建文件都存放在`dockerfiles`目录下。
 你可以使用如下命令手动构建所有镜像：
 ```bash
-cd ToolServer
 docker-compose build
 ```
-这将构建ToolServerManager、ToolServerMonitor和ToolServerNode的docker镜像。
+这将构建ToolServerManager、ToolServerMonitor和ToolServerNode的docker镜像。请注意，由于稳定性问题，配置文件将在构建过程中被复制到docker镜像中。如果你修改了配置文件，你需要重新构建docker镜像以应用修改。
 
 在构建docker镜象后，你可以使用如下命令启动ToolServer：
 ```bash

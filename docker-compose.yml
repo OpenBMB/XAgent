@@ -62,9 +62,10 @@ services:
       context: ./
       dockerfile: dockerfiles/XAgentServer/Dockerfile
     container_name: XAgent-Server
+    env_file:
+      - .env
     environment:
       - TOOLSERVER_URL=http://ToolServerManager:8080
-      - CONFIG_FILE=${CONFIG_FILE}
     volumes:
       - ./assets:/app/assets:ro
     ports:

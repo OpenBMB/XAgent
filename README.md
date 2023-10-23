@@ -108,17 +108,6 @@ python run.py --task "put your task here" --model "gpt-4" --config_file "assets/
 # We ran the web ui docker when building the ToolServer network
 # run nginx in docker
 docker exec XAgent-Server systemctl start nginx
-
-# Also, you can start with python
-# python3.10+ is required
-cd XAgentServer
-pip install -r requirements.txt
-cd ..
-python start_server.py
-# You can run a web page with the following command as well:
-cd ../XAgentWeb
-npm install
-npm run dev
 ```
 Build the docker image for XAgent-Server and start the docker container.
 You will see the XAgent Server listening on port `8090`.

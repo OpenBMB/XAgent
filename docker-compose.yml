@@ -65,6 +65,8 @@ services:
     environment:
       - TOOLSERVER_URL=http://ToolServerManager:8080
       - CONFIG_FILE=${CONFIG_FILE}
+    volumes:
+      - ./assets:/app/assets:ro
     ports:
       - "5173:5173"
       - "8090:8090"

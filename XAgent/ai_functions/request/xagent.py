@@ -4,11 +4,12 @@ import openai
 from openai.error import InvalidRequestError
 
 from XAgent.logs import logger
-from XAgent.config import CONFIG,get_apiconfig_by_model
+from XAgent.config import CONFIG,get_apiconfig_by_model,get_model_name
 
 
 def chatcompletion_request(**kwargs):
-    model_name = kwargs.pop('model')
+    model_name = get_model_name(kwargs.pop('model',CONFIG.default_completion_kwargs['model']))
+    logger.debug("chatcompletion: using " + model_name)
     chatcompletion_kwargs = get_apiconfig_by_model(model_name)
     chatcompletion_kwargs.update(kwargs)
     

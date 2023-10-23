@@ -28,10 +28,6 @@ class OBJGenerator:
         wait=wait_chain(*[wait_none() for _ in range(3)]+[wait_exponential(min=61, max=293)]),
         reraise=True,)
     def chatcompletion(self,**kwargs):
-        model_name = get_model_name(kwargs.pop('model',CONFIG.default_completion_kwargs['model']))
-        kwargs['model'] = model_name
-        logger.debug("chatcompletion: using " + model_name)
-
         request_type = kwargs.pop('request_type',CONFIG.default_request_type)
         for k in list(kwargs.keys()):
             if kwargs[k] is None:

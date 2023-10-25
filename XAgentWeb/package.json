@@ -25,10 +25,13 @@
     "sass-loader": "^13.2.0",
     "save": "^2.9.0",
     "uuid": "^9.0.1",
+    "viewerjs": "^1.11.6",
     "vue": "^3.2.45",
     "vue-codemirror": "^6.1.1",
     "vue-json-viewer": "^3.0.4",
-    "vue-router": "^4.1.6"
+    "vue-router": "^4.1.6",
+    "v-viewer": "^3.0.10",
+    "viewer": "0.10.11"
   },
   "devDependencies": {
     "@commitlint/cli": "^17.3.0",

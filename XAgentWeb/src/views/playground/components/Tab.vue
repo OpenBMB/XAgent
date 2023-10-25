@@ -141,6 +141,7 @@
                     subTasks[index].isShowRefinement === true || isTaskCompleted
                   ) && subTasks[index].refinement"
                 class="task-refinement-wrapper"
+                :key = "index + 'refinement'"
               >
                 <TaskRefineInfo :data="subTasks[index].refinement" />
               </div>
@@ -151,8 +152,6 @@
             >
               <el-skeleton :rows="3" animated />
             </div>
-
-
           </el-collapse>
         </div>
       </el-tab-pane>

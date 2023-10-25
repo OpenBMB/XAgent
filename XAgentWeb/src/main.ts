@@ -8,6 +8,8 @@ import { setupRouteGuard } from './router/guard'
 import { setupHighlightDirective } from './directives/highlight'
 // import { setupClickOutsideDirective } from './directives/click-outside'
 import JsonViewer from 'vue-json-viewer'
+import VueViewer from 'v-viewer';
+import 'viewerjs/dist/viewer.css';
 
 // Import JsonViewer as a Vue.js plugin
 
@@ -22,6 +24,7 @@ const start = async () => {
   setupHighlightDirective(app)
 
   app.use(JsonViewer)
+  app.use(VueViewer);
   
   for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
     app.component(key, component)

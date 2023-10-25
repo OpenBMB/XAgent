@@ -97,7 +97,7 @@ def summarize_action(action_process:list[dict], task:str,)->(list[str],str):
         ret[index] = act_str
     
     reflection = function_manager('actions_reflection',
-                                  actions='\n'.join([ret[i] for i in valid_index]),
+                                  actions=clip_text('\n'.join([ret[i] for i in valid_index]),MAX_RETURN_LENGTH)[0],
                                   current_task=task)
     
     ret_lenght = {k:get_token_nums(v) for k,v in ret.items()}

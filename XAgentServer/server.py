@@ -33,6 +33,7 @@ class XAgentServer:
         config.reload()
         # args
         args = interaction.parameter.args
+        interaction.base.recorder_root_dir = config.record_dir
         if interaction.base.recorder_root_dir:
             if not os.path.exists(interaction.base.recorder_root_dir):
                 raise Exception(

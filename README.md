@@ -13,7 +13,7 @@
 
 <p align="center">
     <a>English</a> •
-    <a href="README_ZH.md">中文</a>
+    <a href="README_ZH.md">中文(Chinese)</a>
 </p>
 
 <p align="center">
@@ -26,9 +26,9 @@
 
 # 📖 Introduction
 XAgent is an open-source experimental Large Language Model (LLM) driven autonomous agent that can automatically solve various tasks. 
-It is designed to be a general-purpose agent that can be applied to a wide range of tasks. XAgent is still in its early stages, and we are working hard to improve it.
+It is designed to be a general-purpose agent that can be applied to a wide range of tasks. XAgent is still in its early stages. We are working hard to improve it.
 
-🏆 Our goal is to create a super-intelligent agent that can solve any given task!
+🏆 Our goal is to create a super-intelligent agent that can solve any given task faster and help you all!!
 
 We welcome diverse forms of collaborations, including full-time and part-time roles and more. If you are interested in the frontiers of agents and want to join us in realizing true autonomous agents, please contact us at xagentteam@gmail.com.
 
@@ -58,7 +58,7 @@ You can also easily add new tools to ToolServer to enhance XAgent's abilities.
 <div><a id="Quickstart"></a></div>
 
 # ✨ Quickstart
-## 🛠️ Build and Setup ToolServer
+## 🛠️ Build and Setup Tool Server
 ToolServer is where XAgent's action takes place. It is a docker container that provides a safe environment for XAgent to run.
 So you should install `docker` and `docker-compose` first. 
 After that, you should build the docker image for ToolServer and start the docker container.

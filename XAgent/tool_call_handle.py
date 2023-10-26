@@ -219,21 +219,23 @@ class ToolServerInterface():
             "arguments": arguments,
             # "hash_id": input_hash_id,
         }
+
         cache_output = recorder.query_tool_server_cache(url,payload)
-        if cache_output != None:
-            command_result = cache_output["tool_output"]
-            response_status_code = cache_output["response_status_code"]
-        else:
+
+
+        if CONFIG['experiment']['redo_action'] or cache_output is None:
             response = requests.post(url, json=payload, cookies=self.cookies)
             response_status_code = response.status_code
-            # import pdb; pdb.set_trace()
-            # print(response.json())
-
             if response.status_code == 200 or response.status_code == 450:
                 command_result = response.json()
                 command_result = unwrap_tool_response(command_result)
             else:
                 command_result = response.text
+                
+        if cache_output != None:
+            command_result = cache_output["tool_output"]
+            response_status_code = cache_output["response_status_code"]
+            
 
         recorder.regist_tool_server(url=url,
                                     payload=payload,

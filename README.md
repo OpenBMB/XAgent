@@ -35,6 +35,7 @@ We welcome diverse forms of collaborations, including full-time and part-time ro
 <div align="center">
     <img src="assets/readme/overview.png" alt="Overview of Xagent" width="500"/>
     <br/>
+    <figcaption>Overview of XAgent.</figcaption>
 </div>
 
 ## <img src="assets/readme/xagent_logo.png" height=30 align="texttop"> XAgent

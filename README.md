@@ -51,6 +51,12 @@ XAgent is composed of three parts:
 - **🧐 Planner** is responsible for generating and rectifying plans for tasks. It divides tasks into subtasks and generates milestones for them, allowing agents to solve tasks step by step.
 - **🦾 Actor** is responsible for conducting actions to achieve goals and finish subtasks. The actor utilizes various tools to solve subtasks, and it can also collaborate with humans to solve tasks.
 
+<div align="center">
+    <img src="assets/readme/loop.png" alt="Planner loop" width="500"/>
+    <br/>
+    <figcaption>The inner loop and outer loop mechanism of XAgent.</figcaption>
+</div>
+
 ## 🧰 ToolServer
 ToolServer is the server that provides XAgent with powerful and safe tools to solve tasks. It is a docker container that provides a safe environment for XAgent to run.
 Currently, ToolServer provides the following tools:

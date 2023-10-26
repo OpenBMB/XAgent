@@ -32,6 +32,11 @@ It is designed to be a general-purpose agent that can be applied to a wide range
 
 We welcome diverse forms of collaborations, including full-time and part-time roles and more. If you are interested in the frontiers of agents and want to join us in realizing true autonomous agents, please contact us at xagentteam@gmail.com.
 
+<div align="center">
+    <img src="assets/readme/overview.png" alt="Overview of Xagent" width="500"/>
+    <br/>
+</div>
+
 ## <img src="assets/readme/xagent_logo.png" height=30 align="texttop"> XAgent
 XAgent is designed with the following features:
 - **Autonomy**: XAgent can automatically solve various tasks without human participation.

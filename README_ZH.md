@@ -28,7 +28,7 @@ XAgent是一个开源的基于大型语言模型（LLM）的自主智能体，�
 我们欢迎各种形式的合作，包括全职、兼职等。如果您对智能体的前沿感兴趣，并希望加入我们实现真正的自主智能体，请通过 xagentteam@gmail.com 与我们联系。
 
 <div align="center">
-    <img src="assets/readme/overview_zh.jpg" alt="XAgent概述" width="500"/>
+    <img src="assets/readme/overview_zh.jpg" alt="XAgent概述" width="700"/>
     <br/>
     <figcaption>XAgent功能概览</figcaption>
 </div>
@@ -47,6 +47,11 @@ XAgent由三部分组成：
 - **🧐 规划器** 负责为任务生成和校正计划。它将任务分解为子任务，并为它们生成里程碑，使智能体能够逐步解决任务。
 - **🦾 行动者** 负责采取行动实现目标和完成子任务。行动者利用各种工具来解决子任务，它也可以与人类合作来解决任务。
 
+<div align="center">
+    <img src="assets/readme/loop.png" alt="Planner loop" width="700"/>
+    <br/>
+    <figcaption>XAgent“内循环”和“外循环”机制</figcaption>
+</div>
 
 ## 🧰 工具服务器
 工具服务器是为XAgent提供强大和安全的工具来解决任务的服务器。它是一个docker容器，为XAgent提供一个安全的运行环境。

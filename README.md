@@ -33,7 +33,7 @@ It is designed to be a general-purpose agent that can be applied to a wide range
 We welcome diverse forms of collaborations, including full-time and part-time roles and more. If you are interested in the frontiers of agents and want to join us in realizing true autonomous agents, please contact us at xagentteam@gmail.com.
 
 <div align="center">
-    <img src="assets/readme/overview.png" alt="Overview of Xagent" width="500"/>
+    <img src="assets/readme/overview.png" alt="Overview of Xagent" width="700"/>
     <br/>
     <figcaption>Overview of XAgent.</figcaption>
 </div>
@@ -52,7 +52,7 @@ XAgent is composed of three parts:
 - **🦾 Actor** is responsible for conducting actions to achieve goals and finish subtasks. The actor utilizes various tools to solve subtasks, and it can also collaborate with humans to solve tasks.
 
 <div align="center">
-    <img src="assets/readme/loop.png" alt="Planner loop" width="500"/>
+    <img src="assets/readme/loop.png" alt="Planner loop" width="700"/>
     <br/>
     <figcaption>The inner loop and outer loop mechanism of XAgent.</figcaption>
 </div>

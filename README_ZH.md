@@ -60,7 +60,6 @@ XAgent由三部分组成：
 因此，您应该首先安装`docker`和`docker-compose`。
 然后，您需要构建工具服务器的镜像。在`ToolServer`目录下，运行以下命令：
 ```bash
-cd ToolServer
 docker-compose up
 ```
 这将构建工具服务器的镜像并启动工具服务器的容器。如果您想在后台运行容器，请使用`docker-compose up -d`。

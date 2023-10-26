@@ -27,6 +27,12 @@ XAgent是一个开源的基于大型语言模型（LLM）的自主智能体，�
 
 我们欢迎各种形式的合作，包括全职、兼职等。如果您对智能体的前沿感兴趣，并希望加入我们实现真正的自主智能体，请通过 xagentteam@gmail.com 与我们联系。
 
+<div align="center">
+    <img src="assets/readme/overview_zh.jpg" alt="XAgent概述" width="500"/>
+    <br/>
+    <figcaption>XAgent功能概览</figcaption>
+</div>
+
 ## <img src="assets/readme/xagent_logo.png" height=30 align="texttop"> XAgent
 
 XAgent具有以下特点：

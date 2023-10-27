@@ -1,11 +1,11 @@
 type historyRole = 'USER' | 'AI'
 export type feedbackRating = 'THUMBS_UP' | 'THUMBS_DOWN' | 'THUMBS_NO'
 
-interface SubTaskInter {
+interface SubTaskInter{
   content?: string
   tools: Array<ToolInter>
 }
-interface ToolInter {
+interface ToolInter{
   thought?: string
   id?: number
   apiName?: string
@@ -52,7 +52,7 @@ export interface ChatInf {
   parentMessageId: string
 }
 
-interface Setting {
+interface Setting{
   mode?: string
   agent?: string
   plugins?: Array<string>

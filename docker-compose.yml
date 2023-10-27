@@ -76,5 +76,6 @@ volumes:
   xagentmongodb:
 
 networks:
-  tool-server-network:
+  default:
+    name: tool-server-network
     driver: bridge

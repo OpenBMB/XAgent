@@ -7,8 +7,8 @@
         <div v-if="isSignup" class="signup-wrapper flex-column">
           <span>{{ loginForm.email }}</span>
           <span class="msg">
-            Your registration is successful and is being queued. 
-            After the review is passed, 
+            Your registration is successful and is being queued.
+            After the review is passed,
             we will invite you to experience it by text message as soon as possible.
           </span>
 
@@ -18,63 +18,34 @@
         </div>
 
         <div v-else class="login-form flex-column">
-          <div
-            class="input-box flex-row"
-            :data-error="!isExistPhone ? loginFormStatus.email.code[mobileCode] : 'Wrong phone number format'"
-            :class="[
+          <div class="input-box flex-row"
+            :data-error="!isExistPhone ? loginFormStatus.email.code[mobileCode] : 'Wrong phone number format'" :class="[
               { focus: focusType === 'email' },
               { empty: loginFormStatus.email.isRequired },
               { 'format-error': loginFormStatus.email.isFormatError && !loginFormStatus.email.isRequired },
-            ]"
-          >
-            <input
-              v-model="loginForm.email"
-              type="text"
-              class="plain-input email-input"
-              placeholder="Enter your email address please"
-              autocomplete="off"
-              @focus="focusType = 'email'"
-              @blur="focusType = ''"
-              @input="changePhone"
-            />
+            ]">
+            <input v-model="loginForm.email" type="text" class="plain-input email-input"
+              placeholder="Enter your email address please" autocomplete="off" @focus="focusType = 'email'"
+              @blur="focusType = ''" @input="changePhone" />
           </div>
-          <div
-            class="input-box flex-row"
-            data-error="Wrong verification code format"
-            :class="[
-              { empty: loginFormStatus.code.isRequired },
-              { disabled: !isExistPhone },
-            ]"
-          >
-            <input
-              v-model="loginForm.token"
-              class="plain-input code-input"
-              type="password"
-              placeholder="Enter your email token please"
-              autocomplete="off"
-              @blur="focusType = ''"
-              @keydown.enter="throttledSubmit"
-            />
-              <p 
-                class="verify-code"
-                v-show="false"
-                :style="codeTime.smsCode === 0 ? 'cursor:pointer' : ''" @click="getVerifyCode">
-                {{ codeTime.smsCode === 0 ? 'Get SMS verification code' : `Resend in (${codeTime.smsCode}s)` }}
-              </p>
+          <div class="input-box flex-row" data-error="Wrong verification code format" :class="[
+            { empty: loginFormStatus.code.isRequired },
+            { disabled: !isExistPhone },
+          ]">
+            <input v-model="loginForm.token" class="plain-input code-input" type="password"
+              placeholder="Enter your email token please" autocomplete="off" @blur="focusType = ''"
+              @keydown.enter="throttledSubmit" />
+            <p class="verify-code" v-show="false" :style="codeTime.smsCode === 0 ? 'cursor:pointer' : ''"
+              @click="getVerifyCode">
+              {{ codeTime.smsCode === 0 ? 'Get SMS verification code' : `Resend in (${codeTime.smsCode}s)` }}
+            </p>
           </div>
 
-          <el-button 
-            class="main-btn flex-row flex-center"
-            @click="throttledSubmit"
-            :loading="isSubmitLoading"
-            >
+          <el-button class="main-btn flex-row flex-center" @click="throttledSubmit" :loading="isSubmitLoading">
             Login
           </el-button>
 
-          <div 
-              v-show="false"
-              class="main-btn flex-row flex-center"
-              @click="registerNow"> 
+          <div v-show="false" class="main-btn flex-row flex-center" @click="registerNow">
             申请
           </div>
         </div>
@@ -89,9 +60,9 @@
           <span class="link-btn" @click="freeTrial">Registration-Free Trial</span>
         </div> -->
 
-        <!-- TODO: 微信登录 -->
+        <!-- TODO: Login with Wechat -->
         <div class="tip" v-show="false">
-         Your applying for registration constitutes your acceptance of our
+          Your applying for registration constitutes your acceptance of our
           <a target="_blank" href="javascript:void(0)">
             Terms of Service
           </a> And
@@ -143,7 +114,7 @@ const loginFormStatus: any = reactive({
     isRequired: false,
     isFormatError: false,
     errorMsg: 'Wrong phone number format',
-    code: { 
+    code: {
       1017: 'Unregistered, please apply for registration',
       1021: 'Reviewing',
       1014: 'Wrong phone number format',
@@ -162,7 +133,7 @@ const changePhone = async () => {
   // loginFormStatus.code.isFormatError = false
   // loginFormStatus.code.isRequired = false
   // if (loginForm.email.length === 11) {
-  //   // TODO: 检验电话号码是否存在
+  //   // TODO:  Check if phone number exists
   //   const res: any = await useCheckPhoneRequest({ mobile: loginForm.email })
 
   //   if (res?.code !== 0) {
@@ -187,9 +158,9 @@ const registerNow = async () => {
     ElMessage({ type: 'success', message: 'Register successfully' })
     localStorage.setItem('token', res.data.token);
     loginForm.token = res.data.token;
-  } else if(res?.status === 'failed') {
+  } else if (res?.status === 'failed') {
     ElMessage({ type: 'error', message: 'Failed to register' })
-  } else  {
+  } else {
     ElMessage({ type: 'error', message: res?.message })
   }
 }
@@ -208,13 +179,13 @@ const getVerifyCode = async () => {
   //   codeTime.smsCode--
   //   if (codeTime.smsCode === 0) clearInterval(timer)
   // }, 1000)
-  // // TODO: 获取验证码
+  // // TODO: Obtain verification code
   const res: any = await useMobileCodeRequest({ mobile: loginForm.email, scene: 2 })
   if (res?.code === 0) {
     ElMessage({ type: 'success', message: 'Send successfully' })
-    ;(document.querySelector('.code-input') as HTMLElement)?.focus()
+      ; (document.querySelector('.code-input') as HTMLElement)?.focus()
   } else {
-    ElMessage({ type: 'error', message: (res?.message  || 'Send failed') })
+    ElMessage({ type: 'error', message: (res?.message || 'Send failed') })
   }
 }
 
@@ -267,7 +238,7 @@ const submit = async () => {
 
   const res: any = await useLoginRequest(param);
   isSubmitLoading.value = false
-    
+
   if (res?.success || res?.message === 'success') {
     userStore.setUserInfo(res?.data)
     authStore.setLoginState(true)
@@ -309,10 +280,12 @@ const signupSuccess = (state: boolean) => {
   .login {
     transform: translateX(-100%);
   }
+
   .apply-form {
     transform: translateX(-100%);
   }
 }
+
 .login {
   margin: auto;
   flex-shrink: 0;
@@ -343,6 +316,7 @@ const signupSuccess = (state: boolean) => {
       text-align: center;
       font-weight: var(--font-weight-5);
     }
+
     .signup-wrapper {
       gap: 20px;
       margin-block-end: 48px;
@@ -363,6 +337,7 @@ const signupSuccess = (state: boolean) => {
       margin-block-end: 48px;
       width: 100%;
       text-align: center;
+
       .input-box {
         width: 100% !important;
         min-width: 280px;
@@ -439,9 +414,11 @@ const signupSuccess = (state: boolean) => {
 
       .input-box.disabled {
         color: #a4a9b6;
+
         input {
           color: #a4a9b6;
         }
+
         &::before {
           content: '';
           position: absolute;
@@ -517,15 +494,18 @@ const signupSuccess = (state: boolean) => {
     font-weight: 400;
 
     gap: 24px;
+
     a {
       color: #ccc;
       text-decoration: none;
     }
+
     a:active {
       color: #eee;
     }
   }
 }
+
 .apply-form {
   width: 100%;
   height: 100%;

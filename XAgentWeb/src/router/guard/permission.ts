@@ -7,7 +7,7 @@ export const createPermissionGuard = (router: Router) => {
     // return
     const isMobile = /Mobi|Android|iPhone/i.test(navigator.userAgent)
     if (isMobile && to.path !== '/mobile') {
-      // 当前设备是移动设备
+      // current device is mobile
       next('/mobile')
       return
     }

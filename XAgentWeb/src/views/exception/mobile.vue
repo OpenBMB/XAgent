@@ -1,12 +1,11 @@
 <template>
   <div class="exception-mobile flex-row">
     <div class="logo flex-row flex-center">
-      <img src="@/assets/images/public/logo.png"
-      alt="" width="35" height="35" />
+      <img src="@/assets/images/public/logo.png" alt="" width="35" height="35" />
     </div>
     <span>API Open Platform</span>
 
-    <!-- 请在PC端进行访问试用 -->
+    <!-- Try out on desktop -->
     <p class="tip">Please visit and try out on PC</p>
   </div>
 </template>
@@ -40,6 +39,7 @@
       border-radius: 50%;
     }
   }
+
   .tip {
     position: absolute;
     top: 50%;

@@ -16,7 +16,6 @@ interface UserState {
 export const useUserStore = defineStore('user', {
   state: (): UserState => {
     return {
-      // 用户信息
       userInfo: null,
       roleList: [],
       lastUpdateTime: 0,

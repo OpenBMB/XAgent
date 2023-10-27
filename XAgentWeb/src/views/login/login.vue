@@ -18,9 +18,9 @@
         </div>
 
         <div v-else class="login-form flex-column">
-          <div 
+          <div
             class="input-box flex-row"
-            :data-error="!isExistPhone ? loginFormStatus.email.code[mobileCode] : 'Wrong phone number format'" 
+            :data-error="!isExistPhone ? loginFormStatus.email.code[mobileCode] : 'Wrong phone number format'"
             :class="[
               { focus: focusType === 'email' },
               { empty: loginFormStatus.email.isRequired },
@@ -28,53 +28,53 @@
             ]"
           >
             <input 
-              v-model="loginForm.email" 
-              type="text" 
+              v-model="loginForm.email"
+              type="text"
               class="plain-input email-input"
-              placeholder="Enter your email address please" 
-              autocomplete="off" 
+              placeholder="Enter your email address please"
+              autocomplete="off"
               @focus="focusType = 'email'"
               @blur="focusType = ''"
-              @input="changePhone" 
+              @input="changePhone"
             />
           </div>
-          <div 
-            class="input-box flex-row" 
-            data-error="Wrong verification code format" 
+          <div
+            class="input-box flex-row"
+            data-error="Wrong verification code format"
             :class="[
               { empty: loginFormStatus.code.isRequired },
               { disabled: !isExistPhone },
             ]"
           >
-            <input 
-              v-model="loginForm.token" 
-              class="plain-input code-input" 
+            <input
+              v-model="loginForm.token"
+              class="plain-input code-input"
               type="password"
-              placeholder="Enter your email token please" 
-              autocomplete="off" 
+              placeholder="Enter your email token please"
+              autocomplete="off"
               @blur="focusType = ''"
               @keydown.enter="throttledSubmit"
             />
               <p 
-                class="verify-code" 
-                v-show="false" 
+                class="verify-code"
+                v-show="false"
                 :style="codeTime.smsCode === 0 ? 'cursor:pointer' : ''" @click="getVerifyCode">
                 {{ codeTime.smsCode === 0 ? 'Get SMS verification code' : `Resend in (${codeTime.smsCode}s)` }}
               </p>
           </div>
 
           <el-button 
-            class="main-btn flex-row flex-center" 
-            @click="throttledSubmit" 
+            class="main-btn flex-row flex-center"
+            @click="throttledSubmit"
             :loading="isSubmitLoading"
             >
             Login
           </el-button>
 
           <div 
-            v-show="false" 
-            class="main-btn flex-row flex-center" 
-            @click="registerNow">
+              v-show="false"
+              class="main-btn flex-row flex-center"
+              @click="registerNow">
             申请
           </div>
         </div>
@@ -267,7 +267,7 @@ const submit = async () => {
 
   const res: any = await useLoginRequest(param);
   isSubmitLoading.value = false
-
+    
   if (res?.success || res?.message === 'success') {
     userStore.setUserInfo(res?.data)
     authStore.setLoginState(true)

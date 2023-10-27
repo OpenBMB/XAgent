@@ -161,22 +161,19 @@ class InteractionDBInterface(InteractionBaseInterface):
         """
         check if the user has an interaction
         """
-        total = self.db.query(func.count(Interaction.id)).filter(
-            Interaction.user_id == user_id, Interaction.is_deleted == False).scalar()
-        interaction_list = self.db.query(Interaction).filter(
-            Interaction.user_id == user_id, Interaction.is_deleted == False).limit(page_size).offset((page_num - 1) * page_size).all()
+        total = self.db.query(func.count(Interaction.id)).filter(Interaction.user_id == user_id, Interaction.is_deleted == False).scalar()
+        interaction_list = self.db.query(Interaction).filter(Interaction.user_id == user_id, Interaction.is_deleted == False).limit(page_size).offset((page_num - 1) * page_size).all()
         data = []
         for i, interaction in enumerate(interaction_list):
-            d_ = InteractionBase.from_db(interaction).to_dict(
-                exclude=["recorder_root_dir", "is_deleted"])
-            parameter = [{**p.args} if isinstance(
-                p.args, dict) else p.args for p in self.get_parameter(d_["interaction_id"])]
+            d_ = InteractionBase.from_db(interaction).to_dict(exclude=["recorder_root_dir", "is_deleted"])
+            parameter = [{**p.args} if isinstance(p.args, dict) else p.args for p in self.get_parameter(d_["interaction_id"])]
             d_["parameters"] = parameter
             data.append(d_)
         return {
             "total": total,
             "rows": data
         }
+
 
     def get_shared_interactions(self, page_size: int = 20, page_num: int = 1) -> list[dict]:
         """
@@ -194,7 +191,6 @@ class InteractionDBInterface(InteractionBaseInterface):
             "total": total,
             "rows": data
         }
-
 
     def get_shared_interaction(self, interaction_id: str) -> SharedInteractionBase | None:
         interaction = self.db.query(SharedInteraction).filter(SharedInteraction.interaction_id == interaction_id, SharedInteraction.is_deleted == False).first()
@@ -248,7 +244,6 @@ class InteractionDBInterface(InteractionBaseInterface):
     def is_running(self, user_id: str):
         interaction = self.db.query(Interaction).filter(Interaction.user_id == user_id, Interaction.status.in_(("running", "waiting"))).first()
         return interaction is not None
-
 
     def get_parameter(self, interaction_id: str):
         parameters = self.db.query(Parameter).filter(Parameter.interaction_id == interaction_id).all()

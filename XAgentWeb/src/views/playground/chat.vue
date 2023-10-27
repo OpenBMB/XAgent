@@ -1,12 +1,12 @@
 <template>
   <section class="container-box flex-column">
     <div ref="listRef" class="history-list flex-column">
-      <template 
-        v-for="({ content, msgID, role, isLatest }, index) in chatMsgInfo" 
+      <template
+        v-for="({ content, msgID, role, isLatest}, index) in chatMsgInfo"
         :key="index"
       >
-        <TransitionGroup 
-          name="message" 
+        <TransitionGroup
+          name="message"
           tag="div"
           >
           <div v-if="role === 'USER'" class="input flex-row">
@@ -17,19 +17,19 @@
           </div>
 
           <div  v-else-if="role === 'AI'" class="result typed-box flex-row">
-            <img class="avatar  round-corner-logo" alt="logo" 
+            <img class="avatar  round-corner-logo"  alt="logo"
               width="52" height="52"
-              src="@/assets/images/playground/main-logo-avatar.png" />
+              src="@/assets/images/playground/main-logo-avatar.png"/>
             <div class="content">
               <Tab 
-                :ref="tabchildList" 
-                :conversationId="conversationId" 
-                :key="msgID" 
+                :ref="tabchildList"
+                :conversationId="conversationId"
+                :key="msgID"
                 :mode="remSetting?.mode || 'auto'"
-                @disconnect="disConnectWebsocket" 
-                @runSubtask="RunNextSubtask" 
+                @disconnect="disConnectWebsocket"
+                @runSubtask="RunNextSubtask"
                 @runInner="RunNextinnerNode"
-                :isLatest="isLatest" :pageMode="pageMode" 
+                :isLatest="isLatest" :pageMode="pageMode"
               />
             </div>
             <div class="feedback-wrapper flex-row">
@@ -108,7 +108,8 @@ let ws: WebSocket | null = null;
 
 let pageMode = computed(() => {
   if(!route.query || !route.query.mode) {
-    if(route.params && route.params.mode) {
+    if(route.params && route.params.mode) 
+    {
       return route.params.mode as string;
     }
   }
@@ -277,7 +278,10 @@ if(recorder_dir) {
   sessionStorage.removeItem('rec');
 }
 const plainUrl = `${ protocol }//${ BACKEND_URL.replace('https://', '').replace('http://', '')
-    }/ws/${conversationId.value}?user_id=${user_id}&token=${token}&description=${currentInput.value.substring(0, 26)}`;
+    }/ws/${conversationId.value}?user_id=${user_id}&token=${token}&description=${
+
+
+currentInput.value.substring(0, 26)}`;
 
 const playbackUrl = `${ protocol }//${
   BACKEND_URL.replace('https://', '').replace('http://', '')
@@ -288,9 +292,12 @@ const playbackUrl = `${ protocol }//${
 const recordUrl = `${ protocol }//${ BACKEND_URL.replace('https://', '').replace('http://', '')
 }/ws_do_recorder?user_id=${user_id}&token=${token}&recorder_dir=${recorder_dir}`;
 
-const runShareUrl = `${ protocol }//${BACKEND_URL.replace('https://', '').replace('http://', '')
-  }/ws_share/${conversationId.value
-  }?user_id=${user_id}&token=${token}`;
+const runShareUrl = `${ protocol }//${
+  
+  BACKEND_URL.replace('https://', '').replace('http://', '')
+}/ws_share/${
+  conversationId.value
+}?user_id=${user_id}&token=${token}`;
 
 const RunNextinnerNode = (data: any) => {
   const query_params = JSON.stringify({
@@ -339,7 +346,7 @@ const sendConnectType = () => {
   const data = {
     type: 'connect',
   }
-  if (ws && ws.readyState === WebSocket.OPEN) {
+  if(ws && ws.readyState === WebSocket.OPEN) {
     ws?.send(JSON.stringify(data));
   }
 }
@@ -353,7 +360,7 @@ const wsMessageHandler = (data: any) => {
       const tabRefArr = refList.value;
       const tabchild = tabRefArr[tabRefArr.length - 1];
 
-      if (data.success === false) {
+      if(data.success === false) {
         ElMessage({
           type: 'error',
           message: data.message
@@ -363,7 +370,7 @@ const wsMessageHandler = (data: any) => {
         return;
       }
 
-      if (data.type = 'pong') {
+      if(data.type = 'pong') {
         pingKeepAlive();
       }
 
@@ -502,7 +509,7 @@ const runSharedConnection = () => {
     console.log("ws.onerror");
   }
   ws.onopen = () => {
-    if(chatIdFromRoute.value && ws && ws.readyState === WebSocket.OPEN) {
+    if(chatIdFromRoute.value  && ws && ws.readyState === WebSocket.OPEN) {
       ws?.send(JSON.stringify(query_params));
     }
   }
@@ -515,7 +522,7 @@ const playbackConnection = () => {
     return;
   }
   const query_params = {
-    type: "replay"
+      type: "replay"
   }
   taskStore.setAutoMode(true);
   ws = new WebSocket(playbackUrl);
@@ -527,7 +534,7 @@ const playbackConnection = () => {
     console.log("ws.onerror");
   }
   ws.onopen = () => {
-    if(chatIdFromRoute.value && ws && ws.readyState === WebSocket.OPEN) {
+    if(chatIdFromRoute.value  && ws && ws.readyState === WebSocket.OPEN) {
       ws?.send(JSON.stringify(query_params));
     }
   }
@@ -659,7 +666,7 @@ const isShowTyped = ref(false)
 const isTypedStop = ref(true)
 
 
-watch(() =>[ route.params.id, route.query.id, route.query.mode],
+watch(() =>[ route.params.id , route.query.id, route.query.mode],
   (newVal, oldVal) => {
 
     taskStore.reset();
@@ -673,7 +680,7 @@ watch(() =>[ route.params.id, route.query.id, route.query.mode],
     if(pageMode.value === 'playback' || pageMode.value === 'review' || pageMode.value === 'record') {
         taskStore.reset();
 
-        if (pageMode.value === 'playback') {
+        if(pageMode.value === 'playback') {
           taskStore.setAutoMode(true);
         } else {
           taskStore.setAutoMode(false);
@@ -947,7 +954,6 @@ const regenerate = () => {
     padding: 0  calc(50vw - 130px - 32vw)  110px;
     overflow-y: auto;
     flex: 1 0 200px;
-
     .user-content-border{
       background: rgba(255,255,255,0.90);
       border-radius: 8px;
@@ -1033,7 +1039,6 @@ const regenerate = () => {
       border-radius: 4px;
     }
   }
-
   .input-border{
     z-index: 5;
     position: absolute;
@@ -1052,12 +1057,10 @@ const regenerate = () => {
       // left: 50%;
       // transform: translateX(-50%);
     }
-
     .refresh-btn-border{
       display: flex;
       align-items: center;
       justify-content: center;
-
       .refresh-btn{
         height: 34px;
         width: 162px;
@@ -1069,14 +1072,12 @@ const regenerate = () => {
         line-height: 16px;
         font-weight: 400;
         cursor: pointer;
-
         .refresh-icon{
           height: 16px;
           width: 16px;
           margin-right: 14px;
         }
       }
-
     }
 
     .warning {
@@ -1098,7 +1099,7 @@ const regenerate = () => {
       }
     }
   }
-
+  
 }
 
 .watermark {

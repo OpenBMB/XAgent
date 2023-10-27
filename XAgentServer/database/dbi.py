@@ -249,7 +249,6 @@ class InteractionDBInterface(InteractionBaseInterface):
         parameters = self.db.query(Parameter).filter(Parameter.interaction_id == interaction_id).all()
         return [InteractionParameter.from_db(param) for param in parameters]
 
-
     def delete_interaction(self, interaction_id: str):
         try:
             interaction = self.db.query(Interaction).filter(Interaction.interaction_id == interaction_id).first()

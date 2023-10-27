@@ -18,7 +18,7 @@
 
           <div  v-else-if="role === 'AI'" class="result typed-box flex-row">
             <img class="avatar  round-corner-logo"  alt="logo"
-              width="52" height="52"
+              width="52" height="52" 
               src="@/assets/images/playground/main-logo-avatar.png"/>
             <div class="content">
               <Tab 
@@ -29,7 +29,8 @@
                 @disconnect="disConnectWebsocket"
                 @runSubtask="RunNextSubtask"
                 @runInner="RunNextinnerNode"
-                :isLatest="isLatest" :pageMode="pageMode"
+                :isLatest="isLatest"
+                :pageMode="pageMode"
               />
             </div>
             <div class="feedback-wrapper flex-row">
@@ -115,6 +116,7 @@ let pageMode = computed(() => {
   }
   return route.query.mode as string || '';
 }); // Redirected from other page, playback, review, or start a new conversation
+
 
 if(pageMode.value === "recorder") {
   chatMsgInfoStore.setCurrentInput('Record Playing');
@@ -279,8 +281,6 @@ if(recorder_dir) {
 }
 const plainUrl = `${ protocol }//${ BACKEND_URL.replace('https://', '').replace('http://', '')
     }/ws/${conversationId.value}?user_id=${user_id}&token=${token}&description=${
-
-
 currentInput.value.substring(0, 26)}`;
 
 const playbackUrl = `${ protocol }//${
@@ -293,7 +293,6 @@ const recordUrl = `${ protocol }//${ BACKEND_URL.replace('https://', '').replace
 }/ws_do_recorder?user_id=${user_id}&token=${token}&recorder_dir=${recorder_dir}`;
 
 const runShareUrl = `${ protocol }//${
-  
   BACKEND_URL.replace('https://', '').replace('http://', '')
 }/ws_share/${
   conversationId.value
@@ -1049,7 +1048,6 @@ const regenerate = () => {
     padding-top: 10px;
     background: rgb(240,241,250);
     box-shadow: inset 0 1px 3px 0 #FFFFFF;
-
     .input-box {
       // width: 58vw;
       width: 100%;
@@ -1078,6 +1076,7 @@ const regenerate = () => {
           margin-right: 14px;
         }
       }
+      
     }
 
     .warning {
@@ -1099,7 +1098,7 @@ const regenerate = () => {
       }
     }
   }
-  
+
 }
 
 .watermark {

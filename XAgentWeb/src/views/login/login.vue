@@ -27,7 +27,7 @@
               { 'format-error': loginFormStatus.email.isFormatError && !loginFormStatus.email.isRequired },
             ]"
           >
-            <input 
+            <input
               v-model="loginForm.email"
               type="text"
               class="plain-input email-input"
@@ -74,7 +74,7 @@
           <div 
               v-show="false"
               class="main-btn flex-row flex-center"
-              @click="registerNow">
+              @click="registerNow"> 
             申请
           </div>
         </div>
@@ -267,7 +267,7 @@ const submit = async () => {
 
   const res: any = await useLoginRequest(param);
   isSubmitLoading.value = false
-    
+
   if (res?.success || res?.message === 'success') {
     userStore.setUserInfo(res?.data)
     authStore.setLoginState(true)

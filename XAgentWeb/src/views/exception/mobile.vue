@@ -1,7 +1,7 @@
 <template>
   <div class="exception-mobile flex-row">
     <div class="logo flex-row flex-center">
-      <img src="@/assets/images/public/logo.png" 
+      <img src="@/assets/images/public/logo.png"
       alt="" width="35" height="35" />
     </div>
     <span>API Open Platform</span>

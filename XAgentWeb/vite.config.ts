@@ -10,7 +10,7 @@ import banner from 'vite-plugin-banner'
 
 import { resolve } from 'path'
 import { createHtmlPlugin } from 'vite-plugin-html'
-import BACKEND_URL from './src/api/backend'
+import BACKEND_URL_LOCALDEPLOY from './src/api/backend'
 
 function pathResolve(dir: string) {
   // const path = resolve(process.cwd(), '.', dir)
@@ -56,16 +56,16 @@ const config: UserConfigExport = {
     BASE_URL: JSON.stringify(VITE_PUBLIC_PATH),
   },
   server: {
-    // proxy: {
-    //   '/api': BACKEND_URL,
-    // },
     proxy: {
-      '/api': {
-        target: BACKEND_URL,
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, ''),
-      }
+      '/api': BACKEND_URL_LOCALDEPLOY,
     },
+    // proxy: {
+    //   '/api': {
+    //     target: BACKEND_URL_LOCALDEPLOY,
+    //     changeOrigin: true,
+    //     rewrite: (path) => path.replace(/^\/api/, ''),
+    //   }
+    // },
   },
 
   build: {

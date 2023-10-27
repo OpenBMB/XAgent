@@ -33,3 +33,9 @@ assets/garbage
 log/**
 
 XAgentWeb/src/api/backend.ts
+assets/config.yml
+assets/gpt4_config.yml
+config.yml
+gpt4_config.yml
+XAgentWeb/pnpm-lock.yaml
+XAgentWeb/pnpm-lock.yaml

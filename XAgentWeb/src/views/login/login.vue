@@ -269,6 +269,7 @@ const submit = async () => {
   isSubmitLoading.value = false
     
   if (res?.success || res?.message === 'success') {
+    
     userStore.setUserInfo(res?.data)
     authStore.setLoginState(true)
     authStore.setLoginToken(res?.data?.token)

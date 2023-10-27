@@ -124,7 +124,6 @@ if(pageMode.value === "recorder") {
 
 console.log("route.params = ", route.params)
 
-let lastConversionId = ref<string>()
 
 let conversationId = computed(() => {
   switch(pageMode.value) {
@@ -174,8 +173,6 @@ const taskInfo = storeToRefs(taskStore);
 const userStore = useUserStore()
 const { userInfo } = storeToRefs(userStore)
 userInfo.value = userStore.getUserInfo;
-
-
 
 const {
   historyArr : ChatHistoryArr
@@ -233,11 +230,11 @@ const stateMap = new Map([
 
 // TODo: when ws closed , stop loading;
 
-const handleConnectFailNotification = () => {
+const handleConnectFailNotification = (msg: string) => {
   taskStore.reset();
   ElMessage({
     type: 'error',
-    message: 'Your connection is interrupted for inactivity timeout, please refresh and try again.'
+    message: msg || 'Connection failed, please try again later.'
   })
 };
 
@@ -404,7 +401,7 @@ const wsMessageHandler = (data: any) => {
               break;
 
           case 'failed':
-              handleConnectFailNotification();
+              handleConnectFailNotification(data?.message);
               disConnectWebsocket();
               break;
 

@@ -29,7 +29,7 @@ You can build them manually with following command:
 ```bash
 docker-compose build
 ```
-This will build all the docker images for ToolServerManager, ToolServerMonitor and ToolServerNode. Note that the configuration files wiil be copyed to the docker images during the building process due to stability issues. If you change the configuration files, you should rebuild the docker images to apply the changes.
+This will build all the docker images for ToolServerManager, ToolServerMonitor and ToolServerNode. Note that the configuration files will be copied to the docker images during the building process due to stability issues. If you change the configuration files, you should rebuild the docker images to apply the changes.
 
 After building the docker images, you can start the docker container with following command:
 ```bash

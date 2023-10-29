@@ -189,3 +189,8 @@ If you find our repo useful, please kindly consider citing:
       year={2023},
 }
 ```
+## All Thanks To Our Contributors.
+
+<a href="https://github.com/OpenBMB/XAgent/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=OpenBMB/XAgent" />
+</a

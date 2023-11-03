@@ -8,7 +8,8 @@
 
 <p align="center">
     <a href="README.md">English</a> •
-    <a>中文</a>
+    <a>中文</a> •
+    <a href="README_JA.md">日本語</a>
 </p>
 
 </div>

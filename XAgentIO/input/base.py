@@ -17,11 +17,11 @@ class BaseInput(metaclass=ABCMeta):
         self.logger = logger
 
     async def interrupt(self):
-        raise NotImplementedError 
+        raise NotImplementedError
 
     def run(self):
         raise NotImplementedError
-    
+
     def close(self):
         # raise XAgentIOCloseError("close connection!")
         pass

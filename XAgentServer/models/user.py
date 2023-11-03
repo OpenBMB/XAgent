@@ -5,19 +5,20 @@ from XAgentServer.database.models import User
 
 
 class XAgentUser(metaclass=abc.ABCMeta):
-
-    def __init__(self, 
-                 user_id: str, 
-                 email: str, 
-                 name: str, 
-                 token: str, 
-                 available: bool = True,
-                 corporation: str = None,
-                 industry: str = None,
-                 position: str = None,
-                 create_time: str = None,
-                 update_time: str = None,
-                 deleted: bool = False):
+    def __init__(
+        self,
+        user_id: str,
+        email: str,
+        name: str,
+        token: str,
+        available: bool = True,
+        corporation: str = None,
+        industry: str = None,
+        position: str = None,
+        create_time: str = None,
+        update_time: str = None,
+        deleted: bool = False,
+    ):
         self.user_id = user_id
         self.email = email
         self.name = name
@@ -42,7 +43,7 @@ class XAgentUser(metaclass=abc.ABCMeta):
             "position": self.position,
             "create_time": self.create_time,
             "update_time": self.update_time,
-            "deleted": self.deleted
+            "deleted": self.deleted,
         }
 
     def to_json(self):
@@ -61,7 +62,7 @@ class XAgentUser(metaclass=abc.ABCMeta):
             position=user_dict["position"],
             create_time=user_dict["create_time"],
             update_time=user_dict["update_time"],
-            deleted=user_dict["deleted"]
+            deleted=user_dict["deleted"],
         )
 
     @staticmethod
@@ -70,7 +71,7 @@ class XAgentUser(metaclass=abc.ABCMeta):
 
     def is_available(self):
         return self.available
-    
+
     @staticmethod
     def from_db(user: User):
         user_id = user.user_id
@@ -95,6 +96,5 @@ class XAgentUser(metaclass=abc.ABCMeta):
             position=position,
             create_time=create_time,
             update_time=update_time,
-            deleted=deleted
+            deleted=deleted,
         )
-        

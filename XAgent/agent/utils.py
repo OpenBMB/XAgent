@@ -1,6 +1,7 @@
 import json
 from typing import Dict
 
+
 def get_command(response_json: Dict):
     """Parse the response and return the command name and arguments
 

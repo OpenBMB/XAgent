@@ -3,13 +3,14 @@ from XAgent.agent.base_agent import BaseAgent
 from XAgent.utils import RequiredAbilities
 from XAgent.message_history import Message
 
+
 class ReflectAgent(BaseAgent):
     abilities = set([RequiredAbilities.reflection])
 
     def parse(
         self,
         placeholders: dict = {},
-        arguments:dict = None,
+        arguments: dict = None,
         functions=None,
         function_call=None,
         stop=None,
@@ -26,5 +27,6 @@ class ReflectAgent(BaseAgent):
             functions=functions,
             function_call=function_call,
             stop=stop,
-            *args,**kwargs
+            *args,
+            **kwargs
         )

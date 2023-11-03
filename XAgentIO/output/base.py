@@ -4,7 +4,6 @@ from XAgentIO.exception import XAgentIOCloseError
 
 
 class BaseOutput(metaclass=ABCMeta):
-
     def __init__(self, kwargs: dict = None):
         self.kwargs = kwargs
 

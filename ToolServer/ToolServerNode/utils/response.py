@@ -1,22 +1,30 @@
 import base64
-from typing import Callable,Dict,Any
+from typing import Callable, Dict, Any
 
 from config import logger
 
-def is_base64(s:str) -> bool:
+
+def is_base64(s: str) -> bool:
     try:
         base64.b64decode(s)
         return True
     except:
         return False
-def is_wrapped_response(obj:dict) -> bool:
-    if 'type' in obj and obj['type'] in ['simple','composite','binary'] and 'data' in obj:
+
+
+def is_wrapped_response(obj: dict) -> bool:
+    if (
+        "type" in obj
+        and obj["type"] in ["simple", "composite", "binary"]
+        and "data" in obj
+    ):
         return True
     return False
 
-def wrap_tool_response(obj:Any) -> dict|list|str|int|float|bool:
-    '''Wrap the response of tool to allow decoding.
-    
+
+def wrap_tool_response(obj: Any) -> dict | list | str | int | float | bool:
+    """Wrap the response of tool to allow decoding.
+
     Format
     ======
     ```
@@ -46,47 +54,32 @@ def wrap_tool_response(obj:Any) -> dict|list|str|int|float|bool:
         ]
     }
     ```
-    '''
-    if isinstance(obj,tuple):
+    """
+    if isinstance(obj, tuple):
         if len(obj) == 0:
-            ret = {
-                'type': 'simple',
-                'data': None
-            }
+            ret = {"type": "simple", "data": None}
         elif len(obj) == 1:
-            ret = {
-                'type': 'simple',
-                'data': obj[0]
-            }
+            ret = {"type": "simple", "data": obj[0]}
         else:
-            ret = {
-                'type': 'composite',
-                'data': []
-            }
+            ret = {"type": "composite", "data": []}
             for o in obj:
-                ret['data'].append(wrap_tool_response(o))
-    elif isinstance(obj,bytes):
+                ret["data"].append(wrap_tool_response(o))
+    elif isinstance(obj, bytes):
         ret = {
-            'type': 'binary',
-            'media_type': 'bytes',
-            'name': None,
-            'data': base64.b64encode(obj).decode()
+            "type": "binary",
+            "media_type": "bytes",
+            "name": None,
+            "data": base64.b64encode(obj).decode(),
         }
-    elif isinstance(obj,(str,int,float,bool,list)) or obj is None:
+    elif isinstance(obj, (str, int, float, bool, list)) or obj is None:
         ret = obj
-    elif isinstance(obj,dict):
+    elif isinstance(obj, dict):
         # check if already wrapped
         if is_wrapped_response(obj):
             ret = obj
         else:
-            ret = {
-                'type': 'simple',
-                'data': obj
-            }
+            ret = {"type": "simple", "data": obj}
     else:
-        logger.warning(f'Unknown type {type(obj)} in wrap_tool_response')
-        ret = {
-            'type': 'simple',
-            'data': obj
-        }
+        logger.warning(f"Unknown type {type(obj)} in wrap_tool_response")
+        ret = {"type": "simple", "data": obj}
     return ret

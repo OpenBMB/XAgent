@@ -4,13 +4,15 @@ import uuid
 
 
 class Node(metaclass=abc.ABCMeta):
-
-    def __init__(self, thoughts: str,
-                 reasoning: str,
-                 plan: list,
-                 using_tools: str,
-                 is_last: bool = False,
-                 node_id: str = None):
+    def __init__(
+        self,
+        thoughts: str,
+        reasoning: str,
+        plan: list,
+        using_tools: str,
+        is_last: bool = False,
+        node_id: str = None,
+    ):
         if plan is None:
             plan = []
         if node_id is None:

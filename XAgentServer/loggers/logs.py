@@ -11,6 +11,7 @@ from typing import Any
 
 from colorama import Fore, Style
 
+
 class JsonFileHandler(logging.FileHandler):
     def __init__(self, filename, mode="a", encoding=None, delay=False):
         super().__init__(filename, mode, encoding, delay)
@@ -25,6 +26,7 @@ class JsonFormatter(logging.Formatter):
     def format(self, record):
         return record.msg
 
+
 class Logger(metaclass=abc.ABCMeta):
     """
     Logger that handle titles in different colors.
@@ -32,13 +34,20 @@ class Logger(metaclass=abc.ABCMeta):
     For console handler: simulates typing
     """
 
-    def __init__(self, log_dir: str = None, log_name: str= "", log_file: str = "activity.log", error_file: str = "errors.log"):
-
+    def __init__(
+        self,
+        log_dir: str = None,
+        log_name: str = "",
+        log_file: str = "activity.log",
+        error_file: str = "errors.log",
+    ):
         if not os.path.exists(log_dir):
             os.makedirs(log_dir)
 
         # create log directory if it doesn't exist
-        self.log_name = time.strftime("%Y-%m-%d", time.localtime()) if not log_name else log_name
+        self.log_name = (
+            time.strftime("%Y-%m-%d", time.localtime()) if not log_name else log_name
+        )
         self.logger = logging.getLogger(self.log_name)
         console_formatter = RecordFormatter("%(title_color)s %(message)s")
 
@@ -52,7 +61,6 @@ class Logger(metaclass=abc.ABCMeta):
         self.console_handler.setLevel(logging.DEBUG)
         self.console_handler.setFormatter(console_formatter)
 
-        
         self.speak_mode = False
         self.chat_plugins = []
 
@@ -90,7 +98,6 @@ class Logger(metaclass=abc.ABCMeta):
             self.logger.addHandler(error_handler)
             self.logger.addHandler(self.file_handler)
             self.logger.setLevel(logging.DEBUG)
-    
 
     def typewriter_log(
         self, title="", title_color="", content="", speak_text=False, level=logging.INFO
@@ -107,9 +114,7 @@ class Logger(metaclass=abc.ABCMeta):
         else:
             content = ""
 
-        self.logger.log(
-            level, content, extra={"title": title, "color": title_color}
-        )
+        self.logger.log(level, content, extra={"title": title, "color": title_color})
 
     def debug(
         self,

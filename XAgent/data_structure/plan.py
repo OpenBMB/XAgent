@@ -2,13 +2,14 @@ from typing import List, Optional
 from XAgent.utils import TaskSaveItem, TaskStatusCode
 from XAgent.data_structure.node import ToolNode
 
-class Plan():
+
+class Plan:
     def __init__(self, data: TaskSaveItem):
         self.father: Optional[Plan] = None
         self.children: List[Plan] = []
         self.data: TaskSaveItem = data
-        self.process_node: ToolNode = None 
-    
+        self.process_node: ToolNode = None
+
     def to_json(self, posterior=True):
         root_json = self.data.to_json(posterior=posterior)
         if self.process_node:
@@ -17,9 +18,9 @@ class Plan():
         # if self.father != None:
         root_json["task_id"] = self.get_subtask_id(to_str=True)
         if len(self.children) > 0:
-            root_json["subtask"] = [ subtask.to_json() for subtask in self.children]
+            root_json["subtask"] = [subtask.to_json() for subtask in self.children]
         return root_json
-    
+
     def get_subtask_id(self, to_str=False):
         subtask_id_list = self.get_subtask_id_list()
         if to_str:
@@ -35,7 +36,7 @@ class Plan():
         child_id = self.father.children.index(self) + 1
         fahter_subtask_id.append(child_id)
         return fahter_subtask_id
-    
+
     @classmethod
     def make_relation(cls, father, child):
         father.children.append(child)
@@ -60,11 +61,10 @@ class Plan():
 
     @classmethod
     def pop_next_subtask(cls, now_plan):
-
         root_plan = now_plan.get_root()
         all_plans = Plan.get_inorder_travel(root_plan)
         order_id = all_plans.index(now_plan)
-        for subtask in all_plans[order_id + 1:]:
+        for subtask in all_plans[order_id + 1 :]:
             if subtask.data.status == TaskStatusCode.TODO:
                 return subtask
         return None

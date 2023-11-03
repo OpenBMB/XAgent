@@ -7,8 +7,11 @@ from core.envs.filesystem import FileSystemEnv
 
 CODE_FS = FileSystemEnv()
 
+
 @toolwrapper()
-async def run_interpreter(code:str=None,command:str=None,filename:str='code.py'):
+async def run_interpreter(
+    code: str = None, command: str = None, filename: str = "code.py"
+):
     """The code interpreter tool that runs code and return the output.
 
     The `code` will be written to file `filename` and the `command` will be executed in a shell.
@@ -23,25 +26,28 @@ async def run_interpreter(code:str=None,command:str=None,filename:str='code.py')
 
     """
     if code is not None and code != "" and filename != "":
-        CODE_FS.write_to_file(filename,code)
+        CODE_FS.write_to_file(filename, code)
 
     if command is None:
-        command = f'python {filename}'
+        command = f"python {filename}"
     exec_proc = await asyncio.create_subprocess_shell(
-        'bash',
+        "bash",
         stderr=asyncio.subprocess.PIPE,
         stdout=asyncio.subprocess.PIPE,
         stdin=asyncio.subprocess.PIPE,
-        cwd=CODE_FS.work_directory)
-    
-    ret = await asyncio.wait_for(exec_proc.communicate(command.encode()),timeout=CONFIG['shell']['timeout'])
-    
+        cwd=CODE_FS.work_directory,
+    )
+
+    ret = await asyncio.wait_for(
+        exec_proc.communicate(command.encode()), timeout=CONFIG["shell"]["timeout"]
+    )
+
     result = {
-        'ReturnCode':exec_proc.returncode,
+        "ReturnCode": exec_proc.returncode,
     }
-    if ret[1]!=b'':
-        result['Error'] = ret[1].decode()
-    if ret[0]!=b'':
-        result['Output'] = ret[0].decode()
+    if ret[1] != b"":
+        result["Error"] = ret[1].decode()
+    if ret[0] != b"":
+        result["Output"] = ret[0].decode()
 
     return result

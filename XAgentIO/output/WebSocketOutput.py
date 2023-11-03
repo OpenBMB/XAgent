@@ -6,7 +6,6 @@ from XAgentServer.response_body import WebsocketResponseBody
 
 
 class WebSocketOutput(BaseOutput):
-
     def __init__(self, websocket: WebSocket):
         super().__init__()
         self.websocket = websocket
@@ -21,4 +20,3 @@ class WebSocketOutput(BaseOutput):
         except Exception as e:
             self.logger.info(traceback.format_exc())
             raise XAgentIOWebSocketDisconnectError
-

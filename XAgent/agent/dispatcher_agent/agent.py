@@ -9,6 +9,7 @@ from XAgent.logs import logger
 from XAgent.message_history import Message
 from XAgent.agent.base_agent import BaseAgent
 
+
 class DispatcherAgent(BaseAgent):
     def __init__(self, config, prompt_messages: List[Message] = None):
         self.config = config
@@ -46,7 +47,9 @@ class DispatcherAgent(BaseAgent):
     def extract_prompts_from_response(self, message):
         try:
             # additional_prompt = message["content"]
-            additional_prompt = re.findall(r"ADDITIONAL USER PROMPT:?\n```(.*)```", message['content'], re.DOTALL)[0].strip()
+            additional_prompt = re.findall(
+                r"ADDITIONAL USER PROMPT:?\n```(.*)```", message["content"], re.DOTALL
+            )[0].strip()
         except IndexError as e:
             logger.error(
                 f"Failed to extract prompts from the dispatcher's response:\n{message['content']}"
@@ -62,7 +65,7 @@ class DispatcherAgent(BaseAgent):
             import requests
             import json
 
-            relevant_procedures = requests.get(url, params={'query': query}).json()[
+            relevant_procedures = requests.get(url, params={"query": query}).json()[
                 "procedures"
             ][0]
         except:
@@ -84,21 +87,21 @@ class DispatcherAgent(BaseAgent):
         # TODO: should we consider additional messages when generating prompt?
         # currently the plan generation and refine agent are the same since we
         # don't consider the additional messages when generating prompt.
-        message,tokens = self.generate(
+        message, tokens = self.generate(
             messages=self.construct_input_messages(
                 task,
                 example_input,
                 example_system_prompt,
                 example_user_prompt,
                 # self.retrieved_procedure(task),
-                ""  # The retrieved procedures are mostly irrelevant for now
+                "",  # The retrieved procedures are mostly irrelevant for now
             ),
             stop=stop,
             **args,
         )
 
         # additional_prompt = self.extract_prompts_from_response(message)
-        additional_prompt = message['arguments']['additional_prompt']
+        additional_prompt = message["arguments"]["additional_prompt"]
 
         prompt_messages = []
         if additional_prompt != "":

@@ -1,1 +1,1 @@
-from .obj_generator import objgenerator,OBJGenerator
+from .obj_generator import objgenerator, OBJGenerator

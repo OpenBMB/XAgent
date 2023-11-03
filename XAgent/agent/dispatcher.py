@@ -93,27 +93,36 @@ class XAgentDispatcher(AgentDispatcher):
             ability_type
         )
         if self.enable:
-            logger.typewriter_log(self.__class__.__name__, Fore.GREEN, f"Refine the prompt of a specific agent for {Fore.GREEN}RequiredAbilities.{ability_type.name}{Style.RESET_ALL}")
+            logger.typewriter_log(
+                self.__class__.__name__,
+                Fore.GREEN,
+                f"Refine the prompt of a specific agent for {Fore.GREEN}RequiredAbilities.{ability_type.name}{Style.RESET_ALL}",
+            )
             _, prompt_messages, tokens = self.dispatcher.parse(
                 target_task, example_input, example_system_prompt, example_user_prompt
             )
             print(prompt_messages)
             if prompt_messages[0].content == "" and prompt_messages[1].content == "":
-                logger.info("Dispatcher fail to follow the output format, we fallback to use the default prompt.")
+                logger.info(
+                    "Dispatcher fail to follow the output format, we fallback to use the default prompt."
+                )
                 prompt_messages = [
                     Message(role="system", content=example_system_prompt),
                     Message(role="user", content=example_user_prompt),
                 ]
             else:
-                logger.typewriter_log(self.__class__.__name__, Fore.GREEN, f"The prompt has been refined!")
+                logger.typewriter_log(
+                    self.__class__.__name__, Fore.GREEN, f"The prompt has been refined!"
+                )
         else:
             prompt_messages = [
                 Message(role="system", content=example_system_prompt),
                 Message(role="user", content=example_user_prompt),
             ]
-        agent = self.build_agent(ability_type, self.config, prompt_messages, *args, **kwargs)
+        agent = self.build_agent(
+            ability_type, self.config, prompt_messages, *args, **kwargs
+        )
         return agent
-
 
 
 agent_dispatcher = XAgentDispatcher(CONFIG, enable=False)

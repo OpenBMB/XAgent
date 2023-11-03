@@ -4,15 +4,19 @@ import uuid
 
 from XAgentServer.models.subtask import Subtask
 
+
 class XAgentOutputData(metaclass=abc.ABCMeta):
-    def __init__(self, task_id: str,
-                 name: str,
-                 goal: str,
-                 handler: str,
-                 tool_budget: int,
-                 tool_recommendation: str,
-                 subtasks: None,
-                 node_id: str = None):
+    def __init__(
+        self,
+        task_id: str,
+        name: str,
+        goal: str,
+        handler: str,
+        tool_budget: int,
+        tool_recommendation: str,
+        subtasks: None,
+        node_id: str = None,
+    ):
         if subtasks is None:
             subtasks = []
         self.name = name
@@ -35,10 +39,8 @@ class XAgentOutputData(metaclass=abc.ABCMeta):
             "goal": self.goal,
             "handler": self.handler,
             "tool_budget": self.tool_budget,
-            "subtasks": [
-                subtask.to_dict() for subtask in self.subtasks
-            ],
-            "tool_recommendation": self.tool_recommendation
+            "subtasks": [subtask.to_dict() for subtask in self.subtasks],
+            "tool_recommendation": self.tool_recommendation,
         }
 
     def to_json(self):

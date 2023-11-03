@@ -1,4 +1,4 @@
-SYSTEM_PROMPT = '''You are an efficient plan-generation agent, your task is to decompose a query into several subtasks that describe must achieved goals for the query.
+SYSTEM_PROMPT = """You are an efficient plan-generation agent, your task is to decompose a query into several subtasks that describe must achieved goals for the query.
 --- Background Information ---
 PLAN AND SUBTASK:
 A plan has a tree manner of subtasks: task 1 contatins subtasks task 1.1, task 1.2, task 1.3, ... and task 1.2 contains subtasks 1.2.1, 1.2.2, ...
@@ -32,7 +32,7 @@ Generate the plan for query with operation SUBTASK_SPLIT, make sure all must rea
 - The task handler is powered by sota LLM, which can directly answer many questions. So make sure your plan can fully utilze its ability and reduce the complexity of the subtasks tree.
 - You can plan multiple subtasks if you want.
 - Minimize the number of subtasks, but make sure all must reach goals are included in the plan.
-'''
+"""
 
 USER_PROMPT = '''This is the the first time you are handling the task, so you should give a initial plan. Here is the query:
 """

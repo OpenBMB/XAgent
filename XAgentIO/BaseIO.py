@@ -11,7 +11,7 @@ class XAgentIO:
         else:
             if not isinstance(input, BaseInput):
                 raise TypeError("input must be a BaseInput instance")
-            
+
         self.Input = input
 
         if output is None:
@@ -19,9 +19,8 @@ class XAgentIO:
         else:
             if not isinstance(output, BaseOutput):
                 raise TypeError("output must be a BaseOutput instance")
-            
-        self.Output = output
 
+        self.Output = output
 
     def set_logger(self, logger):
         self.logger = logger

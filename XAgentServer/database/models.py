@@ -7,9 +7,9 @@ Base = declarative_base()
 
 
 class User(Base):
-    __tablename__="users"
+    __tablename__ = "users"
 
-    id=Column(Integer,primary_key=True,index=True)
+    id = Column(Integer, primary_key=True, index=True)
     user_id = Column(String(32), unique=True, index=True)
     email = Column(String(255), unique=True)
     name = Column(String(255))

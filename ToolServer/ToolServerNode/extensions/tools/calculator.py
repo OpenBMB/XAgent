@@ -3,31 +3,32 @@ import xmltodict
 
 from config import CONFIG
 from core.register import toolwrapper
-        
+
 
 # @toolwrapper()
-def calculator(expression:str)->str:
+def calculator(expression: str) -> str:
     """It is a simple calculator, which can execute Python expressions: e.g., "(123 + 234) / 23 * 1.5 - 8".
-        
+
     :param string expression: The python expression you requested.
     :return string: The execution results of the expression.
     """
-    globals={}
-    locals={}
+    globals = {}
+    locals = {}
     try:
         # Wrap the code in an eval() call to return the result
         wrapped_code = f"__result__ = eval({repr(expression)}, globals(), locals())"
         exec(wrapped_code, globals, locals)
-        return locals.get('__result__', None)
+        return locals.get("__result__", None)
     except Exception as e:
         try:
-        # If eval fails, attempt to exec the code without returning a result
+            # If eval fails, attempt to exec the code without returning a result
             exec(expression, globals, locals)
             return "Code executed successfully."
         except Exception as e:
             return f"Error: {str(e)}"
 
-#wolfram_cfg = CONFIG['wolfram']  
+
+# wolfram_cfg = CONFIG['wolfram']
 # @toolwrapper()
 # def query_wolfram(query:str) -> list[dict]:
 #     """Query WolframAlpha using natural language and return parsed results.
@@ -38,7 +39,7 @@ def calculator(expression:str)->str:
 #     :return array[Object]: The results of the query.
 #     """
 #     response = requests.get(wolfram_cfg['endpoint'], params={'appid': wolfram_cfg['appid'], "input": query})
-    
+
 #     json_data = xmltodict.parse(response.text)
 #     if 'pod' not in json_data["queryresult"]:
 #         return "WolframAlpha API cannot parse the input query."

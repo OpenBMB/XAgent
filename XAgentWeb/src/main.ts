@@ -31,7 +31,7 @@ const start = async () => {
   }
   // setupClickOutsideDirective(app)
 
-  // 当路由准备好时再执行挂载( https://next.router.vuejs.org/api/#isready)
+  // Load when the router is ready( https://next.router.vuejs.org/api/#isready)
   await router.isReady()
 
   app.mount('#app', true)

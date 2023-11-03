@@ -42,7 +42,7 @@ class UserDBInterface(UserBaseInterface):
             user = self.db.query(User).filter(User.email == email, User.deleted == False).first()
         else:
             user = self.db.query(User).filter(User.user_id == user_id, User.deleted == False).first()
-        
+
         return XAgentUser.from_db(user) if user else None
 
     def user_is_exist(self, user_id: str | None = None, email: str | None = None):
@@ -119,7 +119,7 @@ class InteractionDBInterface(InteractionBaseInterface):
         not use
         """
         raise NotImplementedError
-    
+
 
     def get_interaction_dict_list(self):
         raise NotImplementedError
@@ -134,7 +134,7 @@ class InteractionDBInterface(InteractionBaseInterface):
 
     def create_interaction(self, base: InteractionBase) -> InteractionBase:
         """
-        创建一个对话
+        create an interaction
         """
         try:
             self.db.add(Interaction(**base.to_dict()))
@@ -143,10 +143,10 @@ class InteractionDBInterface(InteractionBaseInterface):
             self.db.rollback()
             print(traceback.print_exec())
         return None
-    
+
     def add_parameter(self, parameter: InteractionParameter):
         """
-        创建一个对话
+        add a parameter
         """
         try:
             self.db.add(Parameter(**parameter.to_dict()))
@@ -159,7 +159,7 @@ class InteractionDBInterface(InteractionBaseInterface):
 
     def get_interaction_by_user_id(self, user_id: str, page_size: int = 20, page_num: int = 1) -> list[dict]:
         """
-        查看对话历史
+        check if the user has an interaction
         """
         total = self.db.query(func.count(Interaction.id)).filter(Interaction.user_id == user_id, Interaction.is_deleted == False).scalar()
         interaction_list = self.db.query(Interaction).filter(Interaction.user_id == user_id, Interaction.is_deleted == False).limit(page_size).offset((page_num - 1) * page_size).all()
@@ -173,11 +173,11 @@ class InteractionDBInterface(InteractionBaseInterface):
             "total": total,
             "rows": data
         }
-    
+
 
     def get_shared_interactions(self, page_size: int = 20, page_num: int = 1) -> list[dict]:
         """
-        获取社区分享的数据
+        get shared interactions
         """
         total = self.db.query(func.count(SharedInteraction.id)).filter(SharedInteraction.is_deleted == False).scalar()
         interaction_list = self.db.query(SharedInteraction).filter(SharedInteraction.is_deleted == False).order_by(SharedInteraction.star.desc()).limit(page_size).offset((page_num - 1) * page_size).all()
@@ -191,7 +191,7 @@ class InteractionDBInterface(InteractionBaseInterface):
             "total": total,
             "rows": data
         }
-    
+
     def get_shared_interaction(self, interaction_id: str) -> SharedInteractionBase | None:
         interaction = self.db.query(SharedInteraction).filter(SharedInteraction.interaction_id == interaction_id, SharedInteraction.is_deleted == False).first()
         return SharedInteractionBase.from_db(interaction) if interaction else None
@@ -200,7 +200,7 @@ class InteractionDBInterface(InteractionBaseInterface):
     def interaction_is_exist(self, interaction_id: str) -> bool:
         interaction = self.db.query(Interaction).filter(Interaction.interaction_id == interaction_id, Interaction.is_deleted == False).first()
         return interaction is not None
-    
+
 
     def update_interaction(self, base_data: dict):
         try:
@@ -244,11 +244,11 @@ class InteractionDBInterface(InteractionBaseInterface):
     def is_running(self, user_id: str):
         interaction = self.db.query(Interaction).filter(Interaction.user_id == user_id, Interaction.status.in_(("running", "waiting"))).first()
         return interaction is not None
-    
+
     def get_parameter(self, interaction_id: str):
         parameters = self.db.query(Parameter).filter(Parameter.interaction_id == interaction_id).all()
         return [InteractionParameter.from_db(param) for param in parameters]
-    
+
     def delete_interaction(self, interaction_id: str):
         try:
             interaction = self.db.query(Interaction).filter(Interaction.interaction_id == interaction_id).first()

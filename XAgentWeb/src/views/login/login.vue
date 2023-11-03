@@ -89,7 +89,7 @@
           <span class="link-btn" @click="freeTrial">Registration-Free Trial</span>
         </div> -->
 
-        <!-- TODO: 微信登录 -->
+        <!-- TODO: Login with Wechat -->
         <div class="tip" v-show="false">
          Your applying for registration constitutes your acceptance of our
           <a target="_blank" href="javascript:void(0)">
@@ -162,7 +162,7 @@ const changePhone = async () => {
   // loginFormStatus.code.isFormatError = false
   // loginFormStatus.code.isRequired = false
   // if (loginForm.email.length === 11) {
-  //   // TODO: 检验电话号码是否存在
+  //   // TODO:  Check if phone number exists
   //   const res: any = await useCheckPhoneRequest({ mobile: loginForm.email })
 
   //   if (res?.code !== 0) {
@@ -208,7 +208,7 @@ const getVerifyCode = async () => {
   //   codeTime.smsCode--
   //   if (codeTime.smsCode === 0) clearInterval(timer)
   // }, 1000)
-  // // TODO: 获取验证码
+  // // TODO: Obtain verification code
   const res: any = await useMobileCodeRequest({ mobile: loginForm.email, scene: 2 })
   if (res?.code === 0) {
     ElMessage({ type: 'success', message: 'Send successfully' })
@@ -267,7 +267,7 @@ const submit = async () => {
 
   const res: any = await useLoginRequest(param);
   isSubmitLoading.value = false
-    
+
   if (res?.success || res?.message === 'success') {
     
     userStore.setUserInfo(res?.data)

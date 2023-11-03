@@ -51,7 +51,8 @@ const config: UserConfigExport = {
       inject: { data: { title: 'X-Agent' } },
     }),
   ],
-  // 定义全局常量替换方式。其中每项在开发环境下会被定义在全局，而在构建时被静态替换。
+
+  // Define global constants replacement method. Each item will be defined globally in the development environment and statically replaced during building.
   define: {
     BASE_URL: JSON.stringify(VITE_PUBLIC_PATH),
   },

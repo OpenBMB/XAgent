@@ -11,7 +11,7 @@
 //         }, delay);
 //     };
 // } 
-// 基于计时器的节流
+// Throttle based on timer
 
 const throttle = (fn: Function, delay: number) => {
     let prev = Date.now();
@@ -24,6 +24,6 @@ const throttle = (fn: Function, delay: number) => {
         }
     };
 }
-// 基于时间的节流
+// Throttle based on time
 
 export default throttle;

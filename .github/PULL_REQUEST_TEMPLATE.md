@@ -7,18 +7,16 @@ First of all, thank you for your contribution! 😄
 
 - [ ] New feature / 新特性提交
 - [ ] Fix bug / bug 修复
-- [ ] Style optimization / 样式优化
-- [ ] Code style optimization / 代码风格优化
+- [ ] Refactor code or style / 重构代码或样式
 - [ ] Performance optimization / 性能优化
 - [ ] Build optimization / 构建优化
 - [ ] Website, documentation, demo improvements / 网站、文档、Demo 改进
-- [ ] Refactor code or style / 重构代码或样式
 - [ ] Test related / 测试相关
 - [ ] Other / 其他
 
 ### 🔗 Related Issue / 相关 Issue
 
-(Describe the source of related requirements, such as the related issue discussion link. Example: close #123, close #456. /描述相关需求的来源，如相关的 issue 讨论链接。 例如：close #123, close #456. )
+(Describe the source of related requirements, such as the related issue discussion link. Example: close #xx, close #xx. /描述相关需求的来源，如相关的 issue 讨论链接。 例如：close #xx, close #xxx. )
 
 ### 💡 Background or solution / 需求背景和解决方案
 

@@ -18,7 +18,7 @@ SUBTASK HANDLE:
 A task-handling agent will handle all the subtasks as the inorder-traversal. For example:
 1. it will handle subtask 1 first.
 2. if solved, handle subtask 2. If failed, split subtask 1 as subtask 1.1 1.2 1.3... Then handle subtask 1.1.
-3. Handle subtasks recurrsively, until all subtasks are soloved.
+3. Handle subtasks recurrsively, until all subtasks are solved.
 4. It is powered by a state-of-the-art LLM, so it can handle many subtasks without using external tools or execute codes.
 
 RESOURCES:

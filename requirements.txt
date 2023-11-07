@@ -16,7 +16,7 @@ tqdm
 uvicorn
 json5
 inputimeout
-openai
+openai==0.28.1
 python-dotenv
 sqlalchemy
 tenacity

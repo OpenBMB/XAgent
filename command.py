@@ -85,8 +85,84 @@ class CommandLine():
         if args is None or not isinstance(args, dict):
             raise ValueError("args must be a dict")
 
-        # omitted for brevity
+        user_id = "admin"
+        token = "xagent-admin"
+        description = args.get("description", "XAgent-user")
+        file_list = args.get("file_list", [])
+        record_dir = args.get("record_dir", "")
+        goal = args.get("goal", "")
+        mode = args.get("mode", "auto")
+        plan = args.get("plan", [])
+        max_wait_seconds = args.get("max_wait_seconds", 600)
 
+        self.logger.typewriter_log(
+            title=f"Receive args from {self.client_id}: ",
+            title_color=Fore.RED,
+            content=f"user_id: {user_id}, token: {token}, description: {description}")
+
+        # check running, you can edit it by yourself in envs.py to skip this check
+        if XAgentServerEnv.check_running:
+            if self.interactionDB.is_running(user_id=user_id):
+                raise Exception(
+                    "You have a running interaction, please wait for it to finish!")
+
+        base = InteractionBase(interaction_id=self.client_id,
+                               user_id=user_id,
+                               create_time=datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                               description=description if description else "XAgent",
+                               agent="XAgent",
+                               mode=mode,
+                               file_list=file_list,
+                               recorder_root_dir=record_dir,
+                               status="waiting",
+                               message="waiting...",
+                               current_step=uuid.uuid4().hex,
+                               update_time=datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                               )
+        self.interactionDB.create_interaction(base)
+        self.logger.typewriter_log(
+            title=f"Receive data from {self.client_id}: ",
+            title_color=Fore.RED,
+            content=goal)
+        # in this step, we need to update interaction to register agent, mode, file_list
+
+        parameter = InteractionParameter(
+            interaction_id=self.client_id,
+            parameter_id=uuid.uuid4().hex,
+            args=args,
+        )
+        self.interactionDB.add_parameter(parameter)
+        self.logger.info(
+            f"Register parameter: {parameter.to_dict()} into interaction of {self.client_id}, done!")
+
+        current_step = uuid.uuid4().hex
+        self.interactionDB.update_interaction_status(
+            interaction_id=base.interaction_id, status="running", message="running", current_step=current_step)
+
+        interaction = XAgentInteraction(
+            base=base, parameter=parameter, 
+            interrupt=base.mode != "auto")
+
+        io = XAgentIO(input=CommandLineInput(do_interrupt=base.mode != "auto", max_wait_seconds=max_wait_seconds),
+                      output=CommandLineOutput())
+        interaction.resister_logger(self.logger)
+        self.logger.info(
+            f"Register logger into interaction of {base.interaction_id}, done!")
+
+        io.set_logger(logger=interaction.logger)
+        interaction.resister_io(io)
+        self.logger.info(
+            f"Register io into interaction of {base.interaction_id}, done!")
+        interaction.register_db(self.interactionDB)
+        self.logger.info(
+            f"Register db into interaction of {base.interaction_id}, done!")
+        # Create XAgentServer
+        server = XAgentServer()
+        server.set_logger(logger=self.logger)
+        self.logger.info(
+            f"Register logger into XAgentServer of {base.interaction_id}, done!")
+        self.logger.info(
+            f"Start a new thread to run interaction of {base.interaction_id}, done!")
         asyncio.run(server.interact(interaction=interaction))
 
     def start(self,

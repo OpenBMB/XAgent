@@ -83,11 +83,7 @@ Now show your super capability as a super agent that beyond regular AIs or LLMs!
 
 
 def get_examples_for_dispatcher():
-    """Provides example for the dispatcher to generate the prompt.
-
-    This function defines an example of user query or task and corresponding
-    system and user prompts which can be used by the dispatcher to generate
-    the required prompt.
+    """The example that will be given to the dispatcher to generate the prompt
 
     Returns:
         example_input: the user query or the task

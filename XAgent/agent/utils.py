@@ -2,18 +2,25 @@ import json
 from typing import Dict
 
 def get_command(response_json: Dict):
-    """Parse the response and return the command name and arguments
+    """
+    Parses the response and returns the command name and arguments.
+
+    This function will raise the exception `json.decoder.JSONDecodeError` if the response is not valid JSON.
+    Any other error that occurs is also caught and the function returns an "Error:" message with the exception message.
 
     Args:
-        response_json (json): The response from the AI
+        response_json (Dict): The response from the AI in dictionary format.
 
     Returns:
-        tuple: The command name and arguments
+        tuple: The command name and arguments, or some error indication.
+               If the response json dictionary does not contain the 'command' key, or the value of
+               'command' is not a dictionary, or the 'command' dictionary does not contain the 'name' key,
+               returns a tuple where the first element is 'Error:' and the second element is a string explaining the problem.
+               If some error occurs, returns a tuple where the first element is 'Error:' and the second element is the str of the exception.
 
     Raises:
-        json.decoder.JSONDecodeError: If the response is not valid JSON
-
-        Exception: If any other error occurs
+        json.decoder.JSONDecodeError: If the response is not valid JSON.
+        Exception: If any other error occurs.
     """
     try:
         if "command" not in response_json:

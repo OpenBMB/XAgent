@@ -7,6 +7,14 @@ from connections import db,docker_client
 
 
 async def check_nodes_status():
+    """
+    Asynchronously checks and updates the status of all docker nodes 
+    in the database. If a node is not found in docker, it is deleted 
+    from the database. 
+    
+    This function also stops nodes that have been idle for a specified
+    amount of time based on the configuration.
+    """
     # update the status of all nodes in db with info in docker, if node is not in docker, delete it
     nodes = db['nodes'].find()
     async for node in nodes:
@@ -37,11 +45,20 @@ async def check_nodes_status():
                     container.stop()
                     logger.info("Stopping node: " + node['node_id'] + "  due to idling time used up")
 
+
 async def check_nodes_status_loop():
+    """
+    Calls the check_nodes_status function in an infinite loop. The loop will 
+    pause for a configured amount of time between each iteration.
+    """
     while True:
         await check_nodes_status()
         await asyncio.sleep(CONFIG['node']['check_interval_seconds'])
 
+
 if __name__ =='__main__':
+    """
+    If this module is the main entry point, it creates and starts a new asyncio 
+    event loop to continuously check the status of docker nodes.
+    """
     asyncio.run(check_nodes_status_loop())
-    

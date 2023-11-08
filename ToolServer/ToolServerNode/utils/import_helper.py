@@ -11,7 +11,7 @@ def import_all_modules_in_folder(file,name):
             module_name = item
         else:
             continue
-        
+
         full_module_path = f"{name}.{module_name}"
         # print(module_name,full_module_path)
         imported_module = importlib.import_module(full_module_path)

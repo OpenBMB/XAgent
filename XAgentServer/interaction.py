@@ -15,7 +15,16 @@ from XAgentServer.models.ws import XAgentOutputData
 
 
 class XAgentInteraction(metaclass=abc.ABCMeta):
+    """
+    A class to represent a XAgent interaction.
 
+    This class provides methods to manage and control the interaction.
+
+    Attributes:
+        base (InteractionBase): The interaction base 
+        parameter (InteractionParameter): The parameters of the interaction
+        interrupt (bool): To indicate whether the interaction can be interrupted or not
+    """
 
     def __init__(
         self,
@@ -23,6 +32,14 @@ class XAgentInteraction(metaclass=abc.ABCMeta):
         parameter: InteractionParameter,
         interrupt: bool = False,
     ) -> None:
+        """
+        The constructor for the XAgentInteraction class.
+
+        Args:
+            base (InteractionBase): The interaction base
+            parameter (InteractionParameter): The parameters of the interaction
+            interrupt (bool): To indicate whether the interaction can be interrupted or not
+        """
         self.base = base
         self.parameter = parameter
         self._cache : XAgentOutputData = None
@@ -35,38 +52,84 @@ class XAgentInteraction(metaclass=abc.ABCMeta):
         if not os.path.exists(self.log_dir):
             os.makedirs(self.log_dir)
 
-    def to_dict(self):
+    def to_dict(self) -> dict:
+        """
+        Convert the parameter to a python dict.
+
+        Returns:
+            dict: Dictionary representation of the parameter
+        """
         return self.parameter.to_dict()
 
-    def to_json(self):
+    def to_json(self) -> str:
+        """
+        Convert the parameter to a JSON string.
+
+        Returns:
+            str: JSON string representation of the parameter
+        """
         return json.dumps(self.to_dict(), indent=2, ensure_ascii=False)
 
     def resister_logger(self, logger: Logger):
+        """
+        Register a logger to the interaction.
 
+        Args:
+            logger (Logger): The logger to be registered
+        """
         self.logger = logger
         self.logger.info(f"init interaction: {self.base.interaction_id}")
 
     def resister_io(self, io: XAgentIO):
+        """
+        Register an I/O agent to the interaction.
+
+        Args:
+            io (XAgentIO): The I/O agent to be registered
+        """
         self.io = io
 
     def register_db(self, db: InteractionBaseInterface):
+        """
+        Register a database interface to the interaction.
+
+        Args:
+            db (InteractionBaseInterface): The database interface to be registered
+        """
         self.db = db
 
     def register_recorder_root_dir(self, recorder_root_dir):
+        """
+        Register a root directory for the recorder.
 
+        Args:
+            recorder_root_dir (str): Path to the root directory
+        """
         self.recorder_root_dir = recorder_root_dir
 
     def init_cache(self, data: XAgentOutputData):
+        """
+        Initialize cache with given data.
 
+        Args:
+            data (XAgentOutputData): The data to populate the cache with
+        """
         self._cache = data
         self.logger.info(f"init cache")
 
     def get_cache(self) -> dict:
+        """
+        Get the current cache data.
 
+        Returns:
+            dict: Data from the cache
+        """
         return self._cache.to_dict() if self.data_cache is not None else {}
 
     def save_cache(self):
-        # self.logger.info(f"save cache into mongodb")
+        """
+        Save the current cache data to a JSON file.
+        """
         with open(os.path.join(self.log_dir, "cache.json"), "w", encoding="utf-8") as f:
             json.dump(self._cache.to_dict(), f, indent=2, ensure_ascii=False)
 
@@ -74,6 +137,22 @@ class XAgentInteraction(metaclass=abc.ABCMeta):
                            update_data: dict,
                            status="",
                            current: str = None):
+        """
+        Update the cache data.
+
+        Args:
+            update_data (dict): The update data
+            status (str): The current status of the interaction
+            current (str): The current subtask or refinement task id 
+
+        Raises:
+            ValueError: If status is not in ['start', 'subtask', 'refinement', 'inner', 'finished', 'failed']
+            ValueError: If current is not provided when status is 'subtask' or 'refinement' or 'inner'
+            ValueError: If the update_data is not a list when status is 'subtask'
+            ValueError: If the update_data is not a dict when status is 'refinement' or 'inner'
+            ValueError: If a subtask with current id doesn't exist when status is 'inner'
+        """
+        
         if status not in ["start", "subtask", "refinement", "inner", "finished", "failed"]:
             raise ValueError(
                 "status must be in ['start', 'subtask', 'refinement', 'inner', 'finished', 'failed']")
@@ -204,12 +283,31 @@ class XAgentInteraction(metaclass=abc.ABCMeta):
         if status == "finished":
             await self.auto_close()
 
+
     async def auto_send(self, push_data):
+        """
+        Automatically send the push_data.
+
+        Args:
+            push_data (dict): The data to be sent
+
+        Raises:
+            Exception: If there was an error while sending the data
+        """
 
         # self.logger.info(f"send data: {push_data}")
         await self.io.Output.run(push_data)
 
     async def auto_receive(self, can_modify=None):
+        """
+        Receiving data automatically.
+
+        Args:
+            can_modify (list): list of keys that can be modified in the interaction
+
+        Returns:
+            dict: The received data
+        """
         data = await self.io.Input.run(can_modify)
         self.db.add_parameter(InteractionParameter(
             parameter_id=uuid.uuid4().hex,
@@ -219,6 +317,9 @@ class XAgentInteraction(metaclass=abc.ABCMeta):
         return data
 
     async def auto_close(self):
+        """
+        Automatically close the interaction.
+        """
         # self.io.close()
         self.logger.info(f"close io connection")
         self.db.update_interaction_status(self.base.interaction_id, status="finished",

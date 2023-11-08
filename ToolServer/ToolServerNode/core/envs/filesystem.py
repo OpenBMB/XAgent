@@ -9,33 +9,74 @@ from core.base import BaseEnv
 @toolwrapper()
 class FileSystemEnv(BaseEnv):
     """Provide a file system operation environment for Agent.
+    
+    Attributes:
+        ignored_list (list): List of ignored files or directories patterns.
+        work_directory (str): Path to the working directory.
+        max_entry_nums_for_level (int): Maximum number of entries for a level in the file system tree structure.
     """
+
     def __init__(self, config: Dict[str, Any] = None):
+        """
+        Initialize the file system environment.
+
+        Args:
+            config (dict, optional): Configuration dictionary. Defaults to None.
+        """
+        
         super().__init__(config)
         filesystem_config = self.config['filesystem']
         
         self.ignored_list = filesystem_config["ignored_list"]
         self.work_directory = filesystem_config["work_directory"]
         self.max_entry_nums_for_level = filesystem_config["max_entry_nums_for_level"]
+        
         if not os.path.exists(self.work_directory):
             os.mkdir(self.work_directory,mode=0o777)
         
     def _check_ignorement(self,path:str)->bool:
+        """
+        Check if a path matches any pattern from the ignore list.
+
+        Args:
+            path (str): The path to be checked.
+
+        Returns:
+            bool: `True` if the path matches any pattern from the ignore list, else `False`.
+        """
+        
         for pattern in self.ignored_list:
             if fnmatch.fnmatch(path,pattern):
                 return True
         return False
     
     def _is_path_within_workspace(self,path:str)->bool:
+        """
+        Check if a path is within the workspace directory.
+
+        Args:
+            path (str): The path to be checked.
+
+        Returns:
+            bool: `True` if the path is within the workspace directory, else `False`.
+        """
+        
         common_prefix = os.path.commonprefix([os.path.realpath(path),
                                             os.path.realpath(self.work_directory)])
         return common_prefix == os.path.realpath(self.work_directory)
     
     def _is_path_exist(self,path:str)->bool:
-        """Check if the path exists in the workspace.
+        """
+        Check if a path exists within the workspace directory.
         
-        :param string path: The path to be checked.
-        :return bool: `True` if the path exists, else `False`.
+        Args:
+            path (str): The path to be checked.
+
+        Returns:
+            bool: `True` if the path exists within the workspace directory, else `False`
+
+        Raises:
+            ValueError: Raised if the path is not within the workspace directory.
         """
 
         full_path = os.path.join(self.work_directory, path)
@@ -43,8 +84,10 @@ class FileSystemEnv(BaseEnv):
             raise ValueError(f"Path {path} is not within workspace.")
         return os.path.exists(full_path)
 
-    def print_filesys_struture(self,return_root=False)->str:
-        """Return a tree-like structure for all files and folders in the workspace. Use this tool if you are not sure what files are in the workspace.
+    def print_filesys_struture(self, return_root=False)->str:
+        """
+        Return a tree-like structure for all files and folders in the workspace.
+        Use this tool if you are not sure what files are in the workspace.
 
         This function recursively walks through all the directories in the workspace
         and return them in a tree-like structure, 
@@ -60,8 +103,13 @@ class FileSystemEnv(BaseEnv):
                 - file3.txt
         ```
 
-        :return string: The tree-like structure of the workspace.
+        Args:
+            return_root (bool, optional): If `True`, the root directory is included in the output. Defaults to False.
+
+        Returns:
+            str: A string representation of the tree-like filesystem structure.
         """
+        
         full_repr = ''
         if return_root:
             full_repr += f'Global Root Work Directory: {self.work_directory}\n'
@@ -94,14 +142,23 @@ class FileSystemEnv(BaseEnv):
 
         return full_repr
     
-    def read_from_file(self,filepath:str,line_number:int = 1)->str:
-        """Open and read the textual file content in the workspace, you will see the content of the target file.
+    def read_from_file(self, filepath:str, line_number:int = 1)->str:
+        """
+        Read from a specific file in the workspace. Open and read the textual file content in the workspace, you will see the content of the target file.
         Don't use this if the give `filepath` is writen or modified before, the content in `filepath` should be already returned.
         
-        :param string filepath: The path to the file to be opened, always use relative path to the workspace root.
-        :param integer? line_number: The starting line number of the content to be opened. Defaults to 1.
-        :return string: The content of the file.
+        Args:
+            filepath (str): The path to the file in the workspace.
+            line_number (int, optional): The start line for the content to be read. Defaults to 1.
+
+        Returns:
+            str: String content of the file.
+
+        Raises:
+            FileNotFoundError: Raised if the file could not be found.
+            ValueError: Raised if the file is not within workspace or the line number is out of range.
         """
+        
         if not filepath.startswith(self.work_directory):
             filepath = filepath.strip('/')
             full_path = os.path.join(self.work_directory, filepath)        
@@ -141,7 +198,8 @@ class FileSystemEnv(BaseEnv):
         return content
 
     def write_to_file(self, filepath:str,content:str,truncating:bool = False,line_number:int = None, overwrite:bool = False)->str:
-        """Write or modify the textual file lines based on `content` provided. 
+        """
+        Write or modify the textual file lines based on `content` provided. 
         Return updated content of the file after modification so no further need to call `read_from_file` for this file. Create file if not exists.
         
         Example:
@@ -154,12 +212,21 @@ class FileSystemEnv(BaseEnv):
         Out[2]: '1: Hello World!\\n2: Hello World 2!\\n3: A new line!'
         ```
         
-        :param string filepath: The path to the file to be modified, always use relative path to the workspace root.
-        :param boolean? truncating: If `True`, the file will be truncated before writing, else will read current content before writing. Defaults to `False`.
-        :param integer? line_number: The start line to modified file. Defaults to `None`, which means insert the new content at the end of the file. So do not provide this if you want to append the new content to the file.
-        :param boolean? overwrite: If `True`, the new content will overwrite content started from `line_number` line. Defaults to `False`, which insert the new content at the `line_number` line.
-        :param string content: The new content to be replaced with the old content.
+        Args:
+            filepath (str): The path to the file in the workspace.
+            content (str): The content to be written to the file.
+            truncating (bool, optional): If `True`, the file will be truncated before writing. Defaults to False.
+            line_number (int, optional): The start line where the content should be written. If not provided, the content is appended at the end of the file.
+            overwrite (bool, optional): If `True` the new content will overwrite existing content from the line number onwards. Defaults to False.
+            
+        Returns:
+            str: The content of the file after the write operation.
+            
+        Raises:
+            ValueError: Raised if the file is not within the workspace.
+            FileNotFoundError: Raised if the file could not be found.
         """
+        
         if not filepath.startswith(self.work_directory):
             filepath = filepath.strip('/')
             full_path = os.path.join(self.work_directory, filepath)
@@ -204,5 +271,3 @@ class FileSystemEnv(BaseEnv):
             f.writelines(lines)
             
         return self.read_from_file(filepath)
-        
-

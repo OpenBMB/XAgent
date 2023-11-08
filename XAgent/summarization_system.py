@@ -6,7 +6,18 @@ from XAgent.global_vars import agent_dispatcher
 from XAgent.data_structure.node import Node
 from XAgent.message_history import Message
 
+
 class SummarizationNode(Node):
+    """Class to represent nodes in the summarization tree.
+
+    Inherits from the Node class defined in XAgent.data_structure.node.
+
+    Attributes:
+        father (SummarizationNode): Parent SummarizationNode.
+        children (List[SummarizationNode]): List of child SummarizationNodes.
+        message (Message): Message associated with this node.
+        summarization_from_root_to_here: Summary from root node to this node.
+    """
     def __init__(self):
         self.father: SummarizationNode = None
         self.children: List[SummarizationNode] = []
@@ -17,23 +28,49 @@ class SummarizationNode(Node):
 
     @classmethod
     def add_father_child_relation(cls, father, child):
+        """Adds relation between father SummarizationNode and child SummarizationNode.
+
+        Args:
+            father (SummarizationNode): Parent node.
+            child (SummarizationNode): Child node to be added to the parent node's children list.
+
+        Raises:
+            AssertionError: If the child node is already in the father's children list.
+        """
         assert child not in father.children
         father.children.append(child)
         child.father = father
 
+
 @unique
 class SummarizationTreeQueryResult(Enum):
+    """Enumeration for possible results when querying the summarization tree."""
     have_summary = 0
     not_in_tree = 1
     in_tree_but_no_summary = 2
 
 
 class SummarizationTrieTree:
+    """Class to represent the Summarization Trie Tree. The tree is used to generate summaries.
+
+    Attributes:
+        root (SummarizationNode): Root node of the tree.
+        config: Configuration data for the tree.
+    """
     def __init__(self, config):
         self.root = SummarizationNode()
         self.config = config
 
     def query(self, message_list: List[Message]) -> SummarizationTreeQueryResult:
+        """Queries the tree with the given list of messages.
+
+        Args:
+            message_list (List[Message]): The list of messages for the tree query.
+
+        Returns:
+            SummarizationTreeQueryResult: The state of summary related to the query.
+            SummarizationNode: If the list of messages is in the tree, returns the node where the search ended.
+        """
         now_node = self.root
 
         now_position = 0
@@ -86,8 +123,19 @@ class SummarizationTrieTree:
 
         return now_node
 
+
+    def insert(self, message_list):
+        """Inserts a list of messages into the trie tree.
+
+        Args:
+            message_list (List[Message]): List of messages to be inserted into the tree.
+
+        Returns:
+            SummarizationNode: Returns the end node after insertion.
+        """
+
     @classmethod
-    def get_summarzation_message_all(cls, father_summarize_node: SummarizationNode, message_list: List[Message]):
+    def get_summarzation_message_all(cls, father_summarize_node: SummarizationNode, message_list: List[Message]) -> List[Message]:
         system_prompt = f'''Your task is to create a concise running summary of actions and information results in the provided text, focusing on key and potentially important information to remember.
 
         You will receive the current summary and the your latest actions. Combine them, adding relevant key information from the latest development in 1st person past tense and keeping the summary concise.
@@ -127,6 +175,15 @@ class SummarizationTrieTree:
 
 
     def generate_summary(self, message_list, recursive_mode=True):
+        """Generates a summary for the given list of messages.
+
+        Args:
+            message_list (List[Message]): List of messages to be summarized.
+            recursive_mode (bool): Flag indicating if recursive mode summarization is required.
+            
+        Returns:
+            str: The new summarized content text.
+        """
         status_code, summarize_node = self.query(message_list)
         assert status_code != SummarizationTreeQueryResult.have_summary
         if recursive_mode:
@@ -160,5 +217,6 @@ class SummarizationTrieTree:
 
         return new_summary
         
-            
+
+
 summary_system = SummarizationTrieTree()

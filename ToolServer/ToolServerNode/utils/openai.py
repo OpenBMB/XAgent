@@ -12,7 +12,17 @@ from tenacity import wait_random_exponential,stop_after_attempt,retry
 logger = logging.getLogger(CONFIG['logger'])
 
 class OpenaiPoolRequest:
+    """
+    Handles all OpenAI requests by dispatching them to the API endpoints.
+
+    Attributes:
+        openai_cfg: Configuration dictionary containing OpenAI parameters.
+        pool: list of dictionaries, where each dictionary has all the required details of an endpoint.
+    """
     def __init__(self,):
+        """
+        Initializes the OpenaiPoolRequest class by setting the configuration and loading the pool.
+        """
         self.openai_cfg = deepcopy(CONFIG['openai'])
         
         self.pool:List[Dict] = []
@@ -35,11 +45,24 @@ class OpenaiPoolRequest:
             logger.warning('No openai api key found! Some functions will be disable!')
 
     @retry(wait=wait_random_exponential(multiplier=1, max=10), stop=stop_after_attempt(5),reraise=True)
-    async def request(self,messages,**kwargs):
+    async def request(self,messages,**kwargs) -> Dict[str, Any]:
+        """
+        Sends a request to the OpenAI and gets a response.
+
+        Args:
+            messages: Payload to be sent to OpenAI.
+            kwargs: Optional arguments that the function takes.
+
+        Returns:
+            A dictionary containing the response from the OpenAI.
+
+        Raises:
+            Exception: If the attempt to reach the endpoint exceed limit.
+        """
         
         chat_args:dict = deepcopy(self.openai_cfg['chat_args'])
         chat_args.update(kwargs)
-        
+
         item = random.choice(self.pool)
         chat_args['api_key'] = item['api_key']
         if 'organization' in item:
@@ -51,7 +74,20 @@ class OpenaiPoolRequest:
 
         return await openai.ChatCompletion.acreate(messages=messages,**chat_args)
     
-    async def __call__(self,messages,**kwargs):
+    async def __call__(self,messages,**kwargs) -> Dict[str, Any]:
+        """
+        Makes a request to the OpenAI by calling the instance of the class.
+
+        Args:
+            messages: Payload to be sent to OpenAI.
+            kwargs: Optional arguments that the function takes.
+
+        Returns:
+            A dictionary containing the response from the OpenAI.
+
+        Raises:
+            Exception: If there are no API keys available in the pool.
+        """
         if len(self.pool)==0:
             raise Exception('No openai api key found! OPENAI_PR Disabled!')
         return await self.request(messages,**kwargs)

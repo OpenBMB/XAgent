@@ -299,7 +299,7 @@ class ToolRegister:
                 # try to find env in unloaded extensions
                 if self.dynamic_extension_load(f'extensions.envs.{env_name}') and env_name in self.envs:
                     env = self.envs[env_name]
-                    raise EnvNotFound(env_name=env_name)
+                raise EnvNotFound(env_name=env_name)
             env = self.envs[env_name]
             if tool_name not in env.env_labels.subtools_labels:
                 raise ToolNotFound(tool_name=env_name+'_'+tool_name)

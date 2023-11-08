@@ -31,9 +31,9 @@ class XAgentServerEnv:
     base_dir = "XAgentServer"
     use_redis: bool = False
     recorder_root_dir = "running_records"
-# you can set default_login with True to use the default user "admin" with token "xagent-admin" to login,
+    # you can set default_login with True to use the default user "admin" with token "xagent-admin" to login,
     default_login: bool = True
-# the parameter check_running is used to check whether the interaction is running, 
+    # the parameter check_running is used to check whether the interaction is running, 
     # if you want to connect more than one XAgentServer, you can set check_running to True, 
     # in which case the XAgentServer will check whether the interaction is running in other XAgentServer
     check_running: bool = False

@@ -70,16 +70,12 @@ Refine Node Message: {{refine_node_message}}
 '''
 
 def get_examples_for_dispatcher():
-    """Provides examples to the dispatcher to generate the prompt.
-
-    This function returns a tuple containing a user query/task, a system prompt, and a user prompt. 
-    These examples can be used by the dispatcher to generate new prompts.
+    """The example that will be given to the dispatcher to generate the prompt
 
     Returns:
-        tuple: A tuple containing three string elements (in order):
-            - example_input (str): The user query or task.
-            - example_system_prompt (str): The system's prompt
-            - example_user_prompt (str): The user's prompt
+        example_input: the user query or the task
+        example_system_prompt: the system prompt
+        example_user_prompt: the user prompt
     """
     example_input = "Refine a plan for writing a Python-based calculator."
     example_system_prompt = SYSTEM_PROMPT

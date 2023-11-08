@@ -16,27 +16,45 @@ from XAgent.utils import (RequiredAbilities, SearchMethodStatusCode,
 from .base_query import BaseQuery
 from .plan_exec import Plan, PlanAgent
 from .reflection import get_posterior_knowledge
-
 from XAgentServer.interaction import XAgentInteraction
 from XAgentServer.models.ws import XAgentOutputData
-
 from .working_memory import working_memory_agent
 
 
 class TaskHandler():
+    """
+    Main class for handling tasks within the XAgent system.
+    
+    Attributes:
+        config: The configuration settings for the task handler.
+        function_list: List of available functions for the current task.
+        tool_functions_description_list: List of available tool functions description for the current task.
+        query: The current task of this agent.
+        tool_call_count: Variable for tracking the count of tool calls.
+        plan_agent: Instance of PlanAgent class which is used for generating and handling plan for the current task.
+        interaction: Instance of XAgentInteraction class for interacting with outer world.
+    """
+    
     def __init__(self, config,
                  query: BaseQuery,
                  function_list: List[Dict],
                  tool_functions_description_list: List[dict],
                  interaction: XAgentInteraction):
+        """
+        Initializes TaskHandler with the provided input parameters.
+
+        Args:
+            config: The configuration settings for the TaskHandler
+            query (BaseQuery): Query with the task information
+            function_list (List[Dict]): List of available functions for the current task
+            tool_functions_description_list (List[dict]): List of available tool functions description for the current task
+            interaction (XAgentInteraction): Interface for the agent's interaction with the outer world
+        """
         self.config = config
         self.function_list = function_list
         self.tool_functions_description_list = tool_functions_description_list
-
         self.query = query
-
-        self.tool_call_count = 0  
-
+        self.tool_call_count = 0
         self.plan_agent = PlanAgent(
             config=config,
             query=self.query,
@@ -45,9 +63,17 @@ class TaskHandler():
         # self.avaliable_tools_description_list = tool_functions_description_list
 
         self.interaction = interaction
-
+    
     async def outer_loop_async(self):
+        """
+        Executes the main sequence of tasks in the outer loop.
+        
+        Raises:
+            AssertionError: Raised if a not expected status is encountered while handling the plan.
 
+        Returns:
+            None
+        """
         logger.typewriter_log(
             f"-=-=-=-=-=-=-= BEGIN QUERY SOVLING -=-=-=-=-=-=-=",
             Fore.YELLOW,
@@ -160,6 +186,18 @@ class TaskHandler():
         return
 
     async def inner_loop_async(self, plan: Plan, ):
+        """
+        Generates search plan and process it for the current task.
+
+        Args:
+            plan (Plan): The plan to be processed.
+
+        Raises:
+            AssertionError: Raised if a not expected status is encountered while handling the plan.
+
+        Returns:
+            ReACTChainSearch: Instance of the search plan.
+        """
         task_ids_str = plan.get_subtask_id(to_str=True)
         logger.typewriter_log(
             f"-=-=-=-=-=-=-= Performing Task {task_ids_str} ({plan.data.name}): Begin -=-=-=-=-=-=-=",
@@ -215,8 +253,18 @@ class TaskHandler():
         else:
             assert False, f"{plan.data.name}"
         return search_method
-
+    
     def posterior_process(self, terminal_plan: Plan):
+        """
+        Performs the post-processing steps on the terminal plan including extraction of posterior knowledge
+        and updating the plan data.
+
+        Args:
+            terminal_plan (Plan): The terminal plan after completion of all inner loop tasks.
+
+        Returns:
+            None
+        """
 
         logger.typewriter_log(
             f"-=-=-=-=-=-=-= POSTERIOR_PROCESS, working memory, summary, and reflection -=-=-=-=-=-=-=",
@@ -241,3 +289,4 @@ class TaskHandler():
 
         # Insert the plan into vector DB
         # vector_db_interface.insert_sentence(terminal_plan.data.raw)
+

@@ -30,12 +30,18 @@ USER_PROMPT = ""
 
 
 def get_examples_for_dispatcher():
-    """The example that will be given to the dispatcher to generate the prompt
+    """Returns the example input, system prompt, and user prompt that will be 
+    given to the dispatcher to generate the prompt.
+
+    This function is used to provide examples to the dispatcher, which assists 
+    in generating the prompt. The examples include the user query or task, 
+    system prompt, and user prompt.
 
     Returns:
-        example_input: the user query or the task
-        example_system_prompt: the system prompt
-        example_user_prompt: the user prompt
+        tuple: A tuple containing three elements:
+            1. example_input (str): The user query or the task.
+            2. example_system_prompt (str): The system prompt.
+            3. example_user_prompt (str): The user prompt.
     """
     example_input = "Reflect on the previous actions and give the posterior knowledge"
     example_system_prompt = SYSTEM_PROMPT

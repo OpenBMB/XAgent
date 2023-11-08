@@ -12,32 +12,85 @@ from typing import Any
 from colorama import Fore, Style
 
 class JsonFileHandler(logging.FileHandler):
+    """
+    A class to handle JSON file logging.
+
+    Inherited from `logging.FileHandler`, allows emitting logs directly to a JSON file.
+
+    Attributes:
+        baseFilename (str): Path to the file in which the log records are written to.
+
+    """
     def __init__(self, filename, mode="a", encoding=None, delay=False):
+        """
+        Initialize the JsonFileHandler class with the name of the log file.
+
+        Args:
+            filename (str): Specifies the file that the handler should log to.
+            mode (str, optional): mode to open the file with. Defaults to "a".
+            encoding (str, optional): encoding to use for opening the file. Defaults to None.
+            delay (bool, optional): If delay is true, then file opening is deferred until the first call to emit(). Defaults to False.
+
+        """
         super().__init__(filename, mode, encoding, delay)
 
     def emit(self, record):
+        """
+        Emit a formatted log record into the log file.
+
+        Args:
+            record (logging.LogRecord): Log record which is to be formatted into json data and emitted.
+
+        """
         json_data = json.loads(self.format(record))
         with open(self.baseFilename, "w", encoding="utf-8") as f:
             json.dump(json_data, f, ensure_ascii=False, indent=4)
 
 
 class JsonFormatter(logging.Formatter):
+    """
+    Formatter for JSON log data.
+    """
     def format(self, record):
+        """
+        Log record formatter for JSON log data.
+
+        Args:
+            record (logging.LogRecord): The log record to format.
+
+        Returns:
+            str: Formatted log record as a string.
+
+        """
         return record.msg
 
 class Logger(metaclass=abc.ABCMeta):
     """
-    Logger that handle titles in different colors.
-    Outputs logs in console, activity.log, and errors.log
-    For console handler: simulates typing
+    Abstract Base Class for Loggers with different types of handlers. 
+    Allows setting up multiple loggers with different settings.
+
+    Args:
+        log_dir (str): Path of the directory where the log files should be stored.
+        log_name (str): Logger's name.
+        log_file (str): The name of the main log file.
+        error_file (str): The name of the error log file.
+
     """
-
+    
     def __init__(self, log_dir: str = None, log_name: str= "", log_file: str = "activity.log", error_file: str = "errors.log"):
+        """
+        Initialize the Logger class with the path to log directory, name of the logs and log files.
 
+        Args:
+            log_dir (str, optional): Path of the directory where log files should be stored. Defaults to None.
+            log_name (str, optional): Name of the logger. Defaults to "".
+            log_file (str, optional): Name of the main log file. Defaults to "activity.log".
+            error_file (str, optional): Name of the error log file. Defaults to "errors.log".
+
+        """
         if not os.path.exists(log_dir):
             os.makedirs(log_dir)
 
-        # create log directory if it doesn't exist
         self.log_name = time.strftime("%Y-%m-%d", time.localtime()) if not log_name else log_name
         self.logger = logging.getLogger(self.log_name)
         console_formatter = RecordFormatter("%(title_color)s %(message)s")
@@ -51,7 +104,7 @@ class Logger(metaclass=abc.ABCMeta):
         self.console_handler = ConsoleHandler()
         self.console_handler.setLevel(logging.DEBUG)
         self.console_handler.setFormatter(console_formatter)
-
+        
         
         self.speak_mode = False
         self.chat_plugins = []
@@ -85,13 +138,12 @@ class Logger(metaclass=abc.ABCMeta):
         # self.typing_logger.setLevel(logging.DEBUG)
 
         if self.log_name.endswith("_INTERACT") or not self.logger.handlers:
-            # self.logger.addHandler(self.typing_console_handler)
             self.logger.addHandler(self.console_handler)
             self.logger.addHandler(error_handler)
             self.logger.addHandler(self.file_handler)
             self.logger.setLevel(logging.DEBUG)
-    
 
+    
     def typewriter_log(
         self, title="", title_color="", content="", speak_text=False, level=logging.INFO
     ):
@@ -191,10 +243,24 @@ class Logger(metaclass=abc.ABCMeta):
 """
 Output stream to console using simulated typing
 """
-
+    
 
 class TypingConsoleHandler(logging.StreamHandler):
+    """
+    A logging.StreamHandler subclass that outputs logs to the console like a typewriter.
+    
+    This class simulates typing with varying speed when emitting log records. 
+
+    """
+
     def emit(self, record):
+        """
+        Emit a log record in a typing style with varying speed.
+
+        Args:
+            record (logging.LogRecord): Log record to be emitted.
+
+        """
         min_typing_speed = 0.05
         max_typing_speed = 0.01
 
@@ -207,7 +273,6 @@ class TypingConsoleHandler(logging.StreamHandler):
                     print(" ", end="", flush=True)
                 typing_speed = random.uniform(min_typing_speed, max_typing_speed)
                 time.sleep(typing_speed)
-                # type faster after each word
                 min_typing_speed = min_typing_speed * 0.95
                 max_typing_speed = max_typing_speed * 0.95
             print()
@@ -216,28 +281,52 @@ class TypingConsoleHandler(logging.StreamHandler):
 
 
 class ConsoleHandler(logging.StreamHandler):
+    """
+    A logging.StreamHandler subclass that outputs logs to the console.
+
+    """
     def emit(self, record) -> None:
+        """
+        Emit a log record to the console.
+
+        Args:
+            record (logging.LogRecord): Log record to be emitted.
+
+        """
         msg = self.format(record)
         try:
             print(msg)
         except Exception:
             self.handleError(record)
 
-
+            
 class RecordFormatter(logging.Formatter):
     """
-    Allows to handle custom placeholders 'title_color' and 'message_no_color'.
-    To use this formatter, make sure to pass 'color', 'title' as log extras.
+    A custom log formatter allowing logging with colors in the console output.
+
+    It recognizes the custom placeholders 'title_color' and 'message_no_color'.
+    To use this formatter, the log function should pass 'color' and 'title' as log extras.
+
     """
 
     def format(self, record: LogRecord) -> str:
+        """
+        Format a log record with title color and message with no color.
+
+        Args:
+            record (logging.LogRecord): Log record to be formatted.
+
+        Returns:
+            str: The formatted log record as a string.
+
+        """
         if hasattr(record, "color"):
             record.title_color = (
                 getattr(record, "color")
                 + getattr(record, "title", "")
                 + " "
                 + Style.RESET_ALL
-            )
+)
         else:
             record.title_color = getattr(record, "title", "")
 
@@ -252,5 +341,15 @@ class RecordFormatter(logging.Formatter):
 
 
 def remove_color_codes(s: str) -> str:
+    """
+    Utility function to remove color codes from a string.
+
+    Args:
+        s (str): The input string from which the color codes are removed.
+
+    Returns:
+        str: A string with all color codes removed.
+
+    """
     ansi_escape = re.compile(r"\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])")
     return ansi_escape.sub("", s)

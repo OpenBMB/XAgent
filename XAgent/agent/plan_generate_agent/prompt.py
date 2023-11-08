@@ -42,7 +42,9 @@ You will use operation SUBTASK_SPLIT to split the query into 2-4 subtasks and th
 
 
 def get_examples_for_dispatcher():
-    """The example that will be given to the dispatcher to generate the prompt
+    """Gets examples for the prompt dispatcher.
+
+    This function provides examples that will be given to the dispatcher to generate prompts.
 
     Returns:
         example_input: the user query or the task

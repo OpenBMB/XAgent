@@ -18,6 +18,21 @@ def generate_tool_labels(
     func: Callable[..., Any] = None,
     visible:bool = True,
 )->Union[ToolLabels,None]:
+    """
+    Generate and return tool labels for the provided function. If the tool is not enabled,
+    then a debug log message is printed and None is returned.
+
+    Args:
+        name (str, optional): The name of the tool. If it's not specified, the function's name is used.
+        enabled (bool, optional): Determines if the tool is enabled or not. Defaults to True.
+        disabled_reason (Optional[str], optional): The reason why the tool is disabled. Defaults to None.
+        func (Callable[..., Any], optional): The function for which the tool labels are generated. Defaults to None.
+        visible(bool, optional): The visibility status of the tool. Defaults to True.
+
+    Returns:
+        Union[ToolLabels,None]: A ToolLabels object containing tool information or None if tool is not enabled. 
+    """
+
     if not enabled:
         if disabled_reason is not None:
             logger.debug(f"tool '{func.__name__}' is disabled: {disabled_reason}")

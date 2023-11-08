@@ -14,6 +14,16 @@ from config import CONFIG
 logger = logging.getLogger(CONFIG['logger'])
 
 def get_func_name(func:Callable,env:BaseEnv=None)->str:
+    """
+    Get function name with or without an environment context.
+
+    Args:
+        func (Callable): Input function.
+        env (BaseEnv, optional): Environment for the function. Defaults to None.
+
+    Returns:
+        str: Name of the function in the specific environment context.
+    """
     if env is None or not hasattr(env,'env_labels'):
         if hasattr(func,'tool_labels'):
             return func.tool_labels.name
@@ -27,9 +37,20 @@ def get_func_name(func:Callable,env:BaseEnv=None)->str:
 
 
 class ToolRegister:
-    def __init__(self,
-                 config:dict = {},
-                 ):
+    """
+    Class providing tool registration for a specific configuration.
+    
+    Attributes:
+        config (dict): Configuration settings.
+    """
+
+    def __init__(self, config:dict = {}):
+        """
+        Constructor method.
+
+        Args:
+            config (dict, optional): Configuration settings. Defaults to an empty dict.
+        """
         self.config = deepcopy(CONFIG)
         for k in config:
             self.config[k] = config[k]
@@ -59,8 +80,17 @@ class ToolRegister:
                 self.dynamic_extension_load(extension)
         
         logger.info(f'Loaded {len(self.tools)} tools and {len(self.envs)} envs!')
-        # print(self.tools)
-    def check_and_register(self,attr:Any):
+  
+    def check_and_register(self,attr:Any)->Optional[Union[Callable[..., Any], Type[BaseEnv]]]:
+        """
+        Check and register the attribute if it is either a labeled tool or environment.
+
+        Args:
+            attr (Any): Attribute to check and register.
+
+        Returns:
+            Optional[Union[Callable[..., Any], Type[BaseEnv]]]: Registered tool or environment if it was registered. Otherwise, None.
+        """
         if hasattr(attr,'tool_labels') and isinstance(attr.tool_labels,ToolLabels):
             tool_name = get_func_name(attr)
             if tool_name in self.tools:
@@ -107,6 +137,19 @@ class ToolRegister:
         return None
 
     def register_tool(self,tool_name:str,code:str)->str:
+        """
+        Register a new tool with the provided name and code.
+
+        Args:
+            tool_name (str): Name of the new tool.
+            code (str): Code for the new tool.
+
+        Returns:
+            str: A dictionary representation of descripter of the new tool.
+
+        Raises:
+            ToolRegisterError: If the new tool code failed to execute, or the new tool failed to find, or if the new tool has no labels or is replicated.
+        """
         try:
             exec(code,self.tool_creation_context)
         except Exception as e:
@@ -132,11 +175,15 @@ class ToolRegister:
         return self.get_tool_dict(tool_name)
     
     def dynamic_extension_load(self,extension:str)->bool:
-        '''Load extension dynamically.
-        
-        :param string extension: The load path of the extension.
-        :return boolean: True if success, False if failed.
-        '''
+        """
+        Load extension dynamically.
+
+        Args:
+            extension (str): The load path of the extension.
+
+        Returns:
+            bool: True if success, False if failed.
+        """
         try:
             module = importlib.import_module(extension)
             for attr_name in dir(module):
@@ -144,36 +191,94 @@ class ToolRegister:
                 self.check_and_register(attr)
         except Exception as e:
             logger.error(f'Failed to load extension {extension}! Exception: {e}')
-            # logger.error(traceback.format_exc())
             return False
-        
         return True
         
     def get_tool_dict(self,tool_name:str)->dict:
+        """
+        Get the dictionary representation of the tool.
+
+        Args:
+            tool_name (str): Name of the tool.
+
+        Returns:
+            dict: Dictionary representation of the tool.
+        """
         return self[tool_name].tool_labels.dict(name_overwrite=tool_name)
     
     def get_env_dict(self,env_name:str)->dict:
+        """
+        Get the dictionary representation of the environment.
+
+        Args:
+            env_name (str): Name of the environment.
+
+        Returns:
+            dict: Dictionary representation of the environment.
+
+        Raises:
+            EnvNotFound: If the environment is not found.
+        """
         if env_name not in self.envs:
             raise EnvNotFound(env_name=env_name)
         return self.envs[env_name].env_labels.dict(include_invisible=True,max_show_tools = -1)
     
     def get_all_envs(self)->list[dict]:
+        """
+        Get the dictionary representations of all environments.
+
+        Returns:
+            list[dict]: List of dictionary representations of all environments.
+        """
         return [self.envs[env_name].env_labels.dict()  for env_name in self.envs]
     
     def get_all_tools(self,include_invisible=False)->list[str]:
+        """
+        Get all tools.
+
+        Args:
+            include_invisible (bool, optional): Whether to include invisible tools in the results or not. Defaults to False.
+
+        Returns:
+            list[str]: List of all tools.
+        """
         if include_invisible:
             return [tool_name  for tool_name in self.tools]
         else:
             return [tool_name  for tool_name in self.tools if self.tools[tool_name].tool_labels.visible]
     
     def get_all_tools_dict(self,include_invisible=False)->list[dict]:
+        """
+        Get the dictionary representations of all tools.
+
+        Args:
+            include_invisible (bool, optional): Whether to include invisible tools in the results or not. Defaults to False.
+
+        Returns:
+            list[dict]: List of dictionary representations of all tools.
+        """
         return [self.tools[tool_name].tool_labels.dict(name_overwrite=tool_name)  for tool_name in self.get_all_tools(include_invisible)]
     
     def __getitem__(self, key)->Callable[..., Any]:
+        """
         # two stage index, first find env, then find tool
+
+        Retrieve an item from the tools or environments using a key.
+
+        Args:
+            key (str or tuple): Key for accessing a tool or an environment.
+
+        Returns:
+            Callable[..., Any]: Tool or environment associated with the key.
+
+        Raises:
+            ToolNotFound: If the tool is not found.
+            EnvNotFound: If the environment is not found.
+            NotImplementedError: If the key is not a valid string or tuple of length 2.
+        """
         if isinstance(key,str):
             if key not in self.tools:
-                # check if the tool is a env subtool which not visible
+            # check if the tool is a env subtool which not visible
                 try:
                     tool_name = key.split('_')
                     env_name = tool_name[0]
@@ -194,7 +299,7 @@ class ToolRegister:
                 # try to find env in unloaded extensions
                 if self.dynamic_extension_load(f'extensions.envs.{env_name}') and env_name in self.envs:
                     env = self.envs[env_name]
-                raise EnvNotFound(env_name=env_name)
+                    raise EnvNotFound(env_name=env_name)
             env = self.envs[env_name]
             if tool_name not in env.env_labels.subtools_labels:
                 raise ToolNotFound(tool_name=env_name+'_'+tool_name)

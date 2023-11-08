@@ -11,8 +11,20 @@ from core.register import toolwrapper
 @toolwrapper()
 class WebEnv(BaseEnv):
     """Web Environment providing web interface and browsering.
+
+    Attributes:
+        bing_cfg (dict): Bing specific configurations.
+        web_cfg (dict): Web specific configurations.
+        headers (dict): HTTP headers used while making HTTP requests.
+        client (httpx.AsyncClient): HTTP client used for making HTTP requests.
     """
+
     def __init__(self,config:dict = {}):
+        """Initializes WebEnv with the provided configurations.
+
+        Args:
+            config (dict, optional): Configurations for WebEnv. Defaults to {}.
+        """
         super().__init__(config=config)
         self.bing_cfg = self.config['bing']
         if self.bing_cfg['api_key'] is None:
@@ -25,6 +37,14 @@ class WebEnv(BaseEnv):
         self.client = httpx.AsyncClient(headers=self.headers,verify=False,timeout=30.0,http2=True)
 
     def _check_url_valid(self,url:str):
+        """Checks if the provided URL is valid or not
+
+        Args:
+            url (str): URL to check.
+
+        Raises:
+            ValueError: If the URL is a local URL or if it is not a http or https URL.
+        """
         local_prefixes = [
             "file:///",
             "file://127.0.0.1",
@@ -47,13 +67,24 @@ class WebEnv(BaseEnv):
         
     async def search_and_browse(self, search_query:str,goals_to_browse:str,region:str=None,num_results = 3) -> List[str]:
         """Search with search tools and browse the website returned by search. Note some websites may not be accessable due to network error.
-    
-        :param string search_query: The search query.
-        :param string goals_to_browse: What's you want to find on the website returned by search. If you need more details, request it in here. Examples: 'What is latest news about deepmind?', 'What is the main idea of this article?'
-        :param string? region: The region code of the search, default to `en-US`. Available regions: `en-US`, `zh-CN`, `ja-JP`, `de-DE`, `fr-FR`, `en-GB`.
-        :return string: The results of the search.
-        """
         
+        
+
+        Args:
+            search_query (str): The search query.
+            goals_to_browse (str): What's you want to find on the website returned by search.
+            region (str, optional): The region code of the search. Defaults to 'en-US'.
+            num_results (int, optional): Number of results to fetch. Defaults to 3.
+
+        Returns:
+            List[str]: The results of the search.
+
+        Raises:
+            httpx.HTTPStatusError: If there's an HTTP error while making the request.
+            Exception: For any other unhandled exceptions.
+
+        """
+
         api_key = self.bing_cfg["api_key"]
         endpoint = self.bing_cfg["endpoint"]
         if region is None:
@@ -94,12 +125,20 @@ class WebEnv(BaseEnv):
         return search_results
     
     async def browse_website(self,url:str,goals_to_browse:str)->str:
-        """Give a http or https url to browse a website and return the summarize text. Note some websites may not be accessable due to network error. This tool only return the content of give url and cannot provide any information need interaction with the website.
-        
-        :param string url: The realworld Uniform Resource Locator (web address) to scrape text from. Never provide something like "<URL of the second news article>", give real url!!! Example: 'https://www.deepmind.com/'
-        :param string goals_to_browse: The goals for browse the given `url` (e.g. what you want to find on webpage.). If you need more details, request it in here.
-        :return string: The content of the website, with formatted text.
+        """Gives a http or https url to browse a website and return the summarize text.
+
+        Args:
+            url (str): The real world Uniform Resource Locator (web address)
+            goals_to_browse (str): The goals for browse the given `url` (e.g. what you want to find on webpage.)
+
+        Returns:
+            str: The content of the website, with formatted text.
+
+        Raises:
+            httpx.HTTPStatusError: If there's an HTTP error while making the request.
+
         """
+
         # self._check_url_valid(url)
         res = await self.client.get(url)
         if res.status_code in [301,302,307,308]:

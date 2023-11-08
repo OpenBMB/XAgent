@@ -11,7 +11,20 @@ from XAgent.agent.summarize import summarize_action,summarize_plan
 from XAgent.ai_functions import function_manager
 
 def get_posterior_knowledge(all_plan: Plan, terminal_plan: Plan, finish_node: ToolNode, tool_functions_description_list: List[dict], config):
+    """
+    Reflects on the previous actions and generates the posterior knowledge.
 
+    Args:
+        all_plan (Plan): The complete plan of actions.
+        terminal_plan (Plan): The plan of actions at the terminal.
+        finish_node (ToolNode): The node that represents the finishing tool.
+        tool_functions_description_list (List[dict]): A list of dictionaries that describe tool functions.
+        config (object): The configuration object with settings.
+
+    Returns:
+        dict: A dictionary with the generated posterior knowledge.
+
+    """
     agent = agent_dispatcher.dispatch(
         RequiredAbilities.reflection,
         "Reflect on the previous actions and give the posterior knowledge"
@@ -40,11 +53,5 @@ def get_posterior_knowledge(all_plan: Plan, terminal_plan: Plan, finish_node: To
     )
 
     data = json5.loads(new_message["arguments"])
-    # print(data)
 
     return data
-    
-
-
-
-

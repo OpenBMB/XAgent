@@ -83,7 +83,9 @@ watch(() => fileList.value, (newVal) => {
         message: `The  file "${tipFileName}" type is not supported`
     });
   }
-  fileList.value = allowList
+  if (allowList.length !== fileList.value.length) {
+    fileList.value = allowList
+  }
 });
 
 const configStore = useConfigStore()

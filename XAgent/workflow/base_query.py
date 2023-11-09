@@ -5,11 +5,12 @@ from colorama import Fore, Style
 from XAgent.logs import logger
 
 
-class BaseQuery(metaclass = abc.ABCMeta):
-    def __init__(self, role_name="",task="",plan=[]):
+class BaseQuery(metaclass=abc.ABCMeta):
+    def __init__(self, role_name="", task="", plan=[]):
         self.role_name = role_name
         self.task = task
         self.plan = plan
+
     @abc.abstractmethod
     def log_self(self):
         pass
@@ -26,9 +27,8 @@ class BaseQuery(metaclass = abc.ABCMeta):
         return cls(**json_data)
 
 
-
 class AutoGPTQuery(BaseQuery):
-    def __init__(self,**args):
+    def __init__(self, **args):
         super().__init__(**args)
 
     def log_self(self):

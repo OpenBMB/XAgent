@@ -6,18 +6,19 @@ import json
 
 
 class SharedInteractionBase(metaclass=abc.ABCMeta):
-    def __init__(self,
-                interaction_id: str,
-                user_name: str,
-                create_time: str,
-                update_time: str,
-                description: str,
-                agent: str = "",
-                mode: str = "",
-                is_deleted: bool = False,
-                star: int = 0,
-                record_dir: str = "",
-                ):
+    def __init__(
+        self,
+        interaction_id: str,
+        user_name: str,
+        create_time: str,
+        update_time: str,
+        description: str,
+        agent: str = "",
+        mode: str = "",
+        is_deleted: bool = False,
+        star: int = 0,
+        record_dir: str = "",
+    ):
         self.interaction_id = interaction_id
         self.user_name = user_name
         self.create_time = create_time
@@ -47,23 +48,21 @@ class SharedInteractionBase(metaclass=abc.ABCMeta):
         if exclude:
             data = {k: v for k, v in data.items() if k not in exclude}
         return data
-        
-    
+
     def to_json(self):
         return json.dumps(self.to_dict(), indent=2, ensure_ascii=False)
-    
+
     @classmethod
     def from_db(cls, interaction):
-        return cls(interaction.interaction_id,
-                   interaction.user_name,
-                   interaction.create_time,
-                   interaction.update_time,
-                   interaction.description,
-                   interaction.agent,
-                   interaction.mode,
-                   interaction.is_deleted,
-                   interaction.star,
-                   interaction.record_dir,
-                   )
-        
-        
+        return cls(
+            interaction.interaction_id,
+            interaction.user_name,
+            interaction.create_time,
+            interaction.update_time,
+            interaction.description,
+            interaction.agent,
+            interaction.mode,
+            interaction.is_deleted,
+            interaction.star,
+            interaction.record_dir,
+        )

@@ -7,6 +7,7 @@ from colorama import Fore
 from XAgentServer.envs import XAgentServerEnv
 from XAgentServer.interaction import XAgentInteraction
 from XAgentServer.loggers.logs import Logger
+
 # from XAgentServer.manager import manager
 from XAgentServer.response_body import WebsocketResponseBody
 
@@ -20,16 +21,20 @@ class XAgentServer:
 
     async def interact(self, interaction: XAgentInteraction):
         # query = message
-        from XAgent.agent import (PlanGenerateAgent, PlanRefineAgent,
-                                  ReflectAgent, ToolAgent)
+        from XAgent.agent import (
+            PlanGenerateAgent,
+            PlanRefineAgent,
+            ReflectAgent,
+            ToolAgent,
+        )
         from XAgent.config import CONFIG as config
         from XAgent.global_vars import agent_dispatcher, config
         from XAgent.running_recorder import recorder
-        from XAgent.tool_call_handle import (function_handler,
-                                             toolserver_interface)
+        from XAgent.tool_call_handle import function_handler, toolserver_interface
         from XAgent.workflow.base_query import AutoGPTQuery
         from XAgent.workflow.task_handler import TaskHandler
         from XAgent.workflow.working_memory import WorkingMemoryAgent
+
         config.reload()
         # args
         args = interaction.parameter.args
@@ -37,21 +42,24 @@ class XAgentServer:
         if interaction.base.recorder_root_dir:
             if not os.path.exists(interaction.base.recorder_root_dir):
                 raise Exception(
-                    f"recorder_root_dir {interaction.base.recorder_root_dir} not exists")
+                    f"recorder_root_dir {interaction.base.recorder_root_dir} not exists"
+                )
             recorder.load_from_disk(interaction.base.recorder_root_dir)
             query = recorder.get_query()
             self.logger.info(
-                f"server is running, the start recorder_root_dir is {interaction.base.recorder_root_dir}")
+                f"server is running, the start recorder_root_dir is {interaction.base.recorder_root_dir}"
+            )
         else:
             query = AutoGPTQuery(
-                role_name=args.get('role_name', 'Assistant'),
-                task=args.get('goal', ''),
-                plan=args.get('plan', [
-                ]),
+                role_name=args.get("role_name", "Assistant"),
+                task=args.get("goal", ""),
+                plan=args.get("plan", []),
             )
-       
-            self.logger.info(f"server is running, the start query is {args.get('goal', '')}")
-        
+
+            self.logger.info(
+                f"server is running, the start query is {args.get('goal', '')}"
+            )
+
         recorder.regist_query(query)
         recorder.regist_config(config)
 
@@ -66,8 +74,10 @@ class XAgentServer:
 
         # working memory function is used for communication between different agents that handle different subtasks
         working_memory_function = WorkingMemoryAgent.get_working_memory_function()
-        subtask_functions, tool_functions_description_list = function_handler.get_functions(
-            config)
+        (
+            subtask_functions,
+            tool_functions_description_list,
+        ) = function_handler.get_functions(config)
 
         all_functions = subtask_functions + working_memory_function
 
@@ -82,7 +92,12 @@ class XAgentServer:
 
         upload_files = args.get("file_list", [])
         if upload_files is not None:
-            upload_files = [os.path.join(XAgentServerEnv.Upload.upload_dir, interaction.base.user_id, file) for file in upload_files]
+            upload_files = [
+                os.path.join(
+                    XAgentServerEnv.Upload.upload_dir, interaction.base.user_id, file
+                )
+                for file in upload_files
+            ]
             for file_path in upload_files:
                 try:
                     toolserver_interface.upload_file(file_path)

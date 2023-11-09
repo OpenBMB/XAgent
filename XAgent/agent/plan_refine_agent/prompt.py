@@ -1,4 +1,4 @@
-SYSTEM_PROMPT = '''You are plan-rectify agent, your task is to iterratively rectify a plan of a query.
+SYSTEM_PROMPT = """You are plan-rectify agent, your task is to iterratively rectify a plan of a query.
 --- Background Information ---
 PLAN AND SUBTASK:
 A plan has a tree manner of subtasks: task 1 contatins subtasks task 1.1, task 1.2, task 1.3, and task 1.2 contains subtasks 1.2.1, 1.2.2...
@@ -55,9 +55,9 @@ If task is un-solvable, give up and submit the task.
 - Every time you use a operation, make sure the hierarchy structure of the subtasks remians, e.g. if a subtask 1.2 is to "find A,B,C" , then newly added plan directly related to this plan (like "find A", "find B", "find C") should always be added as 1.2.1, 1.2.2, 1.2.3...
 - You are restricted to give operations in at most 4 times, so the plan refine is not so much.
 - The task handler is powered by sota LLM, which can directly answer many questions. So make sure your plan can fully utilze its ability and reduce the complexity of the subtasks tree.
-'''
+"""
 
-USER_PROMPT = '''Your task is to choose one of the operators of SUBTASK OPERATION, note that
+USER_PROMPT = """Your task is to choose one of the operators of SUBTASK OPERATION, note that
 1.You can only modify the subtask with subtask_id>{{subtask_id}}(not included). 
 2.If you think the existing plan is good enough, use REFINE_SUBMIT.
 3.You can at most perform {{max_step}} operations before REFINE_SUBMIT operation, you have already made {{modify_steps}} steps, watch out the budget. 
@@ -67,7 +67,8 @@ USER_PROMPT = '''Your task is to choose one of the operators of SUBTASK OPERATIO
 --- Status ---
 File System Structure: {{workspace_files}}
 Refine Node Message: {{refine_node_message}}
-'''
+"""
+
 
 def get_examples_for_dispatcher():
     """The example that will be given to the dispatcher to generate the prompt

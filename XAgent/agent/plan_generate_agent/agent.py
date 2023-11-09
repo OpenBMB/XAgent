@@ -11,7 +11,7 @@ class PlanGenerateAgent(BaseAgent):
     def parse(
         self,
         placeholders: dict = {},
-        arguments:dict = None,
+        arguments: dict = None,
         functions=None,
         function_call=None,
         stop=None,
@@ -19,7 +19,6 @@ class PlanGenerateAgent(BaseAgent):
         *args,
         **kwargs
     ):
-
         prompt_messages = self.fill_in_placeholders(placeholders)
         messages = prompt_messages + additional_messages
 
@@ -29,5 +28,6 @@ class PlanGenerateAgent(BaseAgent):
             functions=functions,
             function_call=function_call,
             stop=stop,
-            *args,**kwargs
+            *args,
+            **kwargs
         )

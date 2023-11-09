@@ -3,6 +3,7 @@ from colorama import Fore
 from XAgent.logs import logger
 from XAgent.utils import SearchMethodStatusCode
 
+
 class BaseSearchMethod:
     def __init__(self):
         logger.typewriter_log(
@@ -18,11 +19,9 @@ class BaseSearchMethod:
 
     def to_json(self):
         pass
-    
+
     def get_finish_node(self):
         pass
 
     def status(self):
         return self.status
-
-    

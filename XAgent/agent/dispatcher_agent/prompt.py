@@ -10,7 +10,7 @@
 # System Prompt: {{example_system_prompt}}
 # User Prompt: {{example_user_prompt}}"""
 
-# SYSTEM_PROMPT = """Your task is to refine a prompt for an autonomous agent to successfully complete the assigned task. The user will provide the task, you will provide only the output in the exact format specified below with no explanation or conversation. 
+# SYSTEM_PROMPT = """Your task is to refine a prompt for an autonomous agent to successfully complete the assigned task. The user will provide the task, you will provide only the output in the exact format specified below with no explanation or conversation.
 
 # Below is the current version of prompt:
 # SYSTEM PROMPT:

@@ -4,11 +4,12 @@ from typing import Union
 
 
 class InteractionParameter(metaclass=abc.ABCMeta):
-    def __init__(self,
-                    interaction_id: str,
-                    parameter_id: str,
-                    args: Union[str, dict, None] = None
-                    ):
+    def __init__(
+        self,
+        interaction_id: str,
+        parameter_id: str,
+        args: Union[str, dict, None] = None,
+    ):
         self.interaction_id = interaction_id
         self.args = args
         self.parameter_id = parameter_id
@@ -26,10 +27,9 @@ class InteractionParameter(metaclass=abc.ABCMeta):
     @classmethod
     def from_json(cls, json_data):
         return cls(**json_data)
-    
+
     @classmethod
     def from_db(cls, interaction):
-        return cls(interaction.interaction_id,
-                    interaction.parameter_id,
-                    interaction.args
-                    )
+        return cls(
+            interaction.interaction_id, interaction.parameter_id, interaction.args
+        )

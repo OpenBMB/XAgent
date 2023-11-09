@@ -9,7 +9,7 @@ from typing import List, Literal, TypedDict
 from XAgent.logs import logger
 
 
-MessageRole = Literal["system", "user", "assistant","function"]
+MessageRole = Literal["system", "user", "assistant", "function"]
 MessageType = Literal["ai_response", "action_result"]
 
 
@@ -17,6 +17,7 @@ class MessageDict(TypedDict):
     role: MessageRole
     content: str
     function_call: dict
+
 
 @dataclass
 class Message:
@@ -32,7 +33,7 @@ class Message:
         if self.function_call != None:
             data["function_call"] = self.function_call
         return data
-        
+
     def to_json(self):
         return self.raw()
 
@@ -47,6 +48,7 @@ class Message:
         if a.function_call != b.function_call:
             return False
         return True
+
 
 @dataclass
 class ModelInfo:
@@ -161,7 +163,6 @@ class MessageHistory:
         """
         messages = messages or self.messages
         for i in range(0, len(messages) - 1):
-
             ai_message = messages[i]
 
             if ai_message.type != "ai_response":

@@ -3,15 +3,22 @@ import json
 
 from fastapi import WebSocket, WebSocketDisconnect
 
-from XAgentIO.exception import (XAgentIOWebSocketDisconnectError,
-                                XAgentIOWebSocketTimeoutError)
+from XAgentIO.exception import (
+    XAgentIOWebSocketDisconnectError,
+    XAgentIOWebSocketTimeoutError,
+)
 from XAgentIO.input.base import BaseInput
 from XAgentServer.loggers.logs import Logger
 from XAgentServer.response_body import WebsocketResponseBody
 
 
 class WebSocketInput(BaseInput):
-    def __init__(self, websocket: WebSocket, do_interrupt: bool = False, max_wait_seconds: int = 600):
+    def __init__(
+        self,
+        websocket: WebSocket,
+        do_interrupt: bool = False,
+        max_wait_seconds: int = 600,
+    ):
         super().__init__(do_interrupt, max_wait_seconds)
         self.websocket = websocket
 
@@ -24,7 +31,10 @@ class WebSocketInput(BaseInput):
     async def interrupt(self):
         wait = 0
         while wait < self.max_wait_seconds:
-            print (f"\r waiting for {wait} second, remaining {self.max_wait_seconds - wait} second", end="")
+            print(
+                f"\r waiting for {wait} second, remaining {self.max_wait_seconds - wait} second",
+                end="",
+            )
             try:
                 data = await asyncio.wait_for(self.auto_receive(), 1)
                 if isinstance(data, dict):
@@ -42,10 +52,13 @@ class WebSocketInput(BaseInput):
             except asyncio.TimeoutError:
                 wait += 1
         self.logger.error(f"Wait timeout, close.")
-        self.websocket.send_text(WebsocketResponseBody(data=None, status="failed", message="Wait timeout, close.").to_text())
+        self.websocket.send_text(
+            WebsocketResponseBody(
+                data=None, status="failed", message="Wait timeout, close."
+            ).to_text()
+        )
         raise XAgentIOWebSocketTimeoutError
 
-        
     async def auto_receive(self):
         data = await self.websocket.receive_json()
         return data
@@ -55,5 +68,4 @@ class WebSocketInput(BaseInput):
             data = await self.interrupt()
             return data
         else:
-
             return input

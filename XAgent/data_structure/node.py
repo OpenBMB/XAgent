@@ -7,15 +7,13 @@ from XAgent.message_history import MessageHistory
 from XAgent.utils import ToolCallStatusCode, TaskStatusCode
 
 
-
-class Node(metaclass = abc.ABCMeta):
+class Node(metaclass=abc.ABCMeta):
     def __init__(self):
         pass
 
 
 class ToolNode(Node):
     def __init__(self):
-
         self.father: ToolNode = None
         self.children: list[ToolNode] = []
 
@@ -60,7 +58,7 @@ class ToolNode(Node):
         if self.father == None:
             return 0
         return self.father.get_depth() + 1
-    
+
     def get_subtree_size(self):
         if self.children == []:
             return 1
@@ -68,6 +66,3 @@ class ToolNode(Node):
         for child in self.children:
             now_size += child.get_subtree_size()
         return now_size
-
-
-

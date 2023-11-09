@@ -1,5 +1,6 @@
 class XAgentIOError(Exception):
     """Base class for exceptions in this module."""
+
     pass
 
 
@@ -38,6 +39,7 @@ class XAgentIOCloseError(XAgentIOError):
         self.message = message
         super().__init__(self.message)
 
+
 class XAgentIOWebSocketError(XAgentIOError):
     """Exception raised for errors in the input.
 
@@ -48,6 +50,7 @@ class XAgentIOWebSocketError(XAgentIOError):
     def __init__(self, message="XAgent IO WebSocket Error!"):
         self.message = message
         super().__init__(self.message)
+
 
 class XAgentIOWebSocketTimeoutError(XAgentIOWebSocketError):
     """Exception raised for errors in the input.
@@ -119,4 +122,3 @@ class XAgentIOWebSocketReceiveError(XAgentIOWebSocketError):
     def __init__(self, message="XAgent IO WebSocket Receive Error!"):
         self.message = message
         super().__init__(self.message)
-

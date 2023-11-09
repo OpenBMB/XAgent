@@ -2,7 +2,7 @@ import os
 
 from dotenv import find_dotenv, load_dotenv
 
-load_dotenv(find_dotenv('.env'))
+load_dotenv(find_dotenv(".env"))
 
 
 class XAgentServerEnv:
@@ -11,8 +11,9 @@ class XAgentServerEnv:
     if you change value of the environment variable, you need to restart the XAgentServer by running the following command:
     `python start_server.py`
     or start a unicorn server by yourself
-    
+
     """
+
     app = "app:app"
     prod: bool = os.getenv("PROD", "False").lower() == "true"
     base_dir = "XAgentServer"
@@ -20,8 +21,8 @@ class XAgentServerEnv:
     recorder_root_dir = "running_records"
     # you can set default_login with True to use the default user "admin" with token "xagent-admin" to login,
     default_login: bool = True
-    # the parameter check_running is used to check whether the interaction is running, 
-    # if you want to connect more than one XAgentServer, you can set check_running to True, 
+    # the parameter check_running is used to check whether the interaction is running,
+    # if you want to connect more than one XAgentServer, you can set check_running to True,
     # in which case the XAgentServer will check whether the interaction is running in other XAgentServer
     check_running: bool = False
     host = "0.0.0.0"
@@ -29,7 +30,7 @@ class XAgentServerEnv:
     debug = True
     reload = True
     workers = 1
-    
+
     class DB:
         use_db = False
         # Optional["file", "sqlite", "mysql", "postgresql"]
@@ -51,6 +52,7 @@ class XAgentServerEnv:
             if db_type == "postgresql":
                 # if you want to use postgresql to store data, you can set db_url to "postgresql://{}:{}@{}:{}/{}"
                 db_url = ""
+
     class Redis:
         use_redis = False
         redis_url = "redis://localhost"
@@ -73,8 +75,20 @@ class XAgentServerEnv:
         upload_dir = "XAgentServer/localstorage/upload"
         if not os.path.exists(upload_dir):
             os.makedirs(upload_dir)
-        upload_allowed_types = ["image/png", "image/jpeg", "image/gif", "text/plain",
-                                "application/msword", "pdf", "txt", "pptx", "xlsx", "doc", "ppt", "xls"]
+        upload_allowed_types = [
+            "image/png",
+            "image/jpeg",
+            "image/gif",
+            "text/plain",
+            "application/msword",
+            "pdf",
+            "txt",
+            "pptx",
+            "xlsx",
+            "doc",
+            "ppt",
+            "xls",
+        ]
 
 
 if os.path.exists("XAgentServer/prod_server_envs.py") and XAgentServerEnv.prod:

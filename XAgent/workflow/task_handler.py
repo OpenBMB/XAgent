@@ -4,15 +4,19 @@ from typing import Dict, List
 
 from colorama import Fore
 
-from XAgent.global_vars import agent_dispatcher,config
+from XAgent.global_vars import agent_dispatcher, config
 from XAgent.inner_loop_search_algorithms.ReACT import ReACTChainSearch
 from XAgent.logs import logger, print_task_save_items
 from XAgent.ai_functions import function_manager
 from XAgent.running_recorder import recorder
 from XAgent.tool_call_handle import function_handler, toolserver_interface
-from XAgent.agent.summarize import summarize_plan 
-from XAgent.utils import (RequiredAbilities, SearchMethodStatusCode,
-                          TaskSaveItem, TaskStatusCode)
+from XAgent.agent.summarize import summarize_plan
+from XAgent.utils import (
+    RequiredAbilities,
+    SearchMethodStatusCode,
+    TaskSaveItem,
+    TaskStatusCode,
+)
 from .base_query import BaseQuery
 from .plan_exec import Plan, PlanAgent
 from .reflection import get_posterior_knowledge
@@ -23,19 +27,22 @@ from XAgentServer.models.ws import XAgentOutputData
 from .working_memory import working_memory_agent
 
 
-class TaskHandler():
-    def __init__(self, config,
-                 query: BaseQuery,
-                 function_list: List[Dict],
-                 tool_functions_description_list: List[dict],
-                 interaction: XAgentInteraction):
+class TaskHandler:
+    def __init__(
+        self,
+        config,
+        query: BaseQuery,
+        function_list: List[Dict],
+        tool_functions_description_list: List[dict],
+        interaction: XAgentInteraction,
+    ):
         self.config = config
         self.function_list = function_list
         self.tool_functions_description_list = tool_functions_description_list
 
         self.query = query
 
-        self.tool_call_count = 0  
+        self.tool_call_count = 0
 
         self.plan_agent = PlanAgent(
             config=config,
@@ -47,7 +54,6 @@ class TaskHandler():
         self.interaction = interaction
 
     async def outer_loop_async(self):
-
         logger.typewriter_log(
             f"-=-=-=-=-=-=-= BEGIN QUERY SOVLING -=-=-=-=-=-=-=",
             Fore.YELLOW,
@@ -68,18 +74,22 @@ class TaskHandler():
                 goal="",
                 handler="",
                 tool_budget=0,
-                subtasks=[])
+                subtasks=[],
+            )
         )
-        await self.interaction.update_cache(update_data={
-            "node_id": uuid.uuid4().hex,
-            "task_id": print_data.get("task_id", ""),
-            "name": print_data.get("name", ""),
-            "goal": print_data.get("goal", ""),
-            "handler": print_data.get("handler", ""),
-            "tool_budget": print_data.get("tool_budget", ""),
-            "subtasks": print_data.get("subtask", [])
-        }, status="start", current=print_data.get("task_id", ""))
-
+        await self.interaction.update_cache(
+            update_data={
+                "node_id": uuid.uuid4().hex,
+                "task_id": print_data.get("task_id", ""),
+                "name": print_data.get("name", ""),
+                "goal": print_data.get("goal", ""),
+                "handler": print_data.get("handler", ""),
+                "tool_budget": print_data.get("tool_budget", ""),
+                "subtasks": print_data.get("subtask", []),
+            },
+            status="start",
+            current=print_data.get("task_id", ""),
+        )
 
         self.plan_agent.plan_iterate_based_on_memory_system()
 
@@ -95,15 +105,18 @@ class TaskHandler():
                 return old
 
         self.now_dealing_task = self.plan_agent.latest_plan.children[0]
-        # workspace_hash_id = "" 
+        # workspace_hash_id = ""
         while self.now_dealing_task:
             task_id = self.now_dealing_task.get_subtask_id(to_str=True)
             recorder.change_now_task(task_id)
             if self.interaction.interrupt:
                 goal = self.now_dealing_task.data.goal
-                receive_data = await self.interaction.auto_receive({"args": {"goal": goal}})
+                receive_data = await self.interaction.auto_receive(
+                    {"args": {"goal": goal}}
+                )
                 self.now_dealing_task = rewrite_input_func(
-                    self.now_dealing_task, receive_data)
+                    self.now_dealing_task, receive_data
+                )
             search_method = await self.inner_loop_async(self.now_dealing_task)
 
             self.now_dealing_task.process_node = search_method.get_finish_node()
@@ -112,7 +125,6 @@ class TaskHandler():
 
             working_memory_agent.register_task(self.now_dealing_task)
 
-            
             refinement_result = {
                 "name": self.now_dealing_task.data.name,
                 "goal": self.now_dealing_task.data.goal,
@@ -125,27 +137,25 @@ class TaskHandler():
                 "task_id": task_id,
             }
 
-            await self.interaction.update_cache(update_data=refinement_result, status="refinement", current=task_id)
+            await self.interaction.update_cache(
+                update_data=refinement_result, status="refinement", current=task_id
+            )
 
             if search_method.need_for_plan_refine:
-                self.plan_agent.plan_refine_mode(
-                    self.now_dealing_task)
+                self.plan_agent.plan_refine_mode(self.now_dealing_task)
             else:
                 logger.typewriter_log(
                     f"subtask submitted as no need to refine the plan, continue",
                     Fore.BLUE,
                 )
 
-            self.now_dealing_task = Plan.pop_next_subtask(
-                self.now_dealing_task)
+            self.now_dealing_task = Plan.pop_next_subtask(self.now_dealing_task)
 
             if self.now_dealing_task is None:
                 await self.interaction.update_cache(update_data=[], status="finished")
             else:
-                current_task_id = self.now_dealing_task.get_subtask_id(
-                    to_str=True)
-                remaining_subtask = Plan.get_remaining_subtask(
-                    self.now_dealing_task)
+                current_task_id = self.now_dealing_task.get_subtask_id(to_str=True)
+                remaining_subtask = Plan.get_remaining_subtask(self.now_dealing_task)
                 subtask_list = []
                 for todo_plan in remaining_subtask:
                     raw_data = json.loads(todo_plan.data.raw)
@@ -154,12 +164,17 @@ class TaskHandler():
                     raw_data["node_id"] = uuid.uuid4().hex
                     subtask_list.append(raw_data)
 
-                await self.interaction.update_cache(update_data=subtask_list, status="subtask", current=current_task_id)
+                await self.interaction.update_cache(
+                    update_data=subtask_list, status="subtask", current=current_task_id
+                )
 
         logger.typewriter_log("ALL Tasks Done", Fore.GREEN)
         return
 
-    async def inner_loop_async(self, plan: Plan, ):
+    async def inner_loop_async(
+        self,
+        plan: Plan,
+    ):
         task_ids_str = plan.get_subtask_id(to_str=True)
         logger.typewriter_log(
             f"-=-=-=-=-=-=-= Performing Task {task_ids_str} ({plan.data.name}): Begin -=-=-=-=-=-=-=",
@@ -176,27 +191,37 @@ class TaskHandler():
 
         plan.data.status = TaskStatusCode.DOING
 
-        if self.config.rapidapi_retrieve_tool_count > 0:  
+        if self.config.rapidapi_retrieve_tool_count > 0:
             retrieve_string = summarize_plan(plan.to_json())
-            rapidapi_tool_names, rapidapi_tool_jsons = toolserver_interface.retrieve_rapidapi_tools(
-                retrieve_string, top_k=self.config.rapidapi_retrieve_tool_count)
+            (
+                rapidapi_tool_names,
+                rapidapi_tool_jsons,
+            ) = toolserver_interface.retrieve_rapidapi_tools(
+                retrieve_string, top_k=self.config.rapidapi_retrieve_tool_count
+            )
             if rapidapi_tool_names is not None:
                 function_handler.change_subtask_handle_function_enum(
-                    function_handler.tool_names + rapidapi_tool_names)
+                    function_handler.tool_names + rapidapi_tool_names
+                )
                 function_handler.avaliable_tools_description_list += rapidapi_tool_jsons
             else:
                 print("bug: no rapidapi tool retrieved, need to fix here")
 
         search_method = ReACTChainSearch()
-        
-        arguments = function_manager.get_function_schema('action_reasoning')['parameters']
-        await search_method.run_async(config=self.config,
-                                      agent=agent,
-                                      task_handler=self,
-                                      arguments=arguments,
-                                      functions=function_handler.intrinsic_tools(
-                                          self.config.enable_ask_human_for_help),
-                                      task_id=task_ids_str)
+
+        arguments = function_manager.get_function_schema("action_reasoning")[
+            "parameters"
+        ]
+        await search_method.run_async(
+            config=self.config,
+            agent=agent,
+            task_handler=self,
+            arguments=arguments,
+            functions=function_handler.intrinsic_tools(
+                self.config.enable_ask_human_for_help
+            ),
+            task_id=task_ids_str,
+        )
 
         if search_method.status == SearchMethodStatusCode.SUCCESS:
             plan.data.status = TaskStatusCode.SUCCESS
@@ -217,7 +242,6 @@ class TaskHandler():
         return search_method
 
     def posterior_process(self, terminal_plan: Plan):
-
         logger.typewriter_log(
             f"-=-=-=-=-=-=-= POSTERIOR_PROCESS, working memory, summary, and reflection -=-=-=-=-=-=-=",
             Fore.BLUE,
@@ -234,7 +258,9 @@ class TaskHandler():
         terminal_plan.data.action_list_summary = summary
 
         if "reflection_of_plan" in posterior_data.keys():
-            terminal_plan.data.posterior_plan_reflection = posterior_data["reflection_of_plan"]
+            terminal_plan.data.posterior_plan_reflection = posterior_data[
+                "reflection_of_plan"
+            ]
 
         if "reflection_of_tool" in posterior_data.keys():
             terminal_plan.data.tool_reflection = posterior_data["reflection_of_tool"]

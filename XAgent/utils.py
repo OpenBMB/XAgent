@@ -1,4 +1,3 @@
-
 from enum import Enum, unique
 import abc
 from colorama import Fore, Style
@@ -10,38 +9,46 @@ import tiktoken
 from XAgent.config import CONFIG
 
 
-encoding = tiktoken.encoding_for_model(CONFIG.default_completion_kwargs['model'])
+encoding = tiktoken.encoding_for_model(CONFIG.default_completion_kwargs["model"])
 
-def get_token_nums(text:str)->int:
+
+def get_token_nums(text: str) -> int:
     return len(encoding.encode(text))
 
-def clip_text(text:str,max_tokens:int=None,clip_end=False)->str|int:
+
+def clip_text(text: str, max_tokens: int = None, clip_end=False) -> str | int:
     encoded = encoding.encode(text)
-    decoded = encoding.decode(encoded[:max_tokens] if clip_end else encoded[-max_tokens:])
+    decoded = encoding.decode(
+        encoded[:max_tokens] if clip_end else encoded[-max_tokens:]
+    )
     if len(decoded) != len(text):
-        decoded = decoded + '`wrapped`' if clip_end else '`wrapped`' + decoded
+        decoded = decoded + "`wrapped`" if clip_end else "`wrapped`" + decoded
     return decoded, len(encoded)
+
 
 @unique
 class LLMStatusCode(Enum):
     SUCCESS = 0
     ERROR = 1
 
+
 @unique
 class ToolCallStatusCode(Enum):
     TOOL_CALL_FAILED = -1
     TOOL_CALL_SUCCESS = 0
     FORMAT_ERROR = 1
-    HALLUCINATE_NAME = 2 
-    OTHER_ERROR = 3 
+    HALLUCINATE_NAME = 2
+    OTHER_ERROR = 3
     TIMEOUT_ERROR = 4
     TIME_LIMIT_EXCEEDED = 5
     SERVER_ERROR = 6
-    
+
     SUBMIT_AS_SUCCESS = 7
     SUBMIT_AS_FAILED = 8
+
     def __str__(self):
         return self.__class__.__name__ + ": " + self.name
+
 
 @unique
 class PlanOperationStatusCode(Enum):
@@ -52,12 +59,14 @@ class PlanOperationStatusCode(Enum):
     PLAN_REFINE_EXIT = 4
     OTHER_ERROR = 5
 
+
 @unique
 class SearchMethodStatusCode(Enum):
     DOING = 0
     SUCCESS = 1
     FAIL = 2
-    HAVE_AT_LEAST_ONE_ANSWER = 3 
+    HAVE_AT_LEAST_ONE_ANSWER = 3
+
 
 @unique
 class TaskStatusCode(Enum):
@@ -65,7 +74,8 @@ class TaskStatusCode(Enum):
     DOING = 1
     SUCCESS = 2
     FAIL = 3
-    SPLIT = 4 
+    SPLIT = 4
+
 
 @unique
 class RequiredAbilities(Enum):
@@ -97,25 +107,30 @@ class TaskSaveItem:
 
     action_list_summary: str = ""
     posterior_plan_reflection: List[str] = field(default_factory=lambda: [])
-    tool_reflection: List[Dict[str,str]] = field(default_factory=lambda: [])
-
+    tool_reflection: List[Dict[str, str]] = field(default_factory=lambda: [])
 
     def load_from_json(self, function_output_item):
         if "subtask name" in function_output_item.keys():
             self.name = function_output_item["subtask name"]
         else:
             print(f"field subtask name not exist")
-            
-        if "goal" in function_output_item.keys() and "goal" in function_output_item["goal"].keys():
-            self.goal=function_output_item["goal"]["goal"]
+
+        if (
+            "goal" in function_output_item.keys()
+            and "goal" in function_output_item["goal"].keys()
+        ):
+            self.goal = function_output_item["goal"]["goal"]
         else:
             print(f"field goal.goal not exist")
 
-        if "goal" in function_output_item.keys() and "criticism" in function_output_item["goal"].keys():
-            self.prior_plan_criticism=function_output_item["goal"]["criticism"]
+        if (
+            "goal" in function_output_item.keys()
+            and "criticism" in function_output_item["goal"].keys()
+        ):
+            self.prior_plan_criticism = function_output_item["goal"]["criticism"]
         else:
             print(f"field goal.criticism not exist")
-        
+
         # if "handler" in function_output_item.keys():
         #     self.handler=function_output_item["handler"]
         # else:
@@ -144,7 +159,7 @@ class TaskSaveItem:
         }
         if posterior:
             if self.action_list_summary != "":
-                json_data["action_list_summary"] =  self.action_list_summary
+                json_data["action_list_summary"] = self.action_list_summary
             # if self.posterior_plan_reflection != []:
             #     json_data["posterior_plan_reflection"] = self.posterior_plan_reflection
             # if self.tool_reflection != []:
@@ -154,7 +169,6 @@ class TaskSaveItem:
     @property
     def raw(self) -> str:
         return json.dumps(self.to_json(posterior=True), indent=2, ensure_ascii=False)
-
 
 
 class Singleton(abc.ABCMeta, type):
@@ -170,9 +184,8 @@ class Singleton(abc.ABCMeta, type):
             cls._instances[cls] = super(Singleton, cls).__call__(*args, **kwargs)
         return cls._instances[cls]
 
+
 class AbstractSingleton(abc.ABC, metaclass=Singleton):
     """
     Abstract singleton class for ensuring only one instance of a class.
     """
-
-

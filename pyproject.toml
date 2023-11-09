@@ -17,5 +17,6 @@ readme = "README.md"
 python = "^3.10"
 
 [tool.poetry.group.dev.dependencies]
-# unittest
 pytest = "^7.4.3"
+black = "^23.11.0"
+pre-commit = "^3.5.0"

@@ -12,19 +12,6 @@ from utils.retriever import standardizing
 API_INFOS = {}
 
 def generate_arg_doc(arg_name,arg_type,arg_desc,arg_default=None,arg_optional=None):
-    """
-    Generates argument documentation with type, name, description and default value.
-
-    Args:
-        arg_name (str): Argument name.
-        arg_type (str): Argument type.
-        arg_desc (str): Argument description.
-        arg_default (str, optional): Default value of the argument. Defaults to None.
-        arg_optional (bool, optional): Whether the argument is optional. Defaults to None.
-
-    Returns:
-        str: Formatted argument documentation.
-    """
     match arg_type:
         case 'NUMBER':
             arg_type = 'integer'
@@ -45,15 +32,6 @@ def generate_arg_doc(arg_name,arg_type,arg_desc,arg_default=None,arg_optional=No
         return f':param {arg_type} {arg_name}: {arg_desc}'
 
 def convert_rapidapi_desc_to_code(rapidapi_desc:dict)->list[dict]:
-    """
-    Converts the rapidAPI description to a list of dictionaries.
-
-    Args:
-        rapidapi_desc (dict): The rapidAPI description in dictionary format.
-
-    Returns:
-        list[dict]: A list of dictionaries containing API information.
-    """
     tool_desc = {
         'category':rapidapi_desc['category'],
         'tool_name':standardizing(rapidapi_desc['tool_name']),
@@ -103,18 +81,7 @@ def convert_rapidapi_desc_to_code(rapidapi_desc:dict)->list[dict]:
     return api_infos
 
 def rapid_api_mapper(cls:Type):
-    """
-    Dynamically adds API functions to RapidAPIENnv. 
-    
-    Args:
-        cls (Type): Class of RapidAPIENnv.
-    
-    Returns:
-        Type: Updated class with added API functions.
-    
-    Raises:
-        FileNotFoundError: If both api_infos_json and api_raw_json are not found.
-    """
+    """Dynamic adding api functions to RapidAPIENnv."""
     #reading api list
     if not os.path.exists(CONFIG['rapidapi']['api_infos_json']):
         try:
@@ -139,20 +106,9 @@ def rapid_api_mapper(cls:Type):
 @toolwrapper(visible=False)
 @rapid_api_mapper
 class RapidAPIEnv(BaseEnv):
-    """
-    Class that delivers rapidAPI for tool server.
-
-    Attributes:
-        api_infos (dict): Contains the information related to different APIs.
-    """
+    """RapidAPI Env delivers rapid api for tool server."""
     
     def __init__(self,config:dict={}):
-        """
-        Constructor for RapidAPIEnv class.
-
-        Args:
-            config (dict, optional): Configurations for the RapidAPIEnv. Defaults to {}.
-        """
         super().__init__(config=config)
         
         self.rapidapi_cfg = self.config['rapidapi']
@@ -162,19 +118,6 @@ class RapidAPIEnv(BaseEnv):
         self.api_infos = deepcopy(API_INFOS)
         
     async def _request_rapid_api(self,api_uri:str,arguments:dict={}):
-        """
-        Sends a request to the rapidAPI using the provided parameters and API URI.
-
-        Args:
-            api_uri (str): The API URI for the specific rapidAPI service.
-            arguments (dict, optional): Arguments to be used in the API call. Defaults to {}.
-
-        Returns:
-            dict: Response from the rapidAPI service in dictionary format.
-
-        Raises:
-            HTTPError: If the response from the server has an error.
-        """
         api_info = self.api_infos[api_uri]
         payload = {
             'category':api_info['category'],
@@ -190,3 +133,5 @@ class RapidAPIEnv(BaseEnv):
         response.raise_for_status()
         
         return response.json()
+    
+    

@@ -8,27 +8,19 @@ from core.envs.filesystem import FileSystemEnv
 CODE_FS = FileSystemEnv()
 
 @toolwrapper()
-async def run_interpreter(code:str=None, command:str=None, filename:str='code.py'):
+async def run_interpreter(code:str=None,command:str=None,filename:str='code.py'):
     """The code interpreter tool that runs code and return the output.
 
-    The 'code' will be written to file 'filename' and then 'command' will be executed in a shell. 
-    If 'command' is not provided, 'python {filename}' will be used as the default.
-    The output includes the return code, error message (if any), and the command output (if any). 
+    The `code` will be written to file `filename` and the `command` will be executed in a shell.
+    Example:
+    ```
+    run_interpreter(code='print("hello world")',command='python code.py')
+    ```
 
-    Args: 
-        code (str, optional): The code to be written to the file. Default is None.
-        command (str, optional): The shell command to be executed. Default is None.
-        file (str, optional): The file name where the code will be written. Default is 'code.py'.
+    :param string? code: The code to be written, default to `None`, which means no code will be written to file.
+    :param string? command: The shell command to be executed should avoid requiring additional user input, default to `python {filename}`.
+    :param string? filename: The filename to be written in mode `w`, default to `code.py`.
 
-    Returns: 
-        dict: A dictionary containing 'ReturnCode', 'Error' (if any), and 'Output' (if any).
-
-    Raises:
-        asyncio.TimeoutError: If the execution of the command takes more than 'shell' key value (in seconds) 
-        from the CONFIG dictionary.
-
-    Usage:
-        run_interpreter(code='print("hello world")',command='python code.py')
     """
     if code is not None and code != "" and filename != "":
         CODE_FS.write_to_file(filename,code)

@@ -13,13 +13,33 @@ from XAgentServer.response_body import WebsocketResponseBody
 
 class XAgentServer:
     def __init__(self) -> None:
+        """Initialization for XAgentServer class.
+        
+        Attributes:
+            logger (Logger): An instance of Logger class.
+        """
         self.logger: Logger = None
 
     def set_logger(self, logger):
+        """Set logger for the XAgentServer.
+        
+        Args:
+            logger (Logger): An instance of Logger class.
+        """
         self.logger = logger
 
     async def interact(self, interaction: XAgentInteraction):
-        # query = message
+        """Interact with the XAgent by executing the required tasks, handling the exceptions and logging the details.
+        
+        Args:
+            interaction (XAgentInteraction): An instance of XAgentInteraction class containing interaction details.
+            
+        Raises:
+            Exception: An error occurred accessing the recorder_root_dir.
+            Exception: An error occurred during task execution.
+        """
+      
+        # additional imports are placed inside the function to avoid circular dependencies issues
         from XAgent.agent import (PlanGenerateAgent, PlanRefineAgent,
                                   ReflectAgent, ToolAgent)
         from XAgent.config import CONFIG as config
@@ -30,19 +50,25 @@ class XAgentServer:
         from XAgent.workflow.base_query import AutoGPTQuery
         from XAgent.workflow.task_handler import TaskHandler
         from XAgent.workflow.working_memory import WorkingMemoryAgent
+       
         config.reload()
-        # args
+
         args = interaction.parameter.args
         interaction.base.recorder_root_dir = config.record_dir
+
         if interaction.base.recorder_root_dir:
+            # Check if recorder root directory exists
             if not os.path.exists(interaction.base.recorder_root_dir):
                 raise Exception(
                     f"recorder_root_dir {interaction.base.recorder_root_dir} not exists")
+            
+            # Load the recorder from disk and get the query
             recorder.load_from_disk(interaction.base.recorder_root_dir)
             query = recorder.get_query()
             self.logger.info(
                 f"server is running, the start recorder_root_dir is {interaction.base.recorder_root_dir}")
         else:
+            # Create new AutoGPTQuery
             query = AutoGPTQuery(
                 role_name=args.get('role_name', 'Assistant'),
                 task=args.get('goal', ''),
@@ -52,6 +78,7 @@ class XAgentServer:
        
             self.logger.info(f"server is running, the start query is {args.get('goal', '')}")
         
+        # Register config and query to the recorder
         recorder.regist_query(query)
         recorder.regist_config(config)
 
@@ -62,9 +89,10 @@ class XAgentServer:
             str(config.enable_ask_human_for_help),
         )
 
+        # Initialize toolserver interface with the config
         toolserver_interface.lazy_init(config=config)
 
-        # working memory function is used for communication between different agents that handle different subtasks
+        # Get the working memory function for communication between different agents
         working_memory_function = WorkingMemoryAgent.get_working_memory_function()
         subtask_functions, tool_functions_description_list = function_handler.get_functions(
             config)
@@ -77,6 +105,7 @@ class XAgentServer:
             ToolAgent,
             ReflectAgent,
         ]
+
         for agent in avaliable_agents:
             agent_dispatcher.regist_agent(agent)
 
@@ -100,6 +129,7 @@ class XAgentServer:
             function_list=all_functions,
             tool_functions_description_list=tool_functions_description_list,
         )
+        
         try:
             self.logger.info(f"Start outer loop async")
             await task_handler.outer_loop_async()

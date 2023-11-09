@@ -20,6 +20,20 @@ NOW_SUBTASK_PROMPT = '''
 
 
 def make_message(now_node: ToolNode, task_handler, max_length, config):
+    """
+    Function to generate messages for each node.
+
+    Args:
+        now_node: The current ToolNode instance.
+        task_handler: Handler of the tasks.
+        max_length: Maximum length of the subtask chain.
+        config: The configuration settings.
+
+    Returns:
+        The sequence of messages for the current node.
+
+    """
+    
     if CONFIG.enable_summary:
         terminal_task_info = summarize_plan(
             task_handler.now_dealing_task.to_json())
@@ -44,12 +58,39 @@ def make_message(now_node: ToolNode, task_handler, max_length, config):
 
 
 class ReACTChainSearch(BaseSearchMethod):
+    """
+    Class for ReACT chain search. It performs chain based searches for tasks.
+    """
+    
     def __init__(self):
+        """
+        Initializes ReACTChainSearch object. It maintains a list of trees to represent 
+        the processed tasks.
+        """
         super().__init__()
 
         self.tree_list = []
 
     async def run_async(self, config, agent: BaseAgent, task_handler, arguments, functions, task_id, max_try=1, max_answer=1):
+        """
+        Runs the chain search task.
+
+        Args:
+            config: Configuration for the search.
+            agent: Base agent responsible for chain search.
+            task_handler: Handler of the tasks.
+            arguments: Arguments for the current task to be handled.
+            functions: The available functions for use by agent.
+            task_id: ID of the current task.
+            max_try: Maximum number of attempts.
+            max_answer: Maximum number of answers to be received
+
+        Returns:
+            None
+        Raises:
+            None
+        """
+        
         for _attempt_id in range(max_try):
             await self.generate_chain_async(config, agent, task_handler, arguments,functions, task_id)
 
@@ -59,9 +100,24 @@ class ReACTChainSearch(BaseSearchMethod):
             self.status = SearchMethodStatusCode.FAIL
 
     def get_finish_node(self):
+        """
+        Function to retrieve the finished node in the task tree.
+        
+        Returns:
+            The finished node.  
+        """
         return self.finish_node
 
     def get_origin_data(self, data):
+        """
+        Retrieves the initially entered data.
+
+        Args:
+            data: The initially entered data list.
+        
+        Returns:
+            The initially entered data as a dictionary.:
+        """
         assistant_thoughts_reasoning = None
         assistant_thoughts_plan = None
         assistant_thoughts_speak = None
@@ -83,6 +139,17 @@ class ReACTChainSearch(BaseSearchMethod):
         }}
 
     def rewrite_input_func(self, old, new):
+        """
+        Checks whether the new inputs are valid and if so updates the old input
+        with the new one.
+
+        Args:
+            old: The old input entry.
+            new: The new input entry to replace the old one.
+
+        Returns:
+            The updated input list and the rewrite status.
+        """
         if not isinstance(new, dict):
             pass
         if new is None:
@@ -120,6 +187,23 @@ class ReACTChainSearch(BaseSearchMethod):
             return old, True
 
     async def generate_chain_async(self, config, agent: BaseAgent, task_handler, arguments,functions, task_id):
+        """
+        Run the chain search task.
+
+        Args:
+            config: Configuration for the search.
+            agent: Base agent responsible for chain search.
+            task_handler: Handler of the tasks.
+            arguments: Arguments for the current task to be handled.
+            functions: The available functions for use by agent.
+            task_id: ID of the current task.
+
+        Returns:
+            None.
+        Raises:
+            None.
+        """
+        
         self.tree_list.append(TaskSearchTree())
         now_attempt_tree = self.tree_list[-1]
         now_node = now_attempt_tree.root
@@ -217,7 +301,15 @@ class ReACTChainSearch(BaseSearchMethod):
             elif tool_output_status_code == ToolCallStatusCode.SUBMIT_AS_FAILED:
                 break
 
-        self.finish_node = now_node
-
+        self.finish_node = now_node  
+        
     def to_json(self):
+        """
+        Placeholder function to convert ReACTChainSearch object to JSON.
+
+        Currently not implemented.
+        
+        Returns:
+            None
+        """
         pass

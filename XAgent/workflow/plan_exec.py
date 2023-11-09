@@ -16,19 +16,51 @@ from XAgent.running_recorder import recorder
 from XAgent.tool_call_handle import toolserver_interface
 from XAgent.agent.summarize import summarize_plan,clip_text
 from XAgent.config import CONFIG
+
 def plan_function_output_parser(function_output_item: dict) -> Plan:
+    """Parses the function output item into a Plan object.
+
+    Args:
+        function_output_item (dict): The dictionary representing the function output item.
+
+    Returns:
+        Plan: The parsed Plan object.
+    """
     subtask_node = TaskSaveItem()
     subtask_node.load_from_json(function_output_item=function_output_item)
     subplan = Plan(subtask_node)
     return subplan
 
-
 class PlanRefineChain():
+    """Represents a chain of plan refinements.
+
+    This class keeps track of the refined plans and the associated refine functions.
+
+    Attributes:
+        plans (List[Plan]): The list of refined plans.
+        functions (List[dict]): The list of refine functions.
+    """
+
     def __init__(self, init_plan):
+        """Initializes a PlanRefineChain object.
+
+        Args:
+            init_plan: The initial plan.
+        """
         self.plans = [deepcopy(init_plan)]
         self.functions = []
-    
-    def register(self,function_name, function_input,function_output,new_plan: Plan):
+
+    def register(self, function_name, function_input, function_output, new_plan: Plan):
+        """Registers a plan refinement.
+
+        This method adds the function name, input, and output, as well as the new plan to the refine chain.
+
+        Args:
+            function_name (str): The name of the refine function.
+            function_input (dict): The input of the refine function.
+            function_output (str): The output of the refine function.
+            new_plan (Plan): The new plan after refinement.
+        """
         self.functions.append({
             "name": function_name,
             "input": function_input,
@@ -42,14 +74,24 @@ class PlanRefineChain():
             refine_function_output = function_output,
             plan_after = new_plan.to_json(posterior=True),
         )
-    
+
     def parse_to_message_list(self, flag_changed) -> List[Message]:
+        """Parses the refine chain to a list of messages.
+
+        This method generates a list of messages describing each refinement step in the refine chain.
+
+        Args:
+            flag_changed: A flag indicating whether the plan has changed.
+
+        Returns:
+            List[Message]: A list of messages.
+        """
         assert len(self.plans) == len(self.functions) + 1
-        
-        if CONFIG.enable_summary: 
+
+        if CONFIG.enable_summary:
             init_message = summarize_plan(self.plans[0].to_json())
         else:
-            init_message = json.dumps(self.plans[0].to_json(),indent=2,ensure_ascii=False)
+            init_message = json.dumps(self.plans[0].to_json(), indent=2, ensure_ascii=False)
         init_message =  Message("user", f"""The initial plan and the execution status is:\n'''\n{init_message}\n'''\n\n""")
         output_list = [init_message]
         for k, (function, output_plan) in enumerate(zip(self.functions, self.plans[1:])):
@@ -57,17 +99,35 @@ class PlanRefineChain():
             output_list.append(operation_message)
         if len(self.plans) > 1:
             if flag_changed:
-                if CONFIG.enable_summary: 
+                if CONFIG.enable_summary:
                     new_message = summarize_plan(self.plans[-1].to_json())
                 else:
-                    new_message = json.dumps(self.plans[-1].to_json(),indent=2,ensure_ascii=False)
+                    new_message = json.dumps(self.plans[-1].to_json(), indent=2, ensure_ascii=False)
                 output_list.append(Message("user", f"""The total plan changed to follows:\n'''\n{new_message}\n'''\n\n"""))
             else:
                 output_list.append(Message("user", f"The total plan stay unchanged"))
         return output_list
 
 class PlanAgent():
+    """Represents a plan agent.
+
+    This class is responsible for generating and refining plans.
+
+    Attributes:
+        config: The configuration for the plan agent.
+        query (BaseQuery): The base query for generating plans.
+        avaliable_tools_description_list (List[dict]): The list of available tool descriptions.
+        plan (Plan): The plan.
+        refine_chains (List[PlanRefineChain]): The list of refine chains.
+    """
     def __init__(self, config, query: BaseQuery, avaliable_tools_description_list: List[dict]):
+        """Initializes a PlanAgent object.
+
+        Args:
+            config: The configuration for the plan agent.
+            query (BaseQuery): The base query for generating plans.
+            avaliable_tools_description_list (List[dict]): The list of available tool descriptions.
+        """
         self.config = config
         self.query = query
         self.avaliable_tools_description_list = avaliable_tools_description_list
@@ -83,14 +143,16 @@ class PlanAgent():
 
         self.refine_chains: List[PlanRefineChain] = []
 
-
     def initial_plan_generation(self):
+        """Generates the initial plan.
+
+        This method generates the initial plan by calling the plan generation agent.
+        """
         logger.typewriter_log(
             f"-=-=-=-=-=-=-= GENERATE INITIAL_PLAN -=-=-=-=-=-=-=",
             Fore.GREEN,
             "",
         )
-
 
         split_functions = deepcopy(function_manager.get_function_schema('subtask_split_operation'))
 
@@ -122,6 +184,10 @@ class PlanAgent():
             Plan.make_relation(self.plan, subplan)
 
     def plan_iterate_based_on_memory_system(self):
+        """Iteratively refines the plan based on the memory system.
+
+        This method iteratively refines the plan based on the memory system.
+        """
         logger.typewriter_log(
             f"-=-=-=-=-=-=-= ITERATIVELY REFINE PLAN BASED ON MEMORY SYSTEM -=-=-=-=-=-=-=",
             Fore.BLUE,
@@ -131,9 +197,21 @@ class PlanAgent():
 
     @property
     def latest_plan(self):
+        """Gets the latest plan.
+
+        Returns:
+            The latest plan.
+        """
         return self.plan
 
     def plan_refine_mode(self, now_dealing_task: Plan):
+        """Enters the plan refine mode.
+
+        This method enters the plan refine mode and performs plan refinements based on user suggestions.
+
+        Args:
+            now_dealing_task (Plan): The task that is currently being dealt with.
+        """
         logger.typewriter_log(
             f"-=-=-=-=-=-=-= ITERATIVELY REFINE PLAN BASED ON TASK AGENT SUGGESTIONS -=-=-=-=-=-=-=",
             Fore.BLUE,
@@ -240,6 +318,18 @@ class PlanAgent():
             modify_steps += 1
 
     def deal_subtask_split(self, function_input: dict, now_dealing_task: Plan) -> (str, PlanOperationStatusCode):
+        """Deals with subtask splitting.
+
+        This method handles subtask splitting.
+
+        Args:
+            function_input (dict): The function input.
+            now_dealing_task (Plan): The task that is currently being dealt with.
+
+        Returns:
+            str: The function output.
+            PlanOperationStatusCode: The status code.
+        """
         print(json.dumps(function_input,indent=2,ensure_ascii=False))
 
         inorder_subtask_stack = Plan.get_inorder_travel(self.plan)
@@ -272,6 +362,18 @@ class PlanAgent():
 
 
     def deal_subtask_delete(self, function_input: dict, now_dealing_task: Plan) -> (str, PlanOperationStatusCode):
+        """Deals with subtask deletion.
+
+        This method handles subtask deletion.
+
+        Args:
+            function_input (dict): The function input.
+            now_dealing_task (Plan): The task that is currently being dealt with.
+
+        Returns:
+            str: The function output.
+            PlanOperationStatusCode: The status code.
+        """
         print(json.dumps(function_input,indent=2,ensure_ascii=False))
 
         inorder_subtask_stack:list[Plan] = Plan.get_inorder_travel(self.plan)
@@ -302,6 +404,18 @@ class PlanAgent():
 
 
     def deal_subtask_modify(self, function_input: dict, now_dealing_task: Plan) -> (str, PlanOperationStatusCode):
+        """Deals with subtask modification.
+
+        This method handles subtask modification.
+
+        Args:
+            function_input (dict): The function input.
+            now_dealing_task (Plan): The task that is currently being dealt with.
+
+        Returns:
+            str: The function output.
+            PlanOperationStatusCode: The status code.
+        """
         print(json.dumps(function_input,indent=2,ensure_ascii=False))
 
         inorder_subtask_stack = Plan.get_inorder_travel(self.plan)
@@ -326,6 +440,18 @@ class PlanAgent():
         return json.dumps({"error": f"target_subtask_id '{target_subtask_id}' not found, should in {all_subtask_ids}. Nothing happended",}), PlanOperationStatusCode.TARGET_SUBTASK_NOT_FOUND
 
     def deal_subtask_add(self, function_input: dict, now_dealing_task: Plan) -> (str, PlanOperationStatusCode):
+        """Deals with subtask addition.
+
+        This method handles subtask addition.
+
+        Args:
+            function_input (dict): The function input.
+            now_dealing_task (Plan): The task that is currently being dealt with.
+
+        Returns:
+            str: The function output.
+            PlanOperationStatusCode: The status code.
+        """
         print(json.dumps(function_input,indent=2,ensure_ascii=False))
 
         inorder_subtask_stack:list[Plan] = Plan.get_inorder_travel(self.plan)

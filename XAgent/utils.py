@@ -1,4 +1,3 @@
-
 from enum import Enum, unique
 import abc
 from colorama import Fore, Style
@@ -9,13 +8,33 @@ from typing import List, Dict
 import tiktoken
 from XAgent.config import CONFIG
 
-
 encoding = tiktoken.encoding_for_model(CONFIG.default_completion_kwargs['model'])
 
 def get_token_nums(text:str)->int:
+    """
+    Calculate the number of tokens in the given text.
+    
+    Args:
+        text (str): The text whose tokens need to be counted.
+        
+    Returns:
+        int: The number of tokens in the text.
+    """
     return len(encoding.encode(text))
 
 def clip_text(text:str,max_tokens:int=None,clip_end=False)->str|int:
+    """
+    Truncate the given text to the specified number of tokens.
+    If the original text and the clipped text are not of the same length, '`wrapped`' is added to the beginning or the end of the clipped text.
+    
+    Args:
+        text (str): The text to be clipped.
+        max_tokens (int, optional): Maximum number of tokens. The text will be clipped to contain not more than this number of tokens.
+        clip_end (bool, optional): If True, text will be clipped from the end. If False, text will be clipped from the beginning.
+        
+    Returns:
+        str, int: The clipped text, and the total number of tokens in the original text.
+    """
     encoded = encoding.encode(text)
     decoded = encoding.decode(encoded[:max_tokens] if clip_end else encoded[-max_tokens:])
     if len(decoded) != len(text):
@@ -24,11 +43,27 @@ def clip_text(text:str,max_tokens:int=None,clip_end=False)->str|int:
 
 @unique
 class LLMStatusCode(Enum):
+    """Enumeration describing different status codes for LLM."""
     SUCCESS = 0
     ERROR = 1
 
 @unique
 class ToolCallStatusCode(Enum):
+    """
+    Enumeration descsribing different status codes for tool calls.
+    
+    The status codes are:
+    - TOOL_CALL_FAILED
+    - TOOL_CALL_SUCCESS
+    - FORMAT_ERROR
+    - HALLUCINATE_NAME
+    - OTHER_ERROR
+    - TIMEOUT_ERROR
+    - TIME_LIMIT_EXCEEDED
+    - SERVER_ERROR
+    - SUBMIT_AS_SUCCESS
+    - SUBMIT_AS_FAILED
+    """
     TOOL_CALL_FAILED = -1
     TOOL_CALL_SUCCESS = 0
     FORMAT_ERROR = 1
@@ -45,6 +80,9 @@ class ToolCallStatusCode(Enum):
 
 @unique
 class PlanOperationStatusCode(Enum):
+    """
+    Enumeration descsribing different status codes for plan operations. 
+    """
     MODIFY_SUCCESS = 0
     MODIFY_FORMER_PLAN = 1
     PLAN_OPERATION_NOT_FOUND = 2
@@ -54,6 +92,9 @@ class PlanOperationStatusCode(Enum):
 
 @unique
 class SearchMethodStatusCode(Enum):
+    """
+    Enumeration descsribing different status codes for search methods.
+    """
     DOING = 0
     SUCCESS = 1
     FAIL = 2
@@ -61,6 +102,9 @@ class SearchMethodStatusCode(Enum):
 
 @unique
 class TaskStatusCode(Enum):
+    """
+    Enumeration descsribing different status codes for tasks.
+    """
     TODO = 0
     DOING = 1
     SUCCESS = 2
@@ -69,6 +113,9 @@ class TaskStatusCode(Enum):
 
 @unique
 class RequiredAbilities(Enum):
+    """
+    Enumeration descsribing different abilities required.
+    """
     tool_tree_search = 0
     plan_generation = 1
     plan_refinement = 2
@@ -76,31 +123,46 @@ class RequiredAbilities(Enum):
     summarization = 4
     reflection = 5
 
-
 @dataclass
 class AgentRole:
+    """
+    This class represents the role of a ChatGPT agent in a conversation.
+
+    Attributes:
+        name (str): The name of the agent.
+        prefix (str): The description of agent's role.
+    """
     name: str = "Auto-GPT"
     prefix: str = "You are an expert of using multiple tools to handle diverse real-world user queries."
 
 
 @dataclass
 class TaskSaveItem:
+    """
+    This class represents the structure of saved tasks.
+    
+    Attributes:
+        name (str): The name of the task.
+        goal (str): The objective of the task.
+        milestones (List[str]): The steps involved to achieve the task.
+        prior_plan_criticism (str): Any criticism on the initial plan of the task.
+        status (TaskStatusCode): The current status of the task.
+        action_list_summary (str): A summary of all the actions done to achieve the task.
+        posterior_plan_reflection (List[str]): A list containing reflection of the finally decided plan.
+        tool_reflection (List[Dict[str,str]]): A list of dictionaries where each dictionary holds reflection of a tool.
+    """
+    
     name: str = ""
     goal: str = ""
-    # handler: str = "new_agent"
-    # tool_budget: int = 10
     milestones: List[str] = field(default_factory=lambda: [])
-    # expected_tools: List[str] = field(default_factory=lambda: [])
     prior_plan_criticism: str = ""
-
     status: TaskStatusCode = TaskStatusCode.TODO
-
     action_list_summary: str = ""
     posterior_plan_reflection: List[str] = field(default_factory=lambda: [])
     tool_reflection: List[Dict[str,str]] = field(default_factory=lambda: [])
 
-
     def load_from_json(self, function_output_item):
+        """Load data from the json representation"""
         if "subtask name" in function_output_item.keys():
             self.name = function_output_item["subtask name"]
         else:
@@ -132,6 +194,7 @@ class TaskSaveItem:
         #     self.expected_tools = function_output_item["expected_tools"]
 
     def to_json(self, posterior=False):
+        """Convert the object to json representation."""
         json_data = {
             "name": self.name,
             "goal": self.goal,
@@ -153,6 +216,7 @@ class TaskSaveItem:
 
     @property
     def raw(self) -> str:
+        """Convert the object to a raw json string"""
         return json.dumps(self.to_json(posterior=True), indent=2, ensure_ascii=False)
 
 
@@ -172,7 +236,7 @@ class Singleton(abc.ABCMeta, type):
 
 class AbstractSingleton(abc.ABC, metaclass=Singleton):
     """
-    Abstract singleton class for ensuring only one instance of a class.
+    An abstract Singleton base class. Classes that inherit from this class can have only one instance.
+
+    Implements mechanism to ensure that only one instance of the class exists by using a metaclass.
     """
-
-

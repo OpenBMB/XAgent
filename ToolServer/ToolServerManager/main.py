@@ -8,15 +8,18 @@ import docker.types
 
 from fastapi import FastAPI, Cookie,Request,HTTPException,Response
 from fastapi.responses import JSONResponse,RedirectResponse
-
 from config import CONFIG,logger
 from connections import DB_TYPE,db,docker_client
 
 app = FastAPI()
 
-
 @app.on_event("startup")
 async def startup():
+    """
+    Event handler triggered on startup of the app. Sets up necessary configurations 
+    like checking and creating table nodes if not exists in databse, creating subprocess 
+    to update node status, and registering path to node. 
+    """
     if DB_TYPE == 'sqlite3':
         # check if table nodes exists
         db_cursor:sqlite3.Cursor = db.cursor()
@@ -39,18 +42,37 @@ async def startup():
         
     for path in CONFIG['redirect_to_node_path']['get']:
         app.add_api_route(path, route_to_node, methods=["GET"])
-    
 
 @app.on_event("shutdown")
 def shutdown():
+    """
+    Event handler on shutdown of the app. Specifically closes the database cursor if 
+    the database type os sqlite3.
+    """
     if DB_TYPE == 'sqlite3':
         app.db_cursor.close()
         
 @app.get('/alive')
 async def alive():
+    """
+    Endpoint to check if the service is running.
+
+    Returns:
+        str: "alive"
+    """
     return "alive"
 
 async def get_node_info(node_id:str):
+    """
+    Fetch node information associated with given node_id from the database.
+    
+    Args:
+        node_id (str): The unique identifier of the node whose information is to fetched.
+
+    Returns:
+        dict: A dictionary containing all the key-value pairs of node details, 
+        from the database.
+    """
     # check if cookie is valid
     if DB_TYPE == 'sqlite3':
         db_cursor:sqlite3.Cursor = app.db_cursor
@@ -70,6 +92,19 @@ async def get_node_info(node_id:str):
     return node
 
 async def wait_for_node_startup(node_id:str):
+    """
+    Wait for the startup of node with id node_id. It probes the node status every seconds until 
+    creation_wait_seconds reached.
+    
+    Args:
+        node_id (str): The unique identifier of the node whose startup is to be waited for.
+
+    Returns:
+        bool: True if node has started successfully, False if time out occured before node startup.
+    
+    Raises:
+        HTTPException: If node is not found in the databse.
+    """
     MAX_PROBE_TIMES = CONFIG['node']['creation_wait_seconds']
     probe_times = 0
     while probe_times < MAX_PROBE_TIMES:
@@ -89,9 +124,19 @@ async def wait_for_node_startup(node_id:str):
         await asyncio.sleep(1)
     return False
 
-
 @app.post("/get_cookie")
 async def read_cookie_info():
+    """
+    Fetch server version and node info, create docker container and set the response cookies 
+    with the key "node_id" and value as the id of the created container. Also, adds the created 
+    node's details to the databse and waits for the node to startup.
+
+    Returns:
+        JSONResponse: A response object with status, headers and cookies set accordingly.
+
+    Raises:
+        HTTPException: If node creation timeout occurs.
+    """
     # append server version info
     content = {"message": "add cookie","version":CONFIG['version']}
     response = JSONResponse(content=content)
@@ -104,6 +149,7 @@ async def read_cookie_info():
     logger.info("Node created: " + container.id)
     response.set_cookie(key="node_id", value=container.id)
     container.reload()
+    
     if DB_TYPE == 'sqlite3':
         db_cursor:sqlite3.Cursor = app.db_cursor
         # add node to db
@@ -115,6 +161,7 @@ async def read_cookie_info():
             datetime.datetime.utcnow().isoformat()),
             container.attrs['State']['Health']['Status'])
         db.commit()
+    
     if DB_TYPE == 'mongodb':
         logger.debug(container.attrs['State'])
         await db['nodes'].insert_one({
@@ -133,10 +180,20 @@ async def read_cookie_info():
         logger.warning("Node status detection timeout: " + container.id)
         raise HTTPException(status_code=503, detail="Node creation timeout!")
 
-
-
 @app.post("/reconnect_session")
 async def reconnect_session(node_id:str = Cookie(None)):
+    """
+    Reconnect session of a node. Fetches node info and restarts the node if it exists.
+
+    Args:
+        node_id (str, optional): The unique identifier of the node. Defaults to Cookie(None).
+
+    Returns:
+        str: Success message if node restarts successfully.
+    
+    Raises:
+        HTTPException: If node restart timeout occurs.
+    """
     node = await get_node_info(node_id)
     if node is None:
         return "invalid node_id: " + str(node_id)
@@ -152,9 +209,17 @@ async def reconnect_session(node_id:str = Cookie(None)):
         logger.warning("Node restart timeout: " + node_id)
         raise HTTPException(status_code=503, detail="Node restart timeout!")
 
-
 @app.post("/close_session")
 async def close_session(node_id:str = Cookie(None)):
+    """
+    Close session of a node. Fetches node info and stops the node if it exists and is not already exited.
+
+    Args:
+        node_id (str, optional): The unique identifier of the node. Defaults to Cookie(None).
+
+    Returns:
+        str: Success message if node stops successfully.
+    """
     node = await get_node_info(node_id)
     if node is None:
         return "invalid node_id: " + str(node_id)
@@ -167,6 +232,16 @@ async def close_session(node_id:str = Cookie(None)):
 
 @app.post("/release_session")
 async def release_session(node_id:str = Cookie(None)):
+    """
+    Release session of a node. Fetches node info and kills the node if it exists and is not already exited. 
+    Also, removes the node.
+
+    Args:
+        node_id (str, optional): The unique identifier of the node. Defaults to Cookie(None).
+
+    Returns:
+        str: Success message if node is successfully killed and removed.
+    """
     node = await get_node_info(node_id)
     if node is None:
         return "invalid node_id: " + str(node_id)
@@ -182,6 +257,19 @@ async def release_session(node_id:str = Cookie(None)):
     return "Release session: " + str(node_id)
 
 async def route_to_node(requset:Request,*,node_id:str = Cookie(None)):
+    """
+    Routes a request to a specific node. Fetches the node info, checks if it is valid and running. Updates latest 
+    request time in the database and then sends a post request to the node.
+    
+    Args:
+        request (Request): The request object containing all request information.
+
+    Returns:
+        Response: The response object containing all response information received from the node.
+
+    Raises:
+        HTTPException: If node_id is not valid or if the node is not running or not responding.
+    """
     # logger.info("accept node_id:",node_id)
     node = await get_node_info(node_id)
     if node is None:
@@ -213,8 +301,6 @@ async def route_to_node(requset:Request,*,node_id:str = Cookie(None)):
     logger.info('Response from node: ' + str(response.status_code))
     res = Response(content=response.content, status_code=response.status_code, headers=response.headers)
     return res
-
-
 
 if __name__=="__main__":
     uvicorn.run(app, host="0.0.0.0", port=8080)

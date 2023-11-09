@@ -14,13 +14,31 @@ MessageType = Literal["ai_response", "action_result"]
 
 
 class MessageDict(TypedDict):
+    """
+    Typed dictionary to keep track of message attributes.
+
+    Attributes:
+        role (MessageRole): Source of the message. Can be either 'system', 'user', 'assistant', or 'function'.
+        content (str): The message content.
+        function_call (dict): Callable method.
+    """
+
     role: MessageRole
     content: str
     function_call: dict
 
 @dataclass
 class Message:
-    """OpenAI Message object containing a role and the message content"""
+    """OpenAI Message class.
+
+    A class representing a message from an agent, a user, or a system function.
+
+    Attributes:
+        role (MessageRole): Source of the message, can be either 'system', 'user', 'assistant', or 'function'.
+        content (str): The actual content of the message.
+        type (MessageType): The type of message, either 'ai_response' for AI dialogue messages or 'action_result' for results of API calls.
+        function_call (dict): A dictionary representing the method invocation in programmable API calls.
+    """
 
     role: MessageRole
     content: str
@@ -28,16 +46,35 @@ class Message:
     function_call: dict | None = None
 
     def raw(self) -> MessageDict:
+        """Extracts raw content of the message, stripping away other metadata.
+
+        Returns:
+            MessageDict: Dictionary containing 'role' and 'content'.
+        """
         data = {"role": self.role, "content": self.content}
         if self.function_call != None:
             data["function_call"] = self.function_call
         return data
         
     def to_json(self):
+        """Convert the message into JSON format.
+
+        Returns:
+            MessageDict: JSON representation of the message.
+        """
         return self.raw()
 
     @classmethod
     def equal(cls, a: Message, b: Message):
+        """Checks if two messages are equal by comparing all their attributes.
+
+        Args:
+            a (Message): first message to be compared.
+            b (Message): second message to be compared.
+
+        Returns:
+            bool: Returns True if both messages are equal in all their attributes; False otherwise.
+        """
         if a.role != b.role:
             return False
         if a.content != b.content:
@@ -50,11 +87,13 @@ class Message:
 
 @dataclass
 class ModelInfo:
-    """Struct for model information.
+    """Data class to store model information.
 
-    Would be lovely to eventually get this directly from APIs, but needs to be scraped from
-    websites for now.
-
+    Attributes:
+        name (str): Model name
+        prompt_token_cost (float): Token cost per prompt
+        completion_token_cost (float): Token cost per completion
+        max_tokens (int): Maximum tokens that can be generated
     """
 
     name: str
@@ -65,24 +104,36 @@ class ModelInfo:
 
 @dataclass
 class ChatModelInfo(ModelInfo):
-    """Struct for chat model information."""
+    """Data class to store chat model information."""
 
 
 @dataclass
 class TextModelInfo(ModelInfo):
-    """Struct for text completion model information."""
+    """Data class to store text generation model information."""
 
 
 @dataclass
 class EmbeddingModelInfo(ModelInfo):
-    """Struct for embedding model information."""
+    """Data class to store embedding model information.
+
+    Attributes:
+        embedding_dimensions (int): Number of dimensions in the embedding model.
+    """
 
     embedding_dimensions: int
 
 
 @dataclass
 class MessageHistory:
-    # agent: Agent
+    """Data class to store the history of messages.
+
+    Contains methods to add, retrieve, trim the stored messages.
+
+    Attributes:
+        messages (list[Message]): List of messages in order of their creation.
+        summary (str): String representing the summary of the conversation/history.
+        last_trimmed_index (int): The index of the last erased message from the history.
+    """
 
     messages: list[Message] = field(default_factory=list)
     summary: str = "I was created"
@@ -90,12 +141,30 @@ class MessageHistory:
     last_trimmed_index: int = 0
 
     def __getitem__(self, i: int):
+        """Enables accessing messages by their index.
+
+        Args:
+            i (int): Index of the message in the messages list.
+
+        Returns:
+            Message: Message at index i in the messages list.
+        """
         return self.messages[i]
 
     def __iter__(self):
+        """Returns an iterator over the messages list.
+
+        Returns:
+            iterator: An iterator over the messages list.
+        """
         return iter(self.messages)
 
     def __len__(self):
+        """Returns the count of messages in the messages list.
+
+        Returns:
+            int: Total number of messages in the messages list.
+        """
         return len(self.messages)
 
     def add(
@@ -105,6 +174,17 @@ class MessageHistory:
         type: MessageType | None = None,
         function_call: str | None = None,
     ):
+        """Adds a new message to the messages list.
+
+        Args:
+            role (MessageRole): Source of the message, either 'system', 'user', 'assistant', or 'function'.
+            content (str): Actual content of the message.
+            type (MessageType): Type of the message, 'ai_response' for AI dialogue messages or 'action_result' for results of API calls. Default to None if not specified.
+            function_call (str): A dictionary representing the method invocation in programmable API calls. Default to None if not specified.
+
+        Returns:
+            None
+        """
         if function_call == None:
             message = Message(role, content, type)
         else:
@@ -112,6 +192,14 @@ class MessageHistory:
         return self.append(message)
 
     def append(self, message: Message):
+        """Appends a new message to the messages list.
+
+        Args:
+            message (Message): Message to append to the list.
+
+        Returns:
+            None.
+        """
         return self.messages.append(message)
 
     def trim_messages(
@@ -154,10 +242,16 @@ class MessageHistory:
 
     def per_cycle(self, messages: list[Message] | None = None):
         """
+        This method yields user, ai, and result messages from the conversation cycle.
+
+        Args:
+            messages (list[Message]): The messages currently in the context. If None, uses self.messages.
+
         Yields:
-            Message: a message containing user input
-            Message: a message from the AI containing a proposed action
-            Message: the message containing the result of the AI's proposed action
+            tuple: A tuple containing:
+                - user_message (Message): a message containing user input
+                - ai_message (Message): a message from the AI containing a proposed action
+                - result_message (Message): the message containing the result of the AI's proposed action
         """
         messages = messages or self.messages
         for i in range(0, len(messages) - 1):
@@ -172,9 +266,6 @@ class MessageHistory:
             )
             result_message = messages[i + 1]
             try:
-                # assert is_string_valid_json(
-                #     ai_message.content, LLM_DEFAULT_RESPONSE_FORMAT
-                # ), "AI response is not a valid JSON object"
                 assert result_message.type == "action_result"
 
                 yield user_message, ai_message, result_message
@@ -184,6 +275,11 @@ class MessageHistory:
                 )
 
     def summary_message(self) -> Message:
+        """Build summary message from the current summary.
+
+        Returns:
+            Message: A system message containing the current summary
+        """
         return Message(
             "system",
             f"This reminds you of these events from your past: \n{self.summary}",

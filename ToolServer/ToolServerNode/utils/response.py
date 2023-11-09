@@ -4,18 +4,40 @@ from typing import Callable,Dict,Any
 from config import logger
 
 def is_base64(s:str) -> bool:
+    """
+    Check if the given string is a base64 sting or not.
+
+    Args:
+        s (str): the string to be checked.
+
+    Returns:
+        bool: Returns True if the given string is a base64 string, False otherwise.
+    """
     try:
         base64.b64decode(s)
         return True
     except:
         return False
+
 def is_wrapped_response(obj:dict) -> bool:
+    """
+    Check if the dictionary object is a wrapped response.
+    A dictionary is considered as wrapped response if it has 'type' and 'data' keys,
+    and value of 'type' key is one of ['simple','composite','binary'].
+
+    Args:
+        obj (dict): the dictionary object to be checked.
+
+    Returns:
+        bool: Returns True if the dictionary is a wrapped response, False otherwise.
+    """
     if 'type' in obj and obj['type'] in ['simple','composite','binary'] and 'data' in obj:
         return True
     return False
 
 def wrap_tool_response(obj:Any) -> dict|list|str|int|float|bool:
-    '''Wrap the response of tool to allow decoding.
+    """
+    Wrap the tool response in a standardized object structure (depending on its type) to allow decoding.
     
     Format
     ======
@@ -46,7 +68,21 @@ def wrap_tool_response(obj:Any) -> dict|list|str|int|float|bool:
         ]
     }
     ```
-    '''
+    Standardized Structures:
+    - For simple data types (str, int, float, bool), the object is directly returned.
+    - For composite types (tuples), data is wrapped in an object with a composite type.
+    - For binary data, data is base64 encoded and wrapped in an object with a binary type.
+     
+
+    Args:
+        obj (Any): any Python object that needs to be wrapped.
+
+    Returns:
+        Union[dict, list, str, int, float, bool]: the wrapped response.
+        
+    Raises:
+        logger.warning: raises warning if the type of 'obj' is unknown.
+    """
     if isinstance(obj,tuple):
         if len(obj) == 0:
             ret = {

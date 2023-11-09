@@ -167,7 +167,7 @@ class ReACTChainSearch(BaseSearchMethod):
             if config.enable_ask_human_for_help:
                 human_prompt = "- Use 'ask_human_for_help' when you need help, remember to be specific to your requirement to help user to understand your problem."
             else:
-                human_prompt = "- Human is not avaliable for help. You are not allowed to ask human for help in any form or channel. Solve the problem by yourself. If information is not enough, try your best to use default value."
+                human_prompt = "- Human is not available for help. You are not allowed to ask human for help in any form or channel. Solve the problem by yourself. If information is not enough, try your best to use default value."
 
             all_plan = task_handler.plan_agent.latest_plan.to_json()
             if config.enable_summary:

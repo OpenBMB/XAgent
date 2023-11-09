@@ -29,7 +29,7 @@ Generate the plan for query with operation SUBTASK_SPLIT, make sure all must rea
 - Always make feasible and efficient plans that can lead to successful task solving. Never create new subtasks that similar or same as the existing subtasks.
 - For subtasks with similar goals, try to do them together in one subtask with a list of subgoals, rather than split them into multiple subtasks.
 - Do not waste time on making irrelevant or unnecessary plans.
-- The task handler is powered by sota LLM, which can directly answer many questions. So make sure your plan can fully utilze its ability and reduce the complexity of the subtasks tree.
+- The task handler is powered by sota LLM, which can directly answer many questions. So make sure your plan can fully utilize its ability and reduce the complexity of the subtasks tree.
 - You can plan multiple subtasks if you want.
 - Minimize the number of subtasks, but make sure all must reach goals are included in the plan.
 '''

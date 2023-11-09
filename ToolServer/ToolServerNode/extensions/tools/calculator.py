@@ -7,20 +7,10 @@ from core.register import toolwrapper
 
 # @toolwrapper()
 def calculator(expression:str)->str:
-    """
-    Executes a given python expression and returns the result.
-
-    This function can process mathematical arithmetic operations such 
-    as addition, subtraction, multiplication, division, etc. e.g "(123 + 234) / 23 * 1.5 - 8".
-    
-    Args:
-        expression (str): Python expression to execute.
-
-    Returns:
-        str: The execution results of the input expression.
+    """It is a simple calculator, which can execute Python expressions: e.g., "(123 + 234) / 23 * 1.5 - 8".
         
-    Raises:
-        Exception: If the expression cannot be processed.
+    :param string expression: The python expression you requested.
+    :return string: The execution results of the expression.
     """
     globals={}
     locals={}
@@ -40,21 +30,12 @@ def calculator(expression:str)->str:
 #wolfram_cfg = CONFIG['wolfram']  
 # @toolwrapper()
 # def query_wolfram(query:str) -> list[dict]:
-#     """
-#     Query WolframAlpha using natural language and return parsed results.
+#     """Query WolframAlpha using natural language and return parsed results.
 
-#     This function allows access to computation, math, curated knowledge & real-time data through 
-#     Wolfram|Alpha and Wolfram Language. Note this tool is only used for high-level mathematically 
-#     related queries, NOT the simple computations.
+#     Query by access computation, math, curated knowledge & real-time data through Wolfram|Alpha and Wolfram Language. Note this tool is only used for high-level mathematically related queries, NOT the simple computations.
 
-#     Args:
-#         query (str): WolframAlpha query to execute.
-
-#     Returns:
-#         list[dict]: The results of the query.
-
-#     Raises:
-#         Exception: If the query cannot be processed.
+#     :param string query: The query you requested.
+#     :return array[Object]: The results of the query.
 #     """
 #     response = requests.get(wolfram_cfg['endpoint'], params={'appid': wolfram_cfg['appid'], "input": query})
     
@@ -77,6 +58,7 @@ def calculator(expression:str)->str:
 
 #     for ret in rets:
 #         ret = filter_dict(ret, blacklist=blacklist)
+#         # Do further cleaning to retain only the input and result pods
 #         if "@title" in ret:
 #             if ret["@title"] == "Input" or ret["@title"] == "Result":
 #                 cleaned_rets.append(ret)

@@ -6,8 +6,11 @@ import traceback
 
 from copy import deepcopy
 from colorama import Fore
-
-from openai.error import AuthenticationError, PermissionError, InvalidRequestError
+import pkg_resources
+if pkg_resources.parse_version(pkg_resources.get_distribution("openai").version) >= pkg_resources.parse_version("1.0.0"):
+    from openai import AuthenticationError, PermissionDeniedError, BadRequestError
+else:
+    from openai.error import AuthenticationError, PermissionError, InvalidRequestError
 from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_not_exception_type, wait_chain, wait_none
 
 
@@ -23,7 +26,7 @@ class OBJGenerator:
         self.chatcompletion_request_funcs = {}
         
     @retry(
-        retry=retry_if_not_exception_type((AuthenticationError, PermissionError, InvalidRequestError, AssertionError)),
+        retry=retry_if_not_exception_type((AuthenticationError, PermissionDeniedError, BadRequestError, AssertionError)),
         stop=stop_after_attempt(CONFIG.max_retry_times+3), 
         wait=wait_chain(*[wait_none() for _ in range(3)]+[wait_exponential(min=61, max=293)]),
         reraise=True,)

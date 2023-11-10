@@ -59,24 +59,6 @@ def chat_completion_to_dict(chat_completion_instance):
     }
     return response
 
-
-def handle_max_context_length_error(
-    model_name, chatcompletion_kwargs, kwargs, openai_function
-):
-    if model_name == "gpt-4" and "gpt-4-32k" in CONFIG.api_keys:
-        model_name = "gpt-4-32k"
-    else:
-        model_name = "gpt-3.5-turbo-16k"
-
-    print(f"max context length reached, retrying with {model_name}")
-    chatcompletion_kwargs = get_apiconfig_by_model(model_name)
-    chatcompletion_kwargs.update(kwargs)
-    chatcompletion_kwargs.pop("schema_error_retry", None)
-
-    response = openai_function(**chatcompletion_kwargs)
-    return response
-
-
 def chatcompletion_request(**kwargs):
     model_name = get_model_name(
         kwargs.pop("model", CONFIG.default_completion_kwargs["model"])
@@ -92,12 +74,12 @@ def chatcompletion_request(**kwargs):
         request_timeout = kwargs.pop("request_timeout", 60)
         if "base_url" in chatcompletion_kwargs:
             base_url = chatcompletion_kwargs.pop("base_url", None)
-        elif "api_base" in chatcompletion_kwargs:
+        else:
             base_url = chatcompletion_kwargs.pop("api_base", None)
         api_key = chatcompletion_kwargs.pop("api_key", None)
         chatcompletion_kwargs.update(kwargs)
         client = OpenAI(api_key=api_key, base_url=base_url)
-        print()
+
         try:
             response = chat_completion_to_dict(
                 client.chat.completions.create(**chatcompletion_kwargs)
@@ -105,16 +87,29 @@ def chatcompletion_request(**kwargs):
             if response["choices"][0]["finish_reason"] == "length":
                 raise BadRequestError("maximum context length exceeded", None)
         except BadRequestError as e:
-            if "maximum context length" in e._message:
-                response = handle_max_context_length_error(
-                    model_name,
-                    chatcompletion_kwargs,
-                    kwargs,
-                    client.chat.completions.create,
-                )
+            if "maximum context length" in e.message:
+                if model_name == "gpt-4" and "gpt-4-32k" in CONFIG.api_keys:
+                    model_name = "gpt-4-32k"
+                else:
+                    model_name = "gpt-3.5-turbo-16k"
+
+                print(f"max context length reached, retrying with {model_name}")
+                chatcompletion_kwargs = get_apiconfig_by_model(model_name)
+                request_timeout = kwargs.pop("request_timeout", 60)
+                if "base_url" in chatcompletion_kwargs:
+                    base_url = chatcompletion_kwargs.pop("base_url", None)
+                else:
+                    base_url = chatcompletion_kwargs.pop("api_base", None)
+                api_key = chatcompletion_kwargs.pop("api_key", None)
+                chatcompletion_kwargs.update(kwargs)
+                chatcompletion_kwargs.pop("schema_error_retry", None)
+
+                response = chat_completion_to_dict(
+                    client.chat.completions.create(**chatcompletion_kwargs)
+                    )
             else:
                 raise e
-
+            
     else:
         import openai
         from openai.error import InvalidRequestError
@@ -127,13 +122,23 @@ def chatcompletion_request(**kwargs):
             if response["choices"][0]["finish_reason"] == "length":
                 raise InvalidRequestError("maximum context length exceeded", None)
         except InvalidRequestError as e:
-            if "maximum context length" in e._message:
-                response = handle_max_context_length_error(
-                    model_name,
-                    chatcompletion_kwargs,
-                    kwargs,
-                    openai.ChatCompletion.create,
-                )
+            if 'maximum context length' in e._message:
+                if model_name == 'gpt-4':
+                    if 'gpt-4-32k' in CONFIG.api_keys:
+                        model_name = 'gpt-4-32k'
+                    else:
+                        model_name = 'gpt-3.5-turbo-16k'
+                elif model_name == 'gpt-3.5-turbo':
+                    model_name = 'gpt-3.5-turbo-16k'
+                else:
+                    raise e
+                print("max context length reached, retrying with " + model_name)
+                chatcompletion_kwargs = get_apiconfig_by_model(model_name)
+                chatcompletion_kwargs.update(kwargs)
+                chatcompletion_kwargs.pop('schema_error_retry', None)
+                
+                response = openai.ChatCompletion.create(**chatcompletion_kwargs)
+                response = json.loads(str(response))
             else:
                 raise e
 

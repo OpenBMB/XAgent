@@ -6,21 +6,25 @@
 
 [![Twitter](https://img.shields.io/twitter/follow/XAgent?style=social)](https://twitter.com/XAgentTeam) [![Discord](https://img.shields.io/badge/XAgent-Discord-purple?style=flat)](https://discord.gg/zncs5aQkWZ) [![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-green.svg)](https://opensource.org/license/apache-2-0/) ![Welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)
 
+</div>
+
 <p align="center">
     <a href="README.md">English</a> •
     <a>中文</a> •
     <a href="README_JA.md">日本語</a>
 </p>
 
-</div>
 <p align="center">
-  <a href="#Quickstart">指南</a> •
-  <a href="https://www.youtube.com/watch?v=QGkpd-tsFPA">案例</a> •
+  <a href="#Quickstart">教程</a> •
+  <a href="https://www.youtube.com/watch?v=QGkpd-tsFPA">演示</a> •
   <a href="https://blog.x-agent.net/blog/xagent/">博客</a> •
+  <a href="https://readthedocs.org/projects/xagent-doc/">文档</a> •
   <a href="#Citation">引用</a>
 </p>
 
-# 📖 介绍
+
+## 📖 介绍
+
 XAgent是一个开源的基于大型语言模型（LLM）的自主智能体，可以自动解决各种任务。
 它被设计为一个通用的智能体，可以应用于各种任务。目前，XAgent仍处于早期阶段，我们正在努力改进它。
 
@@ -34,7 +38,7 @@ XAgent是一个开源的基于大型语言模型（LLM）的自主智能体，�
     <figcaption>XAgent功能概览</figcaption>
 </div>
 
-## <img src="assets/readme/xagent_logo.png" height=30 align="texttop"> XAgent
+### <img src="assets/readme/xagent_logo.png" height=30 align="texttop"> XAgent
 
 XAgent具有以下特点：
 - **自主性**：XAgent可以在没有人类参与的情况下自动解决各种任务。
@@ -54,7 +58,8 @@ XAgent由三部分组成：
     <figcaption>XAgent“内循环”和“外循环”机制</figcaption>
 </div>
 
-## 🧰 工具服务器
+### 🧰 工具服务器
+
 工具服务器是为XAgent提供强大和安全的工具来解决任务的服务器。它是一个docker容器，为XAgent提供一个安全的运行环境。
 目前，工具服务器提供以下工具：
 - **📝 文件编辑器** 提供一个文本编辑工具，可以写入、读取和修改文件。
@@ -66,8 +71,10 @@ XAgent由三部分组成：
 
 <div><a id="Quickstart"></a></div>
 
-# ✨ 快速开始
-## 🛠️ 构建和设置工具服务器
+## ✨ 快速开始
+
+### 🛠️ 构建和设置工具服务器
+
 工具服务器是XAgent的行动发生的地方。它是一个docker容器，为XAgent提供一个安全的运行环境。
 因此，您应该首先安装`docker`和`docker-compose`。
 然后，您需要构建工具服务器的镜像。在`ToolServer`目录下，运行以下命令：
@@ -82,7 +89,8 @@ docker-compose up
 docker compose build
 ```
 
-## 🎮 配置并运行XAgent
+### 🎮 配置并运行XAgent
+
 在启动ToolServer后，您可以配置并运行XAgent。
 - 安装依赖项：（需要Python版本 >= 3.10）
 ```bash
@@ -106,8 +114,8 @@ python run.py --task "put your task here" --model "gpt-4"
 
 - 使用GUI运行XAgent
 ```bash
-# 在ToolServer docker 时已经开启web ui docker了
-# 只需新开一个命令行，开启docker中的 nginx
+## 在ToolServer docker 时已经开启web ui docker了
+## 只需新开一个命令行，开启docker中的 nginx
 docker exec XAgent-Server systemctl start nginx
 ```
 构建XAgent-Server的docker镜像并启动docker容器。
@@ -118,12 +126,14 @@ docker exec XAgent-Server systemctl start nginx
 
 <div><a id="Demo"></a></div>
 
-# 🎬 案例
+## 🎬 案例
+
 我们提供了一些使用XAgent解决任务的案例：
 你可以在[XAgent官网](https://www.x-agent.net/)上查看我们的在线演示。我们还提供了视频演示和使用XAgent的案例：
 ![Demo](assets/readme/demo.gif)
 
-## 案例1. 数据分析：展示双环机制的有效性
+### 案例1. 数据分析：展示双环机制的有效性
+
 在这个案例中，我们将展示XAgent如何使用双环机制来解决数据分析任务。
 我们将使用一个简单的数据集`iris.zip`上传到XAgent，然后让XAgent分析数据集并生成一个报告。
 XAgent将任务分解为4个子任务：（1）数据理解，（2）验证Python环境，（3）编写数据分析代码，（4）编写报告。
@@ -131,19 +141,22 @@ XAgent将任务分解为4个子任务：（1）数据理解，（2）验证Pytho
 
 ![Data Statics by XAgent](assets/readme/statistics.png)
 
-## 案例2. 推荐：展示与人类的合作
+### 案例2. 推荐：展示与人类的合作
+
 XAgent拥有独特的能力，可以积极寻求人类协助并共同解决问题，持续重新定义着人类与智能体人合作的界限。如下方截图所示，用户寻求了XAgent的帮助，以推荐一些适合友好聚会的优秀餐厅，但未提供具体细节。识别到提供的信息不足，XAgent利用了“请求人类帮助”工具，促使人类介入以获取用户的偏好位置、预算限制、烹饪偏好以及任何饮食限制。凭借这宝贵的反馈信息，XAgent轻松地生成了定制的餐厅推荐，确保用户及其朋友们获得了个性化和令人满意的体验。
 
 ![Illustration of Ask for Human Help of XAgent](assets/readme/ask_for_human_help.png)
 
-## 案例3. 训练模型：高级工具使用者
+### 案例3. 训练模型：高级工具使用者
+
 XAgent 不仅能处理琐碎任务，还可以在复杂任务中提供宝贵的帮助，比如模型训练。在这里，我们展示了一个用户希望分析电影评论并评估特定电影周围公众情感的情景。作为回应，XAgent 迅速启动了下载 IMDB 数据集的过程，以训练一款先进的 BERT 模型（见下方截图），利用深度学习的强大能力。拥有了这个训练有素的 BERT 模型，XAgent 能够轻松地应对电影评论的复杂细节，提供关于公众对各种电影看法的见解性预测。
 
 ![bert_1](assets/readme/bert_1.png)
 ![bert_2](assets/readme/bert_2.png)
 ![bert_3](assets/readme/bert_3.png)
 
-## 📊 评测
+### 📊 评测
+
 我们进行了人类偏好评估，以评估XAgent的性能。我们为评估准备了超过50个现实世界的复杂任务，可以分为5个类别：搜索与报告，编码与开发，数据分析，数学和生活助手。
 
 我们将XAgent的结果与[AutoGPT](https://github.com/Significant-Gravitas/AutoGPT)进行比较，结果显示XAgent完全胜过AutoGPT。
@@ -156,14 +169,22 @@ XAgent 不仅能处理琐碎任务，还可以在复杂任务中提供宝贵的�
 
 <div><a id="Blog"></a></div>
 
-# 🖌️ 博客
+## 🖌️ 博客
+
 我们的官方博客在[这里](https://blog.x-agent.net/)！
 
-# 🌟 星标历史
+## 🌟 我们的贡献者
 
-[![Star History Chart](https://api.star-history.com/svg?repos=openbmb/xagent&type=Date)](https://star-history.com/#openbmb/xagent&Date)
+衷心感谢所有贡献者。你们的努力使得这个项目不断成长和进步。无论大小，每一份贡献都是宝贵的。
 
-# 引用
+![贡献者](https://contrib.rocks/image?repo=OpenBMB/XAgent)
+
+## 🌟 星标历史
+
+[![Star History Chart](https://api.star-history.com/svg?repos=openbmb/xagent&type=Date)](https://star-history.com/##openbmb/xagent&Date)
+
+## 引用
+
 如果您发现我们的仓库对您有帮助，请引用我们的论文：
 ```angular2
 @misc{xagent2023,

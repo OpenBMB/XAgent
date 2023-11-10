@@ -4,10 +4,7 @@
 
 <div align="center">
 
-
 [![Twitter](https://img.shields.io/twitter/follow/XAgent?style=social)](https://twitter.com/XAgentTeam) [![Discord](https://img.shields.io/badge/XAgent-Discord-purple?style=flat)](https://discord.gg/zncs5aQkWZ) [![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-green.svg)](https://opensource.org/license/apache-2-0/) ![Welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)
-
-
 
 </div>
 
@@ -18,15 +15,15 @@
 </p>
 
 <p align="center">
-  <a href="#クイックスタート">チュートリアル</a> •
+  <a href="#Quickstart">チュートリアル</a> •
   <a href="https://www.youtube.com/watch?v=QGkpd-tsFPA">デモ</a> •
   <a href="https://blog.x-agent.net/blog/xagent/">ブログ</a> •
-  <a href="#引用">引用
-  </a>
+  <a href="https://readthedocs.org/projects/xagent-doc/">ドキュメント</a> •
+  <a href="#Citation">引用</a>
 </p>
 
+## 📖 はじめに
 
-# 📖 はじめに
 XAgent は、オープンソースの実験的な大規模言語モデル（LLM）駆動自律エージェントであり、様々なタスクを自動的に解決することができる。
 これは幅広いタスクに適用できる汎用エージェントとして設計されています。XAgent はまだ初期段階にあり、私たちはその改良に励んでいます。
 
@@ -40,7 +37,8 @@ XAgent は、オープンソースの実験的な大規模言語モデル（LLM�
     <figcaption>XAgent の概要。</figcaption>
 </div>
 
-## <img src="assets/readme/xagent_logo.png" height=30 align="texttop"> XAgent
+### <img src="assets/readme/xagent_logo.png" height=30 align="texttop"> XAgent
+
 XAgentは以下の機能を備えています:
 - **自律性**: XAgentは人間が関与することなく、さまざまなタスクを自動的に解決することができます。
 - **安全性**: XAgent は安全に動作するように設計されています。すべてのアクションは docker コンテナ内で制約されています。とにかく実行しましょう!
@@ -59,7 +57,8 @@ XAgent は次の 3 つの部分で構成されています:
     <figcaption>XAgent の内部ループと外部ループのメカニズム。</figcaption>
 </div>
 
-## 🧰 ToolServer
+### 🧰 ToolServer
+
 ToolServer は、タスクを解決するための強力で安全なツールを XAgent に提供するサーバです。これは、XAgent が実行するための安全な環境を提供する docker コンテナです。
 現在、ToolServer は以下のツールを提供しています:
 - **📝 ファイルエディタ** は、ファイルの書き込み、読み込み、変更を行うためのテキスト編集ツールを提供します。
@@ -71,8 +70,10 @@ ToolServer は、タスクを解決するための強力で安全なツールを
 
 <div><a id="クイックスタート"></a></div>
 
-# ✨ クイックスタート
-## 🛠️ ToolServer の構築とセットアップ
+## ✨ クイックスタート
+
+### 🛠️ ToolServer の構築とセットアップ
+
 ToolServer は、XAgent の動作が行われる場所です。これは、XAgent が実行するための安全な環境を提供する Docker コンテナになります。
 そのため、まず `docker` と `docker-compose` をインストールする必要があります。
 その後、ToolServer 用の docker イメージをビルドし、docker コンテナを起動します。
@@ -86,7 +87,8 @@ ToolServer が更新された場合、イメージを再構築する必要があ
 docker compose build
 ```
 
-## 🎮 XAgent のセットアップと実行
+### 🎮 XAgent のセットアップと実行
+
 ToolServer のセットアップが完了したら、XAgent の実行を開始します。
 - インストール要件 (Python >= 3.10 が必要)
 ```bash
@@ -124,8 +126,8 @@ python run.py --task "put your task here" --model "gpt-4" --config_file "assets/
 
 - GUI で XAgent を実行する
 ```bash
-# ToolServer ネットワークを構築する際に、Web ui docker を実行しました
-# docker で nginx を実行する
+## ToolServer ネットワークを構築する際に、Web ui docker を実行しました
+## docker で nginx を実行する
 docker exec XAgent-Server systemctl start nginx
 ```
 XAgent-Server 用の docker イメージをビルドし、docker コンテナを起動します。
@@ -135,30 +137,35 @@ GUI デモの詳細については、[こちら](XAgentServer/README.md) を参�
 
 <div><a id="デモ"></a></div>
 
-# 🎬 デモ
+## 🎬 デモ
+
 ここでは、XAgent によるタスクの解決事例も紹介する:
 [XAgent Official Website](https://www.x-agent.net/) では、ライブデモをご覧いただけます。また、XAgent を使用したビデオデモやショーケースもこちらでご覧いただけます:
 ![Demo](assets/readme/demo.gif)
 
-## ケース 1. データ分析: デュアルループメカニズムの有効性の実証
+### ケース 1. データ分析: デュアルループメカニズムの有効性の実証
+
 まず、複雑なデータ分析においてユーザーを支援するケースから始める。ここでは、ユーザがデータ解析の支援を求めて `iris.zip` ファイルを XAgent に送信した。(1)データの検査と理解、(2)システムの Python 環境に関連するデータ分析ライブラリがあるかどうかの検証、(3)データ処理と分析のためのデータ分析コードの作成、(4)Python コードの実行結果に基づく分析レポートのコンパイル。
 以下は、XAgent が作成した図である。
 ![Data Statics by XAgent](assets/readme/statistics.png)
 
 
-## ケース 2. レコメンデーション: 人間とエージェントのインタラクションの新しいパラダイム
+### ケース 2. レコメンデーション: 人間とエージェントのインタラクションの新しいパラダイム
+
 人間の支援を積極的に求め、問題解決に協力するユニークな機能を備えた XAgent は、人間とエージェントの協力の境界を再定義し続けています。下のスクリーンショットに示されているように、あるユーザが XAgent に、親睦を深める集まりに最適なレストランを紹介するよう助けを求めたが、具体的な情報を提供することができなかった。提供された情報が不十分であることを認識した XAgent は、AskForHumanHelp ツールを使用して、人間の介入を促し、ユーザの好みの場所、予算の制約、料理の好み、食事の制限を引き出した。この貴重なフィードバックをもとに、XAgent はシームレスにカスタマイズされたお勧めのレストランを生成し、ユーザーとその友人にパーソナライズされた満足のいく体験を提供しました。
 
 ![Illustration of Ask for Human Help of XAgent](assets/readme/ask_for_human_help.png)
 
-## ケース 3. トレーニングモデル: 洗練されたツールユーザー
+### ケース 3. トレーニングモデル: 洗練されたツールユーザー
+
 XAgent は、平凡なタスクに取り組むだけでなく、モデルのトレーニングのような複雑なタスクにおいても貴重な支援となります。ここでは、あるユーザが映画のレビューを分析し、特定の映画を取り巻く世論の感情を評価したいというシナリオを示します。これに対して XAgent は、IMDB データセットをダウンロードしてプロセスを迅速に開始し、ディープラーニングのパワーを活用して最先端の BERT モデルをトレーニングします（以下のスクリーンショットを参照）。XAgent は、この訓練された BERT モデルによって、映画レビューの複雑なニュアンスをシームレスにナビゲートし、さまざまな映画に対する一般の認識に関する洞察に満ちた予測を提供します。
 
 ![bert_1](assets/readme/bert_1.png)
 ![bert_2](assets/readme/bert_2.png)
 ![bert_3](assets/readme/bert_3.png)
 
-## 📊 評価
+### 📊 評価
+
 XAgent の性能を評価するために、人間の嗜好評価を実施しました。評価のために [50 以上の実世界の複雑なタスク](assets/tasks.yml)を用意し、5 つのクラスに分類します: これらは、「検索とレポート」「コーディングと開発」「データ分析」「数学」「生活支援」の 5 つのクラスに分類されます。
 XAgent と [AutoGPT](https://github.com/Significant-Gravitas/AutoGPT) の結果を比較したところ、XAgent が AutoGPT に完勝しました。
 全ての実行結果は近日公開予定です。
@@ -173,17 +180,24 @@ XAgent と [AutoGPT](https://github.com/Significant-Gravitas/AutoGPT) の結果�
 
 <div><a id="ブログ"></a></div>
 
-# 🖌️ ブログ
+## 🖌️ ブログ
 
 ブログは[こちら](https://blog.x-agent.net/)でご覧いただけます!
 
 <div><a id="引用"></a></div>
 
-# 🌟 Star History
+## 🌟 貢献者の皆さんへ
 
-[![Star History Chart](https://api.star-history.com/svg?repos=openbmb/xagent&type=Date)](https://star-history.com/#openbmb/xagent&Date)
+このプロジェクトに貢献してくれた皆さん、心から感謝します。皆さんの努力が、このプロジェクトの成長と繁栄を支えています。どんな貢献も、大きくても小さくても、非常に価値があります。
 
-# 引用
+![貢献者](https://contrib.rocks/image?repo=OpenBMB/XAgent)
+
+## 🌟 Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=openbmb/xagent&type=Date)](https://star-history.com/##openbmb/xagent&Date)
+
+## 引用
+
 もし私たちのリポジトリが役に立つとお感じになりましたら、ぜひ引用をご検討ください:
 ```angular2
 @misc{xagent2023,

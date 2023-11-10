@@ -68,7 +68,7 @@ class OBJGenerator:
             case 'openai':                
                 response = self.function_call_refine(kwargs,response)
             case 'xagent':
-                pass
+                response = self.xagent_call_refine(kwargs,response)
             case _:
                 raise NotImplementedError(f"Request type {request_type} not implemented")
         
@@ -88,6 +88,56 @@ class OBJGenerator:
             module = importlib.import_module(f'.{request_type}','XAgent.ai_functions.request')
             self.chatcompletion_request_funcs[request_type] = getattr(module,'chatcompletion_request')
         return self.chatcompletion_request_funcs[request_type]
+
+    def dynamic_xagent_jsons_fixs(self,messages:list=[],functions:list=[],broken_jsons:list=[],function_schema:dict=None,arguments_schema:dict=None,error_msgs:list = []):
+        """Attempts to fix invalid json and validate it against the function schema using customized model
+
+        Args:
+            broken_jsons(list, optional): The invalid input jsons data.
+            arguments_schema: extra arguments schema to validate the json data against.
+            function_schema: specified function Schema to validate the json data against.
+            messages (list, optional): Additional messages related to the json validation error.
+            functions(list, optional): All functions to choose.
+            error_msgs (list, optional): Error messages related to the jsons validation error.
+
+        Returns:
+            A dictionary format response retrieved from AI service call.
+        """
+        if function_schema is not None:
+            logger.typewriter_log(
+            f'Schema Validation for Function call {function_schema["name"]} failed, trying to fix it...', Fore.YELLOW)
+        elif arguments_schema is not None:
+            logger.typewriter_log(
+            f'Schema Validation for last Function call failed, trying to fix it...', Fore.YELLOW)
+        
+        logger.typewriter_log(f"error_msgs of this schema check {error_msgs}",Fore.YELLOW)
+
+        repair_req_kwargs = deepcopy(CONFIG.default_completion_kwargs)
+        repair_req_kwargs['messages'] = [*messages,
+                                  {
+                                      'role': 'system',
+                                      'content': '\n'.join([
+                                          'Your last function call result in error',
+                                          '--- Error ---',
+                                          "\n".join(error_msgs),
+                                          'Your task is to fix all errors exist in the Broken Json String to make the json validate for the schema in the given function, and use new string to call the function again.',
+                                          '--- Notice ---',
+                                          '- You need to carefully check the json string and fix the errors or adding missing value in it.',
+                                          '- Do not give your own opinion or imaging new info or delete exisiting info!',
+                                          '- Make sure the new function call does not contains information about this fix task!',
+                                          '--- Broken Json String ---',
+                                          "\n".join(broken_jsons),
+                                          'Start!'
+                                      ])
+                                  }]
+        if len(functions):
+            repair_req_kwargs['functions'] = functions
+        if function_schema is not None:
+            repair_req_kwargs['function_call'] = {'name': function_schema['name']}
+        if arguments_schema is not None:
+            repair_req_kwargs['arguments'] = arguments_schema
+        return self.chatcompletion(**repair_req_kwargs)
+
 
     def dynamic_json_fixs(self, broken_json, function_schema, messages: list = [], error_message: str = None):
         """Attempts to fix invalid json and validate it against the function schema
@@ -126,6 +176,37 @@ class OBJGenerator:
         repair_req_kwargs['function_call'] = {'name': function_schema['name']}
         return self.chatcompletion(**repair_req_kwargs)
     
+
+    def schema_validation(self,schema:dict,to_validate:str):
+        """Validates arguments against the schema.
+
+        Args:
+            schema (dict): Schema to validate the arguments against.
+            to_validate (str): Arguments data to be validated.
+
+        Returns:
+            Error message after schema validation.
+
+        Raises:
+            Exception: Error occurred while validating the arguments.
+        """
+        def validate():
+            nonlocal schema,to_validate
+            if isinstance(to_validate,str):
+                to_validate = {} if to_validate == '' else json5.loads(to_validate)
+            # function validate
+            if "parameters" in schema:
+                jsonschema.validate(instance=to_validate["arguments"], schema=schema['parameters'])
+            # arguments validate
+            else:
+                jsonschema.validate(instance=to_validate,schema=schema)
+        try:
+            validate()
+        except Exception as e:
+            return str(e)
+        
+        return ""
+
     def load_args_with_schema_validation(self,function_schema:dict,args:str,messages:list=[],*,return_response=False,response=None):
         """Validates arguments against the function schema.
 
@@ -166,7 +247,97 @@ class OBJGenerator:
             return arguments,response
         else:
             return arguments
-        
+    
+    def xagent_call_refine(self,req_kwargs,response):
+        """Validates and refines the function call response using customized model.
+
+        Args:
+            req_kwargs: Request data parameters.
+            response: The response received from the service call.
+
+        Returns:
+            Refined and validated response.
+
+        Raises:
+            FunctionCallSchemaError: Error occurred during the schema validation of the function call.
+        """
+        # record the error of function schema and arguments schema
+        error_records = []
+        broken_jsons = []
+        arguments_schema = req_kwargs.get("arguments",None)
+        function_schema = None
+        functions = req_kwargs.get("functions",[])
+
+        response['choices'][0]['message']['content'] = json5.loads(response['choices'][0]['message']['content'])
+ 
+        if "function_call" not in response['choices'][0]['message']['content'] and "arguments" not in response['choices'][0]['message']['content']:
+            logger.typewriter_log("FunctionCallSchemaError: No function call or arguments in the response",Fore.RED)
+            # if with error msg
+            if "broken_json" in response['choices'][0]['message']['content']:
+                response = self.dynamic_xagent_jsons_fixs(messages=req_kwargs['messages'],functions=functions,broken_jsons=[response['choices'][0]['message']['content']["broken_json"]],error_msgs=[response['choices'][0]['message']['content']["error_message"]])
+                return response
+            raise FunctionCallSchemaError(f"No function call or arguments found in the response: {response['choices'][0]['message']['content']} ")
+        # verify the schema of the argument if exists
+        if "function_call" in response['choices'][0]['message']['content']:
+                # verify the schema of the function call if exists
+                function_schema = list(filter(lambda x: x['name'] == response['choices'][0]['message']['content']['function_call']['name'],req_kwargs['functions']))
+                function_schema = None if len(function_schema) == 0 else function_schema[0]
+                
+                if function_schema is None:
+                    if '"{}"'.format(response['choices'][0]['message']['content']['function_call']['name']) in req_kwargs['messages'][0]['content']:
+                        # Temporal fix for tool call without reasoning
+                        logger.typewriter_log("Warning: Detect tool call without reasoning",Fore.YELLOW)
+                        response['choices'][0]['message']['content']['function_call']['arguments'] = orjson.dumps({
+                            'tool_call':{
+                                'tool_name':response['choices'][0]['message']['content']['function_call']['name'],
+                                'tool_input':response['choices'][0]['message']['content']['function_call']['arguments']
+                            }
+                        })
+                        return response            
+                    
+                    error_message = {
+                        'role':'system',
+                        'content': f"Error: Your last function calling call function {response['choices'][0]['message']['content']['function_call']['name']} that is not in the provided functions. Make sure function name in list: {list(map(lambda x:x['name'],req_kwargs['functions']))}"
+                    }
+                    
+                    if req_kwargs['messages'][-1]['role'] != 'system' and 'Your last function calling call function' not in req_kwargs['messages'][-1]['content']:
+                        req_kwargs['messages'].append(error_message)
+                    elif req_kwargs['messages'][-1]['role'] == 'system' and 'Your last function calling call function' in req_kwargs['messages'][-1]['content']:
+                        req_kwargs['messages'][-1] = error_message
+                        
+                    logger.typewriter_log(f"FunctionCallSchemaError: Function {response['choices'][0]['message']['content']['function_call']['name']} not found in the provided functions.",Fore.RED)
+                    raise FunctionCallSchemaError(f"Function {response['choices'][0]['message']['content']['function_call']['name']} not found in the provided functions: {list(map(lambda x:x['name'],req_kwargs['functions']))}")
+                
+                error_msg = self.schema_validation(schema=function_schema,to_validate=response['choices'][0]['message']['content']['function_call'])
+                if len(error_msg):
+                    error_records.append(error_msg)
+                    if not isinstance(response['choices'][0]['message']['content']['function_call'],str):
+                        broken_json = json5.dumps(response['choices'][0]['message']['content']['function_call'])
+                    else:
+                        broken_json = response['choices'][0]['message']['content']['function_call']
+                    broken_jsons.append(broken_json)
+
+        # verify the schema of the arguments if exists
+        if "arguments" in response['choices'][0]['message']['content']:
+            if "arguments" not in req_kwargs:
+                logger.typewriter_log(f"FunctionCallSchemaError: Function {response['choices'][0]['message']['content']['function_call']['name']} not found in the provided functions.",Fore.RED)
+                raise FunctionCallSchemaError(f"Unexpected extra arguments")
+            # validate the arguments schema
+            error_msg = self.schema_validation(schema=arguments_schema,to_validate=response['choices'][0]['message']['content']['arguments'])
+            if len(error_msg):
+                error_records.append(error_msg)
+                if not isinstance(response['choices'][0]['message']['content']['arguments'],str):
+                    broken_json = json5.dumps(response['choices'][0]['message']['content']['arguments'])
+                else:
+                    broken_json = response['choices'][0]['message']['content']['arguments']
+                broken_jsons.append(broken_json)
+
+        if len(error_records):
+            response = self.dynamic_xagent_jsons_fixs(messages=req_kwargs['messages'],functions=functions,broken_jsons=broken_jsons,error_msgs=error_records,function_schema=function_schema,arguments_schema=arguments_schema)
+        response['choices'][0]['message']['content'] = json5.dumps(response['choices'][0]['message']['content'])
+        return response
+
+
     def function_call_refine(self,req_kwargs,response):
         """Validates and refines the function call response.
 

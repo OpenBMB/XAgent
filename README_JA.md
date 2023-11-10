@@ -18,7 +18,7 @@
   <a href="#Quickstart">チュートリアル</a> •
   <a href="https://www.youtube.com/watch?v=QGkpd-tsFPA">デモ</a> •
   <a href="https://blog.x-agent.net/blog/xagent/">ブログ</a> •
-  <a href="https://readthedocs.org/projects/xagent-doc/">ドキュメント</a> •
+  <a href="https://xagent-doc.readthedocs.io/en/latest/">ドキュメント</a> •
   <a href="#Citation">引用</a>
 </p>
 

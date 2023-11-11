@@ -32,9 +32,9 @@ XAgent は、オープンソースの実験的な大規模言語モデル（LLM�
 フルタイムでもパートタイムなど、多様な形でのコラボレーションを歓迎します。エージェントのフロンティアに興味があり、私たちと一緒に真の自律型エージェントを実現したい方は、xagentteam@gmail.com までご連絡ください。
 
 <div align="center">
-    <img src="assets/readme/workflow.png" alt="XAgentのワークフロー" width="700"/>
+    <img src="assets/readme/overview.png" alt="Overview of Xagent" width="700"/>
     <br/>
-    <figcaption>XAgentのワークフロー図。</figcaption>
+    <figcaption>XAgent の概要。</figcaption>
 </div>
 
 ### <img src="assets/readme/xagent_logo.png" height=30 align="texttop"> XAgent
@@ -52,9 +52,9 @@ XAgent は次の 3 つの部分で構成されています:
 - **🦾 Actor** は、目標を達成し、サブタスクを完了させるためのアクションを実行する責任を負います。アクターはサブタスクを解決するためにさまざまなツールを利用し、人間と協力してタスクを解決することもできます。
 
 <div align="center">
-    <img src="assets/readme/loop.png" alt="Planner loop" width="700"/>
+    <img src="assets/readme/workflow.png" alt="XAgentのワークフロー" width="700"/>
     <br/>
-    <figcaption>XAgent の内部ループと外部ループのメカニズム。</figcaption>
+    <figcaption>XAgentのワークフロー図。</figcaption>
 </div>
 
 ### 🧰 ToolServer

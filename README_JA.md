@@ -78,8 +78,10 @@ ToolServer は、XAgent の動作が行われる場所です。これは、XAgen
 そのため、まず `docker` と `docker-compose` をインストールする必要があります。
 その後、ToolServer 用の docker イメージをビルドし、docker コンテナを起動します。
 ```bash
-docker compose up
+docker-compose up --build
 ```
+これによりツールサーバーのイメージが構築され、ツールサーバーのコンテナが起動します。
+コンテナをバックグラウンドで実行したい場合は、`docker-compose up -d --build` を使用してください。
 ToolServer の詳細については、[こちら](ToolServer/README.md)を参照してください。
 
 ToolServer が更新された場合、イメージを再構築する必要があります:

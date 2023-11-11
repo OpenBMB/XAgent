@@ -32,9 +32,9 @@ XAgent は、オープンソースの実験的な大規模言語モデル（LLM�
 フルタイムでもパートタイムなど、多様な形でのコラボレーションを歓迎します。エージェントのフロンティアに興味があり、私たちと一緒に真の自律型エージェントを実現したい方は、xagentteam@gmail.com までご連絡ください。
 
 <div align="center">
-    <img src="assets/readme/overview.png" alt="Overview of Xagent" width="700"/>
+    <img src="assets/readme/workflow.png" alt="XAgentのワークフロー" width="700"/>
     <br/>
-    <figcaption>XAgent の概要。</figcaption>
+    <figcaption>XAgentのワークフロー図。</figcaption>
 </div>
 
 ### <img src="assets/readme/xagent_logo.png" height=30 align="texttop"> XAgent

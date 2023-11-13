@@ -52,9 +52,9 @@ XAgent は次の 3 つの部分で構成されています:
 - **🦾 Actor** は、目標を達成し、サブタスクを完了させるためのアクションを実行する責任を負います。アクターはサブタスクを解決するためにさまざまなツールを利用し、人間と協力してタスクを解決することもできます。
 
 <div align="center">
-    <img src="assets/readme/loop.png" alt="Planner loop" width="700"/>
+    <img src="assets/readme/workflow.png" alt="XAgentのワークフロー" width="700"/>
     <br/>
-    <figcaption>XAgent の内部ループと外部ループのメカニズム。</figcaption>
+    <figcaption>XAgentのワークフロー図。</figcaption>
 </div>
 
 ### 🧰 ToolServer
@@ -78,8 +78,10 @@ ToolServer は、XAgent の動作が行われる場所です。これは、XAgen
 そのため、まず `docker` と `docker-compose` をインストールする必要があります。
 その後、ToolServer 用の docker イメージをビルドし、docker コンテナを起動します。
 ```bash
-docker compose up
+docker-compose up --build
 ```
+これによりツールサーバーのイメージが構築され、ツールサーバーのコンテナが起動します。
+コンテナをバックグラウンドで実行したい場合は、`docker-compose up -d --build` を使用してください。
 ToolServer の詳細については、[こちら](ToolServer/README.md)を参照してください。
 
 ToolServer が更新された場合、イメージを再構築する必要があります:

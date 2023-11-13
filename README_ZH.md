@@ -53,9 +53,9 @@ XAgent由三部分组成：
 - **🦾 行动者** 负责采取行动实现目标和完成子任务。行动者利用各种工具来解决子任务，它也可以与人类合作来解决任务。
 
 <div align="center">
-    <img src="assets/readme/loop.png" alt="Planner loop" width="700"/>
+    <img src="assets/readme/workflow.png" alt="XAgent的工作流程" width="700"/>
     <br/>
-    <figcaption>XAgent“内循环”和“外循环”机制</figcaption>
+    <figcaption>XAgent的工作流程图。</figcaption>
 </div>
 
 ### 🧰 工具服务器
@@ -79,9 +79,9 @@ XAgent由三部分组成：
 因此，您应该首先安装`docker`和`docker-compose`。
 然后，您需要构建工具服务器的镜像。在`ToolServer`目录下，运行以下命令：
 ```bash
-docker-compose up
+docker-compose up --build
 ```
-这将构建工具服务器的镜像并启动工具服务器的容器。如果您想在后台运行容器，请使用`docker-compose up -d`。
+这将构建工具服务器的镜像并启动工具服务器的容器。如果您想在后台运行容器，请使用`docker-compose up -d --build`。
 参考[ToolServer](ToolServer/README_ZH.md)获取更多信息。
 
 如果需要更新工具服务器或您想重新构建工具服务器的镜像，请使用以下命令：

@@ -53,9 +53,9 @@ XAgent is composed of three parts:
 - **🦾 Actor** is responsible for conducting actions to achieve goals and finish subtasks. The actor utilizes various tools to solve subtasks, and it can also collaborate with humans to solve tasks.
 
 <div align="center">
-    <img src="assets/readme/loop.png" alt="Planner loop" width="700"/>
+    <img src="assets/readme/workflow.png" alt="Workflow of Xagent" width="700"/>
     <br/>
-    <figcaption>The inner loop and outer loop mechanism of XAgent.</figcaption>
+    <figcaption>Workflow of XAgent.</figcaption>
 </div>
 
 ### 🧰 ToolServer
@@ -79,8 +79,10 @@ ToolServer is where XAgent's action takes place. It is a docker container that p
 So you should install `docker` and `docker-compose` first. 
 After that, you should build the docker image for ToolServer and start the docker container.
 ```bash
-docker compose up
+docker-compose up --build
 ```
+This will build the image for the ToolServer and start the ToolServer's container. 
+If you want to run the container in the background, please use `docker-compose up -d --build`.
 Refer [here](ToolServer/README.md) for detailed information about our ToolServer.
 
 If the ToolServer is updated, you have to rebuild the images:

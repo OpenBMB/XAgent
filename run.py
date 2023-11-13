@@ -68,6 +68,6 @@ if __name__ == '__main__':
         upload_files=args['upload_files'],
     )
     
-    if args.quiet:
+    if args['quiet']:
         sys.stdout.close()
         sys.stdout = original_stdout

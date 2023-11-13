@@ -1,8 +1,7 @@
 import json
 from XAgent.logs import logger
 from XAgent.config import CONFIG, get_apiconfig_by_model, get_model_name
-import pkg_resources
-
+import importlib.metadata as metadata
 
 def chat_completion_to_dict(chat_completion_instance):
     """
@@ -78,9 +77,7 @@ def chatcompletion_request(**kwargs):
     # Get model-related configuration parameters
     chatcompletion_kwargs = get_apiconfig_by_model(model_name)
 
-    if pkg_resources.parse_version(
-        pkg_resources.get_distribution("openai").version
-    ) >= pkg_resources.parse_version("1.0.0"):
+    if metadata.version("openai") >= "1.0.0":
         from openai import OpenAI, BadRequestError
 
         request_timeout = kwargs.pop("request_timeout", 60)

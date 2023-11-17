@@ -117,7 +117,7 @@ class ToolAgent(BaseAgent):
                 validate()
             except Exception as e:  
                 messages[0] = change_tool_call_description(messages[0],reverse=True)
-                tool_call_args = objgenerator.dynamic_json_fixs(
+                tool_call_args = objgenerator.dynamic_json_fixes(
                     broken_json=tool_call_args,
                     function_schema=tool_schema,
                     messages=messages,

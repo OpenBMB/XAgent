@@ -1,14 +1,14 @@
 import orjson
 import json5
 import jsonschema
+import jsonschema.exceptions
 import importlib
 import traceback
 
 from copy import deepcopy
 from colorama import Fore
 
-from openai.error import AuthenticationError, PermissionError, InvalidRequestError
-from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_not_exception_type, wait_chain, wait_none
+from tenacity import retry, stop_after_attempt, retry_if_exception_type
 
 from .error import FunctionCallSchemaError
 
@@ -28,10 +28,12 @@ class OBJGenerator:
         self.chatcompletion_request_funcs = {}
         
     @retry(
-        retry=retry_if_not_exception_type((AuthenticationError, PermissionError, InvalidRequestError, AssertionError)),
-        stop=stop_after_attempt(CONFIG.max_retry_times+3), 
-        wait=wait_chain(*[wait_none() for _ in range(3)]+[wait_exponential(min=61, max=293)]),
-        reraise=True,)
+        stop=stop_after_attempt(3),
+        retry=retry_if_exception_type((
+            jsonschema.exceptions.ValidationError,
+            FunctionCallSchemaError
+            )),
+        )
     def chatcompletion(self,**kwargs):
         """Processes chat completion requests and retrieves responses.
 

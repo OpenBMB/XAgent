@@ -90,57 +90,7 @@ class OBJGenerator:
             self.chatcompletion_request_funcs[request_type] = getattr(module,'chatcompletion_request')
         return self.chatcompletion_request_funcs[request_type]
 
-    def dynamic_xagent_jsons_fixs(self,messages:list=[],functions:list=[],broken_jsons:list=[],function_schema:dict=None,arguments_schema:dict=None,error_msgs:list = []):
-        """Attempts to fix invalid json and validate it against the function schema using customized model
-
-        Args:
-            broken_jsons(list, optional): The invalid input jsons data.
-            arguments_schema: extra arguments schema to validate the json data against.
-            function_schema: specified function Schema to validate the json data against.
-            messages (list, optional): Additional messages related to the json validation error.
-            functions(list, optional): All functions to choose.
-            error_msgs (list, optional): Error messages related to the jsons validation error.
-
-        Returns:
-            A dictionary format response retrieved from AI service call.
-        """
-        if function_schema is not None:
-            logger.typewriter_log(
-            f'Schema Validation for Function call {function_schema["name"]} failed, trying to fix it...', Fore.YELLOW)
-        elif arguments_schema is not None:
-            logger.typewriter_log(
-            f'Schema Validation for last Function call failed, trying to fix it...', Fore.YELLOW)
-        
-        logger.typewriter_log(f"error_msgs of this schema check {error_msgs}",Fore.YELLOW)
-
-        repair_req_kwargs = deepcopy(CONFIG.default_completion_kwargs)
-        repair_req_kwargs['messages'] = [*messages,
-                                  {
-                                      'role': 'system',
-                                      'content': '\n'.join([
-                                          'Your last function call result in error',
-                                          '--- Error ---',
-                                          "\n".join(error_msgs),
-                                          'Your task is to fix all errors exist in the Broken Json String to make the json validate for the schema in the given function, and use new string to call the function again.',
-                                          '--- Notice ---',
-                                          '- You need to carefully check the json string and fix the errors or adding missing value in it.',
-                                          '- Do not give your own opinion or imaging new info or delete exisiting info!',
-                                          '- Make sure the new function call does not contains information about this fix task!',
-                                          '--- Broken Json String ---',
-                                          "\n".join(broken_jsons),
-                                          'Start!'
-                                      ])
-                                  }]
-        if len(functions):
-            repair_req_kwargs['functions'] = functions
-        if function_schema is not None:
-            repair_req_kwargs['function_call'] = {'name': function_schema['name']}
-        if arguments_schema is not None:
-            repair_req_kwargs['arguments'] = arguments_schema
-        return self.chatcompletion(**repair_req_kwargs)
-
-
-    def dynamic_json_fixs(self, broken_json, function_schema, messages: list = [], error_message: str = None):
+    def dynamic_json_fixes(self, broken_json, function_schema, messages: list = [], error_message: str = None):
         """Attempts to fix invalid json and validate it against the function schema
 
         Args:
@@ -240,7 +190,7 @@ class OBJGenerator:
             if not isinstance(arguments,str):
                 arguments = json5.dumps(arguments)
             # give one opportunity to fix the json string
-            response = self.dynamic_json_fixs(arguments,function_schema,messages,str(e))
+            response = self.dynamic_json_fixes(arguments,function_schema,messages,str(e))
             arguments = response['choices'][0]['message']['function_call']['arguments']
             validate()
 

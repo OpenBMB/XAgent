@@ -68,7 +68,8 @@ class OBJGenerator:
             case 'openai':                
                 response = self.function_call_refine(kwargs,response)
             case 'xagent':
-                response = self.xagent_call_refine(kwargs,response)
+                pass
+                # response = self.xagent_call_refine(kwargs,response)
             case _:
                 raise NotImplementedError(f"Request type {request_type} not implemented")
         

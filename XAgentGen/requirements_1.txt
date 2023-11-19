@@ -17,10 +17,8 @@ accelerate==0.24.1
 fastapi
 logzero==1.7.0
 orjson
+packaging
 referencing==0.30.2
-pydantic==1.10.7
 torch==2.1.0
 deepspeed==0.12.2
-flash-attn==2.0.4
 addict==2.4.0
-vllm==0.2.2

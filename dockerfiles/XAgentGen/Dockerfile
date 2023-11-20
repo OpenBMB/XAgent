@@ -10,7 +10,18 @@ COPY XAgentGen/requirements_1.txt .
 
 COPY XAgentGen/requirements_2.txt .
 
+# 安装软件源管理工具
+RUN apt update && apt install -y software-properties-common
+
+# 添加deadsnakes PPA
+RUN add-apt-repository ppa:deadsnakes/ppa
+
+# 再次更新软件源并安装Python 3.10和pip
 RUN apt update && apt install -y python3.10 python3.10-distutils python3-pip
+
+# 创建符号链接以便使用python3.10和pip3.10
+RUN ln -s /usr/bin/python3.10 /usr/bin/python3 && \
+    ln -s /usr/bin/pip3 /usr/bin/pip
 
 RUN pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple
 

@@ -5,7 +5,7 @@ api_keys:
       repetition_penalty: 1.2
       frequency_penalty: 0.5
       max_tokens: 16384
-      api_base: http://127.0.0.1:8000/chat/completions
+      api_base: http://127.0.0.1:13520/chat/completions
 
 
 default_request_type: xagent # or xagent

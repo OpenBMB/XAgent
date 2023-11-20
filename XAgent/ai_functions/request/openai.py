@@ -1,6 +1,5 @@
 import json
 import openai
-import httpx
 from XAgent.logs import logger
 from XAgent.config import CONFIG, get_apiconfig_by_model, get_model_name
 

@@ -1,4 +1,4 @@
-FROM nvidia/cuda:11.6.2-cudnn8-runtime-ubuntu20.04
+FROM pytorch/pytorch:2.1.0-cuda11.8-cudnn8-devel
 
 LABEL Role="xagentgen.node"
 
@@ -10,28 +10,18 @@ COPY XAgentGen/requirements_1.txt .
 
 COPY XAgentGen/requirements_2.txt .
 
-# 安装软件源管理工具
-RUN apt update && apt install -y software-properties-common
-
-# 添加deadsnakes PPA
-RUN add-apt-repository ppa:deadsnakes/ppa
-
-# 再次更新软件源并安装Python 3.10和pip
-RUN apt update && apt install -y python3.10 python3.10-distutils python3-pip
+RUN apt update && apt install -y git ninja-build
 
 RUN pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple
 
-RUN pip install --no-cache-dir --upgrade pip
+RUN pip install packaging
+
+RUN MAX_JOBS=8 pip install flash-attn==2.0.4 --no-build-isolation
 
 RUN pip install --no-cache-dir -r requirements_1.txt
 
 RUN pip install --no-cache-dir -r requirements_2.txt 
 
-RUN wget https://github.com/vllm-project/vllm/releases/download/v0.2.2/vllm-0.2.2+cu118-cp310-cp310-manylinux1_x86_64.whl
-
-RUN pip uninstall torch -y
-
-RUN pip install --no-cache-dir torch --upgrade --index-url https://download.pytorch.org/whl/cu118
 
 RUN rm -rf /tmp/* /var/tmp/*
 

@@ -73,10 +73,16 @@ services:
       - "8090:8090"
 
   XAgentGen:
-    image: xagentgen:0.3
+    image: xagentgen:0.1
     build:
       context: ./
       dockerfile: dockerfiles/XAgentGen/Dockerfile
+    volumes:
+      - ./XAgentGen:/app:rw
+      # - /host/model/path:/model
+    ports:
+      - "13520:13520"
+    # entrypoint: python /app/app.py --model-path /model --port 13520
 
 volumes:
   xagentmongodb:

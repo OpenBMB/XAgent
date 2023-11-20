@@ -6,11 +6,13 @@ LABEL Role="xagentgen.node"
 
 WORKDIR /app
 
-RUN pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple
-
 COPY XAgentGen/requirements_1.txt .
 
 COPY XAgentGen/requirements_2.txt .
+
+RUN apt update && apt install -y python3.10 python3.10-distutils python3-pip
+
+RUN pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple
 
 RUN pip install --no-cache-dir -r requirements_1.txt
 

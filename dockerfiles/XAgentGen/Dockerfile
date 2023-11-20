@@ -16,6 +16,12 @@ RUN pip install --no-cache-dir -r requirements_1.txt
 
 RUN pip install --no-cache-dir -r requirements_2.txt 
 
+RUN wget https://github.com/vllm-project/vllm/releases/download/v0.2.2/vllm-0.2.2+cu118-cp310-cp310-manylinux1_x86_64.whl
+
+RUN pip uninstall torch -y
+
+RUN pip install --no-cache-dir torch --upgrade --index-url https://download.pytorch.org/whl/cu118
+
 RUN rm -rf /tmp/* /var/tmp/*
 
 

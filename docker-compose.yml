@@ -71,8 +71,9 @@ services:
     ports:
       - "5173:5173"
       - "8090:8090"
-      
+
   XAgentGen:
+    image: xagentgen:0.3
     build:
       context: ./
       dockerfile: dockerfiles/XAgentGen/Dockerfile

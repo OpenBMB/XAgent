@@ -1,3 +1,2 @@
 pydantic==1.10.13
 flash-attn==2.0.4
-vllm==0.2.2

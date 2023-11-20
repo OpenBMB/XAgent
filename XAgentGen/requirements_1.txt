@@ -7,8 +7,8 @@ numpy==1.24.3
 perscache==0.6.1
 Pillow==9.3.0
 pytest==7.3.0
-Requests==2.31.0
-scipy==1.11.3
+Requests
+scipy
 tenacity==8.2.3
 tiktoken==0.4.0
 transformers==4.35.0

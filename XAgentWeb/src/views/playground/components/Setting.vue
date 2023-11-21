@@ -78,7 +78,14 @@
           </div>
         </div> -->
       </div>
+      
+     
     </div>
+
+    <button
+      class="hidden-btn"
+      @click="handleRecord"
+      >REC</button>
   </div>
 </template>
   

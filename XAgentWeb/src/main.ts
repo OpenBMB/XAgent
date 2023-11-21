@@ -9,16 +9,14 @@ import { setupHighlightDirective } from './directives/highlight'
 // import { setupClickOutsideDirective } from './directives/click-outside'
 import JsonViewer from 'vue-json-viewer'
 import VueViewer from 'v-viewer';
-import useReactInsideVue from './react/index.jsx';
 import 'viewerjs/dist/viewer.css';
 
 // Import JsonViewer as a Vue.js plugin
 
 const start = async () => {
   const app = createApp(App)
-  app.directive('react', (el, binding) => {
-    useReactInsideVue(binding.value, el)
-});
+
+  app.config.globalProperties.$ws_instance = null
 
   setupStore(app)
   setupRouter(app)

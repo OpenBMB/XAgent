@@ -104,7 +104,6 @@
       "subTaskNumber", "innerNumber", "isFreezed"
   ]);
 
-
   const isEndNode = computed(() => props.isEndNode as boolean);
   const isFreezed =  computed(() => props.isFreezed as boolean);
   const subTaskNumber = computed(() => props.subTaskNumber)
@@ -178,8 +177,12 @@
     const param = toRaw(dataItem)
 
     emit('runToNext', {
-      subTaskNumber: subTaskNumber.value,
-      innerNumber: innerNumber.value,
+      ...param,
+      ...{
+        thought: thought.value,
+        apiName: apiName.value,
+        apiParameter: apiParameter.value,
+      }
     });
 
     runLoading.value = false

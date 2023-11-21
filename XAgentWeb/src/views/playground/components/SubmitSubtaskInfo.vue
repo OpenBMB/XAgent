@@ -1,19 +1,18 @@
 <template>
     <div class="end-subtask-info">
         <div class="end-subtask-info-content">
-            <div class="end-subtask-info-content-item" v-if="CommandName">
+            <div class="end-subtask-info-content-item">
                 <span class="end-subtask-info-content-item-title">
                     Command Name:
                 </span>
                 <json-viewer
-                    
                     class="end-subtask-info-content-item-viewer" 
                     :value="CommandName"
                     :expand-depth="0"
                     :expanded="false"
                     ></json-viewer>
             </div>
-            <div class="end-subtask-info-content-item" v-if="Arguments">
+            <div class="end-subtask-info-content-item">
                 <span class="end-subtask-info-content-item-title">
                     Arguments:
                 </span>
@@ -22,10 +21,7 @@
                     :expanded="false"
                     :value="Arguments"></json-viewer>
             </div>
-            <div    class="end-subtask-info-content-item" 
-                    v-if="ExecutionResults"
-                    v-show="!IncludePictures"
-                >
+            <div class="end-subtask-info-content-item">
                 <span class="end-subtask-info-content-item-title">
                     Execution Results:
                 </span>
@@ -42,7 +38,7 @@
                         View Result
                     </el-button>
                 </span>
-                
+
                 <json-viewer 
                     v-else
                     class="end-subtask-info-content-item-viewer"
@@ -50,18 +46,7 @@
                     :expanded="false"
                     :value="ExecutionResults"
                 ></json-viewer>
-                <!-- <span
-                    v-if="IncludePictures"
-                    class="result-viewer-btn-wrapper">
-                    <img 
-                        v-for="(item, index) in Pictures"
-                        :key="index"
-                        :src="item.data"
-                        style="width: 100%; height: auto; margin-top: 5px;" alt="">
-                </span> -->
             </div>
-
-            <images-viewer  :dataList="imagesArr" v-if="IncludePictures" />
 
             <div class="end-subtask-info-content-item" 
                 v-if="isPythonNoteBook"
@@ -99,6 +84,8 @@
                 </span>
             </div>
 
+            <image-viewer  :dataList="imagesArr" v-if="false" />
+
             <el-dialog
                     v-model="isModalOpen"
                     :title="modalTitle"
@@ -108,11 +95,7 @@
                     :before-close="handleClose"
                     destroy-on-close
                 >
-                <code-viewer 
-                    :value="viewedCodeStr" 
-                    :isShowLineNum="showLineNum"
-                />
-
+                <code-viewer :value="viewedCodeStr" :isShowLineNum="showLineNum" />
                 <template v-slot:footer>
                     <el-button 
                         type="primary"
@@ -124,10 +107,10 @@
 </template>
 
 <script lang="ts" setup>
-import { View } from '@element-plus/icons-vue';
-import { ref, } from 'vue';
-import CodeViewer from './CodeViewer.vue';
-import ImagesViewer from './ImagesViewer.vue';
+import { ref, } from 'vue'
+import ImageViewer from './ImageViewer.vue'
+import CodeViewer from './CodeViewer.vue'
+import { View } from '@element-plus/icons-vue'
 
 const props = defineProps(['data'])
 
@@ -151,27 +134,28 @@ const isString = (obj: any) => {
 }
 
 const getImagesArrFromResult = (data: any) => {
-    if(!Array.isArray(data)) {
+    if(typeof data === 'string') {
         return [];
-    } else {
-        const imagesType = ['png', 'jpg', 'jpeg', 'gif', 'bmp'];
+    }
+    if( Array.isArray(data) ) {
         return data.filter((item: any) => {
-            return imagesType.includes(item.media_type)
+            return item.media_type.startsWith('image/')
         }).map((item: any) => {
             return {
                 name: item.file_name,
                 data: item.file_data,
-                type: item.media_type
+                type: item.file_name.split('.').pop(),
             }
-        });        
+        });
+    } else {
+        return []
     }
-
 }
 
 const getCommanStatus = (status: string) => {
-    if(status.toLowerCase().includes('success')) {
+    if(status.includes('SUCCESS') || status.includes('Success')) {
         return 1;
-    } else if(status.toLowerCase().includes('fail')) {
+    } else if(status.includes('FAIL') || status.includes('Fail')) {
         return -1;
     } else {
         return 0;
@@ -179,9 +163,9 @@ const getCommanStatus = (status: string) => {
 }
 
 const getCommandStatusIcon = (status: string) => {
-    if(status.toLowerCase().includes('success')) {
+    if(status.includes('SUCCESS') || status.includes('Success')) {
         return '✅';
-    } else if(status.toLowerCase().includes('fail')) {
+    } else if(status.includes('FAIL') || status.includes('Fail')) {
         return '❌';
     } else {
         return '⏳';
@@ -189,9 +173,8 @@ const getCommandStatusIcon = (status: string) => {
 }
 
 const imagesArr = computed(
-    () => getImagesArrFromResult(props.data.tool_output)
+    () => getImagesArrFromResult(props.data.ExecutionResults)
 );
-
 const isPythonNoteBook = computed(
     () => props.data.tool_name.includes('PythonNotebook_execute_cell') ? true : false);
 
@@ -203,31 +186,8 @@ const Arguments = computed(
 
 const ExecutionResults = computed(
     () => {
-        if (props.data.is_include_pictures && Array.isArray(props.data.tool_output)) {
-            return props.data.tool_output.filter((item: any) => {
-                return item.media_type !== void 0 
-            });
-        } else {
-            return props.data.tool_output;
-        }
+        return props.data.tool_output;
     });
-
-const IncludePictures = computed(
-    () => {
-        return props.data.is_include_pictures;
-    });
-
-// const Pictures = computed(
-//     () => {
-//         return props.data.tool_output.filter((item: any) => {
-//             return ["png"].includes(item.media_type)
-//         }).map((item: any) => {
-//             return {
-//                 name: item.file_name,
-//                 data: `data:image/${item.media_type};base64,${item.file_data}`
-//             }
-//         });
-//     });
 
 const CommandStatus = computed(
     () => props.data.tool_status_code);
@@ -235,21 +195,10 @@ const CommandStatus = computed(
 const ToolInputCode = computed(
     () => props.data.tool_input?.code || '');
 
-const stringEscape = (str: string) => {
-    try {
-        return JSON.parse(str)
-    } catch (e) {
-        console.log(e);
-    }
-}
-
-
-
 const handleViewResult = () => {
     modalTitle.value  = "Execution Results"
     isModalOpen.value = true;
     showLineNum.value = false;
-    console.log("ExecutionResults: ", ExecutionResults.value);
     viewedCodeStr.value = ExecutionResults.value
 }
 const handleViewCode = () => {

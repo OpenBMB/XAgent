@@ -38,7 +38,7 @@
             />
             <python-notebook-viewer 
                 :datasource="fileWrapper.file"
-                v-if="fileTypeClassify(currentActiveFileType) === 'jpt'" />
+                v-show="fileTypeClassify(currentActiveFileType) === 'jpt'" />
             <images-viewer  
                 :dataList="imagesArr"
                 :isSingleFile="true"

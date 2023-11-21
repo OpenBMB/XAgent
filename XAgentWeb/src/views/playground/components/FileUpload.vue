@@ -10,7 +10,7 @@
             :on-change="handleChange"
             :on-preview="handlePreview"
             :on-remove="handleRemove"
-            :auto-upload="false"
+            :auto-upload="true"
             :http-request="uploadFile"
             :multiple="true"
             :on-success="handleSuccess"
@@ -19,7 +19,7 @@
               <el-button type="primary"
                 :icon="Upload"
                 :disabled="fileList.length === 5">
-                Click to Choose
+                Upload Files
               </el-button>
           </template>
           <template #tip>
@@ -28,13 +28,6 @@
               </div>
           </template>
       </el-upload>
-      <el-button 
-        type="primary"
-        plain
-        class="upload-start-btn"
-        @click="uploadNow"
-        :disabled="fileList.length === 0"
-        >Upload now </el-button>
   </div>
 </template>
 
@@ -53,41 +46,42 @@ const uploadFinished = ref(false)
 const BACKEND_URL = (
   import.meta.env.VITE_BACKEND_URL as string
   ).replace(/\/api/, '');
-const url = BACKEND_URL + '/workspace/upload';  
+  
+const url = '/api/workspace/upload';  
 
 const handleChange: UploadProps['onChange'] = (uploadFile, uploadFiles) => {
 }
 
-watch(() => fileList.value, (newVal) => {
+// watch(() => fileList.value, (newVal) => {
 
-  let pattern = /\.([a-zA-Z0-9]+)$/;
-  let allowFileType = ['png', 'jpeg', 'gif', 'pdf', 'txt', 'pptx', 'xlsx', 'doc', 'ppt', 'xls', "py", "zip"]
-  let allowList:any = [],allowTag = true,tipFileName = ``
-  // 校验文件类型
-  for (let i = 0; i < newVal.length;i++) {
-    let fileName = newVal[i].name
-    let match = fileName.match(pattern);
+//   let pattern = /\.([a-zA-Z0-9]+)$/;
+//   let allowFileType = ['png', 'jpeg', 'gif', 'pdf', 'txt', 'pptx', 'xlsx', 'doc', 'ppt', 'xls', "py", "zip"]
+//   let allowList:any = [],allowTag = true,tipFileName = ``
+//   // 校验文件类型
+//   for (let i = 0; i < newVal.length;i++) {
+//     let fileName = newVal[i].name
+//     let match = fileName.match(pattern);
     
-    if (match) {
-      let file_type = match[1];
-      if (allowFileType.indexOf(file_type) == -1) {
-        allowTag = false
-        tipFileName = fileName
-      } else {
-        allowList.push(newVal[i])
-      }
-      } else {
-        allowList.push(newVal[i])
-    }
-  }
-  if (!allowTag) {
-    ElMessage({ 
-        type: 'warning',
-        message: `The  file "${tipFileName}" type is not supported`
-    });
-  }
-  fileList.value = allowList
-});
+//     if (match) {
+//       let file_type = match[1];
+//       if (allowFileType.indexOf(file_type) == -1) {
+//         allowTag = false
+//         tipFileName = fileName
+//       } else {
+//         allowList.push(newVal[i])
+//       }
+//       } else {
+//         allowList.push(newVal[i])
+//     }
+//   }
+//   if (!allowTag) {
+//     ElMessage({ 
+//         type: 'warning',
+//         message: `The  file "${tipFileName}" type is not supported`
+//     });
+//   }
+//   fileList.value = allowList
+// });
 
 const configStore = useConfigStore()
 
@@ -120,6 +114,12 @@ const uploadFile = (param: any) => {
         grouping: true,
         message: "upload successful!"
     });
+    } else {
+      ElMessage({ 
+        type: 'error',
+        grouping: true,
+        message: res?.data?.message || "upload fiald"
+    });
     }
   }).catch((err) => {
     ElMessage({ 
@@ -127,7 +127,6 @@ const uploadFile = (param: any) => {
         grouping: true,
         message: "upload failed"
     });
-    console.log(err);
   })
 }
 

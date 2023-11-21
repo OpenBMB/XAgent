@@ -128,8 +128,8 @@ interface LoginFormInf {
 
 const isSubmitLoading = ref(false)
 
-const DEFAULT_ACCOUNT = 'Guest'
-const DEFAULT_PSWD = 'xagent'
+const DEFAULT_ACCOUNT = 'admin'
+const DEFAULT_PSWD = 'xagent-admin'
 
 const loginForm = reactive<LoginFormInf>({
   email: DEFAULT_ACCOUNT,

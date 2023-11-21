@@ -1,6 +1,5 @@
 <template>
   <section class="sidebar">
-
     <div class="logo_name_border flex-column">
       <img class="logo" alt="" draggable="false"
         src="@/assets/images/playground/main-logo-6-5.png" 
@@ -9,16 +8,14 @@
       <img class="name" src="@/assets/images/playground/name-logo.png" draggable="false"
         alt="" width="128" height="35"/>
     </div>
-
     <div 
         class="new-talk flex-row flex-center"
         @click="createNewTalk"
-        v-if="isBetaUser">
+        v-if="false">
       <span>New Talk</span>
     </div>
-
     <div class="history-list flex-column" 
-        v-if="isBetaUser"
+      v-if="false"
       >
       <div
         v-for="(item, index) in historyTalkArr"
@@ -72,7 +69,6 @@
         class="no-data loading flex-column flex-center"
         data-loading="Data Loading..."></div>
     </div>
-    
     <div class="clear-btn-border flex-center">
       <el-dropdown 
         placement="top"
@@ -81,66 +77,33 @@
         @command="handleCommand"
       >
         <span class="el-dropdown-link">
-          <el-icon class="el-icon--left">
-            <Setting />
-          </el-icon>
+          <el-icon class="el-icon--left"><Setting /></el-icon>
             Settings
         </span>
 
         <template #dropdown>
           <el-dropdown-menu>
-            <el-dropdown-item command="blog">
-              <div class="menu-item-row">
-                <span>
-                  Blog
-                </span>
-              </div>
-            </el-dropdown-item>
-          </el-dropdown-menu>
-
-          <el-divider :style="{padding: '0px',margin: '0px'}" v-if="isBetaUser"></el-divider>
-
-          <el-dropdown-menu>
-            <el-dropdown-item command="community">
-              <div class="menu-item-row">
-                <span>
-                  Community
-                </span>
-              </div>
-            </el-dropdown-item>
-          </el-dropdown-menu>
-
-          <!-- 暂时关闭 -->
-          <!-- <el-divider :style="{padding: '0px',margin: '0px'}" v-if="isBetaUser"></el-divider>
-          
-          <el-dropdown-menu v-if="isBetaUser">
-            <el-dropdown-item command="runrecord">
-              <div class="menu-item-row">
-                <span>
-                  Run Recorder 
-                </span>
-              </div>
-            </el-dropdown-item>
-          </el-dropdown-menu> -->
-
-          <el-divider :style="{padding: '0px',margin: '0px'}" v-if="isBetaUser"></el-divider>
-          
-          <el-dropdown-menu>
             <el-dropdown-item command="logout">
               <div class="menu-item-row">
-                <span>
-                  <svg t="1698909989767" class="icon"
-                    viewBox="0 0 1024 1024"
-                    version="1.1"
-                    xmlns="http://www.w3.org/2000/svg" p-id="4227"
-                    width="15px" height="15px"><path d="M85.333333 256a85.333333 85.333333 0 0 1 85.333334-85.333333h384a85.333333 85.333333 0 0 1 85.333333 85.333333v85.333333a42.666667 42.666667 0 1 1-85.333333 0V256H170.666667v512h384v-85.333333a42.666667 42.666667 0 1 1 85.333333 0v85.333333a85.333333 85.333333 0 0 1-85.333333 85.333333H170.666667a85.333333 85.333333 0 0 1-85.333334-85.333333V256z m652.501334 97.834667a42.666667 42.666667 0 0 1 60.330666 0l128 128a42.666667 42.666667 0 0 1 0 60.330666l-128 128a42.666667 42.666667 0 0 1-60.330666-60.330666L793.002667 554.666667H384a42.666667 42.666667 0 1 1 0-85.333334h409.002667l-55.168-55.168a42.666667 42.666667 0 0 1 0-60.330666z" fill="#8a8a8a" p-id="4228"></path></svg>
-                </span>
                 <span>
                   Log out
                 </span>
               </div>
             </el-dropdown-item>
           </el-dropdown-menu>
+
+          <el-divider :style="{padding: '0px',margin: '0px'}" v-if="false"></el-divider>
+          <el-dropdown-menu   v-if="false">
+            <el-dropdown-item command="runrecord">
+              <div class="menu-item-row">
+                <span>
+                  Run record from file 
+                </span>
+              </div>
+            </el-dropdown-item>
+          </el-dropdown-menu>
+
+
         </template>
       </el-dropdown>
     </div>
@@ -148,16 +111,11 @@
 </template>
 
 <script setup lang="ts">
-
-import { ElMessage, ElMessageBox } from 'element-plus';
-import generateRandomId from "/@/utils/uuid";
-// import AppComp from '/@/react-js/components/App.jsx';
+import { ElMessage, ElMessageBox } from 'element-plus'
 
 const loading = ref(true)
 const route = useRoute()
 const router = useRouter()
-
-// const reactContainer = ref(null);
 
 const userStore = useUserStore()
 const authStore = useAuthStore()
@@ -172,7 +130,7 @@ const {
   userInfo: userInfo
 } = storeToRefs(userStore)
 
-const isBetaUser = computed(() => userInfo.value?.is_beta === true ? true : false)
+const isBetaUser = true;
 
 const { isRequestingAi } = storeToRefs(chatMsgInfoStore)
 const emits = defineEmits<{ (e: 'createTalk'): void; (e: 'clear'): void }>();
@@ -185,16 +143,17 @@ const createNewTalk = () => {
     })
     return
   }
-  router.push('/playground');
+  router.push('/playground')
 }
 
+const history = ref<{ title: string; convID: string; accountID: number }[]>([])
 onMounted(() => {
-  queryHistoryData();
-  // renderReactCompInsideVue(AppComp, reactContainer.value);
+    // queryHistoryData()
 });
 
 const queryHistoryData = () => {
   loading.value = true
+  
   useHistoryListRequest().then((res) => {
       const list = res?.data?.rows || []
       chatMsgInfoStore.setHistoryArr(list);
@@ -245,7 +204,7 @@ const deleteHistory = async (item: any , index: number) => {
   await useDeleteHistoryRequest({
     interaction_id: item.interaction_id
   });
-  queryHistoryData()
+  // queryHistoryData()
 }
 
 const playbackItem = (item: any, index: number) => {
@@ -280,36 +239,18 @@ const Logout = () => {
   });
 }
 
-const handleShare = () => {
-  // router.push({ path: '/share' })
-  window.open('https://x-agent.net/', '_blank');
-}
-
 const handleRecord = () => {
-  ElMessageBox.prompt('Please enter a record file path:', 'REC', {
-    confirmButtonText: 'OK',
-    cancelButtonText: 'Cancel',
-    inputPattern: /\S+/,
-    inputErrorMessage: 'Invalid String',
-  })
-  .then(({ value }) => {
-    if (value) {
-      sessionStorage.setItem('rec', value);
+    let rec_file = window.prompt('Please enter a record file path:');
+    if (rec_file) {
+      sessionStorage.setItem('rec', rec_file);
       router.push({
         name: 'NewTalk',
         params: {
           mode: "recorder",
-          id: generateRandomId(),
+          id: "test"
         }});
     }
-  })
-  .catch(() => {
-    ElMessage({
-      type: 'info',
-      message: 'Cancelled',
-    })
-  })
-}
+  }
 
 const handleCommand = (command: string) => {
   switch (command) {
@@ -319,14 +260,6 @@ const handleCommand = (command: string) => {
 
     case 'runrecord':
       handleRecord();
-      break;
-
-    case 'community':
-      handleShare();
-      break;
-
-    case 'blog':
-    window.open('https://blog.x-agent.net/', '_blank');
       break;
 
     default:
@@ -353,7 +286,7 @@ const clearHistory = () => {
     //   historyTalkStore.clearHistory()
     //   router.push('/playground')
     // }
-      router.push('/share');
+      router.push('/playground');
     });
   }
 </script>
@@ -403,23 +336,18 @@ const clearHistory = () => {
       position: relative;
       gap: 8px;
       justify-content: flex-start;
-      align-items: flex-start;
       word-break: break-all;
       user-select: none;
       font-family: MiSans-Normal;
       font-size: 14px;
       color: #777e91;
       margin: 0 10px;
-      padding: 14px 18px;
+      padding: 16px 18px;
       --line-clamp: 2;
       text-overflow: ellipsis;
 
       .icon {
         width: 16px;
-      }
-
-      .ellipsis {
-        line-height: 18px;
       }
 
       &:hover {
@@ -429,10 +357,13 @@ const clearHistory = () => {
         .delete_btn {
           display: flex;
           width: auto;
+
+
+
         }
       }
       .delete_btn {
-        width: 50px;
+        width: auto;
         height: 100%;
         background-image: linear-gradient(269deg, #ffffff 50%, rgba(255, 255, 255, 0) 100%);
         border-radius: 4px;
@@ -442,8 +373,6 @@ const clearHistory = () => {
         display: none;
         align-items: center;
         justify-content: flex-end;
-        padding-left: 20px;
-
         span {
           display: inline-flex;
           justify-content: center;
@@ -455,7 +384,6 @@ const clearHistory = () => {
           &:hover {
             background: #e1e5fa;
             border-radius: 4px;
-
             :deep(svg) {
               // margin: 0 12px 0 auto;
               width: 14px;
@@ -497,24 +425,20 @@ const clearHistory = () => {
       left: 0;
       bottom: 0;
       width: 100%;
+      background-color: #fff;
 
-      .clear-btn {
-        cursor: pointer;
-        border: 1px solid #c1c1c1;
-        border-radius: 4px;
-        height: 43px;
-        width: 100%;
-        font-family: PingFangSC-Regular;
-        font-size: 14px;
-        color: #777e91;
+  .clear-btn {
+    cursor: pointer;
+    border: 1px solid #c1c1c1;
+    border-radius: 4px;
+    height: 43px;
+    width: 100%;
+    font-family: PingFangSC-Regular;
+    font-size: 14px;
+    color: #777e91;
 
-      }
-
-
-      :deep(.el-dropdown-link) {
-        user-select: none;
-      }
-    }
+  }
+}
 }
 
 .dropdown-menu {
@@ -526,14 +450,6 @@ const clearHistory = () => {
   width: 100%;
   padding: 0;
   text-align: center;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-
-  svg {
-    margin-top: 5px;
-    margin-right: 8px;
-  }
 }
 
 </style>
@@ -594,10 +510,8 @@ const clearHistory = () => {
   width: 212px !important;
 }
 
-
-@media screen and (max-height: 600px) {
-  .no-data {
-    display: none
-  }
+.el-dropdown-link {
+  user-select: none;
 }
+
 </style>

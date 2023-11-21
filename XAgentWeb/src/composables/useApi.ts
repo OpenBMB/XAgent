@@ -23,10 +23,10 @@ httpService.interceptors.request.use((config) => {
   const token = useGetLocalCache(STORAGE_TOKEN)
   config.headers!.token = token
 
-  if (import.meta.env.VITE_MODE === 'production') {
-    config.url = config.url?.replace('/api', '/api/account/v1')
-    config.url = config.url?.replace('/api', '/api/chat/v1')
-  }
+  // if (import.meta.env.VITE_MODE === 'production') {
+  //   config.url = config.url?.replace('/api', '/account/v1')
+  //   config.url = config.url?.replace('/api', '/chat/v1')
+  // }
   return config
 })
 // const authStore = useAuthStoreOut()
@@ -64,35 +64,26 @@ export const useCheckPhoneRequest = (params: { mobile: string }) => {
 
 
 export const useSignUpRequest = (params: any): Promise<Result<any>> => {
-  return httpService.post('/api/user/register', params)
+  return httpService.post('/api/register', params)
 }
 
 export const useSharedConvsRequest = (params: any): Promise<Result<any>> => {
-  return httpService.post('/api/conv/getSharedInteractions', params)
+  return httpService.post('/api/getSharedInteractions', params)
 }
 
 export const useLoginRequest = (params: { email: string; token: string }) => {
-  return httpService.post('/api/user/login', params)
+  return httpService.post('/api/login', params)
 }
 
 export const useRegisterRequest = (params: {
   email: string,
   name: string,
 }) => {
-  return httpService.post('/api/user/register', params)
-} 
-// @ deprecated
+  return httpService.post('/api/register', params)
+}
 
 export const useLogoutRequest = (): Promise<Result<any>> => {
   return httpService.get('/api/logout')
-}
-
-export const useWorkspaceFileRequest = (params: any) => {
-  return httpService.post('/api/workspace/file', params)
-}
-
-export const shareRequest = (params: any) => {
-  return httpService.post('/api/conv/shareInteraction', params)
 }
 
 /**
@@ -103,20 +94,18 @@ export const shareRequest = (params: any) => {
  * @returns
  */
 export const useMobileCodeRequest = (params: { mobile: string | number; scene: number }) => {
-  return httpService.post('/api/sendSmsCode', params)
+  return httpService.post('/sendSmsCode', params)
 }
 
 export const useEmailCodeRequest = (params: { email: string }) => {
-  return httpService.post('/api/sendEmailCode', params)
+  return httpService.post('/sendEmailCode', params)
 }
-
-
 
 /**
  * 获取用户secret key
  */
 export const useDetailRequest = (): Promise<Result<{ appKey: string; secretKey: string }>> => {
-  return httpService.post('/api/key/details')
+  return httpService.post('/key/details')
 }
 
 /**
@@ -132,7 +121,7 @@ export const useFeedbackRequest = (params: {
   rating: 'THUMBS_UP' | 'THUMBS_DOWN' | 'THUMBS_NO'
   feedbackAction?: 'COPY' | 'REGENERATE'
 }): Promise<Result<{}>> => {
-  return httpService.post('/api/msg/feedback', params)
+  return httpService.post('/msg/feedback', params)
 }
 
 /**
@@ -146,7 +135,7 @@ export const useChatRequest = (params: {
   parentMessageId: string
   generateType?: 'REGENERATE' | 'NORMAL'
 }): Promise<Result<{ output: string; msgId: string; costTimeMillis: number }>> => {
-  return httpService.post('/api/next', params)
+  return httpService.post('/next', params)
 }
 
 /**
@@ -154,7 +143,7 @@ export const useChatRequest = (params: {
  * @returns
  */
 export const useApiDetailsRequest = (): Promise<Result<{ balance: number; costAmount: number; failRate: string; totalCount: number }>> => {
-  return httpService.post('/api/call/details')
+  return httpService.post('/call/details')
 }
 
 export const useHistoryByIdRequest = (): Promise<Result<{ convInfoList: [] }>> => {
@@ -172,7 +161,7 @@ export const useHistoryListRequest = (): Promise<Result<any>> => {
   const userStore = useUserStore()
   const userInfo = userStore.getUserInfo
 
-  return httpService.post('/api/conv/getUserInteractions', 
+  return httpService.post('/api/getUserInteractions', 
     { 
       user_id: userInfo?.user_id,
       token: userInfo?.token,
@@ -192,7 +181,7 @@ export const useQueryChatRequest = (params: {
 }): Promise<
   Result<{ msgInfos: { msgID: string; content: string; parentMsgID: string; feedbackMsg: string; role: string; rating: string }[] }>
 > => {
-  return httpService.post('/api/getMsgsByConvID', params)
+  return httpService.post('/getMsgsByConvID', params)
 }
 
 export const useDeleteHistoryRequest = (params: object): Promise<Result<{}>> => {
@@ -200,21 +189,9 @@ export const useDeleteHistoryRequest = (params: object): Promise<Result<{}>> => 
   const userStore = useUserStore()
   const userInfo = userStore.getUserInfo
 
-  return httpService.post('/api/conv/deleteInteraction', {
+  return httpService.post('/api/deleteInteraction', {
     user_id: userInfo?.user_id,
     token: userInfo?.token,
     ...params
   });
 }
-
-export const useInitChatPreparation = (): Promise<Result<{}>> => {
-  
-  const userStore = useUserStore()
-  const userInfo = userStore.getUserInfo
-
-  return httpService.post('/api/conv/init_conv_env', {
-    user_id: userInfo?.user_id,
-    token: userInfo?.token,
-  });
-}
-

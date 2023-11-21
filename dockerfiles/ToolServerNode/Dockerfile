@@ -6,6 +6,15 @@ EXPOSE 31942
 
 WORKDIR /app
 
+# 添加清华源
+# If you are not in China,
+# you can comment out the following two lines of code to improve the mirrored builds
+COPY sources.list /etc/apt/sources.list
+RUN rm -rf /etc/apt/sources.list.d/debian.sources
+
+# 更新 apt-get
+RUN apt-get update
+
 RUN apt update && apt install -y build-essential make openjdk-17-jdk-headless curl docker.io docker-compose psmisc sudo
 
 RUN pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple

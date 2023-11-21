@@ -2,7 +2,7 @@
     <codemirror
         v-model="code"
         placeholder="Code is here..."
-        :style="{ height: '100%' }"
+        :style="{ height: '100%', width: '100%' }"
         :autofocus="true"
         :indent-with-tab="true"
         :tab-size="2"
@@ -33,7 +33,11 @@
       isShowLineNum: {
         type: Boolean,
         default: false
-      }
+      },
+      isLineWrapping: {
+        type: Boolean,
+        default: false
+      },
     },
     setup(props, { emit }) {
 
@@ -50,7 +54,7 @@
 
       const CodeEditorOptions = reactive({
           lineNumbers: false,
-          lineWrapping: false,
+          lineWrapping: props.isLineWrapping,
           theme: 'one-dark',
           mode: 'python',
           indentUnit: 2,

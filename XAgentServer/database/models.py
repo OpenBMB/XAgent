@@ -1,31 +1,10 @@
-from sqlalchemy import JSON, Boolean, Column, ForeignKey, Integer, String, Text
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import relationship
-
-
-Base = declarative_base()
+"""SQLAlchemy models for XAgentServer"""
+from sqlalchemy import JSON, Boolean, Column, Integer, String, Text
+from XAgentServer.database.connect import Base
 
 
 class User(Base):
-    """
-    This class defines the structure of the 'users' table in the database.
-    It contains all attributes and methods related to a User object.
-
-    Attributes:
-        id (Integer): Holds the the identifier of the User. 
-        user_id (String): Holds the unique user ID.
-        email (String): Holds the user's email address.
-        name (String): Holds the user's name.
-        token (String): Holds the user's token.
-        available (Boolean): Holds the availability status of the user.
-        deleted (Boolean): Holds the deletion status of the user.
-        corporation (Text): Holds the name of the company or corporation the user belongs to.
-        industry (Text): Holds the industry the user operates in.
-        position (String): Holds the position of the user at the corporation.
-        create_time (String): Holds the creation time of the user.
-        update_time (String): Holds the last update time of the user.
-    """
-
+    """XAgent Users"""
     __tablename__="users"
 
     id=Column(Integer,primary_key=True,index=True)
@@ -34,6 +13,7 @@ class User(Base):
     name = Column(String(255))
     token = Column(String(255))
     available = Column(Boolean, default=True)
+    is_beta = Column(Boolean, default=False)
     deleted = Column(Boolean, default=False)
     corporation = Column(Text)
     industry = Column(Text)
@@ -43,27 +23,7 @@ class User(Base):
 
 
 class Interaction(Base):
-    """
-    Represents the structure of the 'interactions' table in the database, 
-    and defines the attributes and behaviors of an Interaction object.
-    
-    Attributes:
-        id (Integer): Holds the the unique identifier of the Interaction.
-        interaction_id (String): Holds the interaction ID.
-        user_id (String): Holds the user ID involved in the interaction.
-        create_time (String): Holds the creation time of the interaction.
-        update_time (String): Indicates when the interaction was last updated.
-        description (String): Brief explanation of the interaction.
-        agent (String): Agent's name involved in the interaction.
-        mode (String): Modality of the interaction.
-        recorder_root_dir (Text): Root directory for saving interaction records.
-        file_list (JSON): List of files related to the interaction.
-        status (String): Status of the interaction.
-        message (Text): messages involved in the interaction.
-        current_step (String): Step where the interaction is currently at.
-        is_deleted (Boolean): Indicates if the interaction has been deleted.
-    """    
-
+    """XAgent Interactions"""
     __tablename__ = "interactions"
 
     id = Column(Integer, primary_key=True, index=True)
@@ -80,19 +40,11 @@ class Interaction(Base):
     message = Column(Text)
     current_step = Column(String(255))
     is_deleted = Column(Boolean, default=False)
+    call_method = Column(String(255), default="web")
 
 
 class Parameter(Base):
-    """
-    This class represents the structure of the 'interaction_parameters' table in the database. 
-    It defines the attributes and behaviors of a Parameter object.
-    
-    Attributes:
-        id (Integer): Unique identifier of the Parameter.
-        interaction_id (String): ID of the interaction to which the parameter belongs.
-        parameter_id (String): ID of the parameter.
-        args (JSON): Holds the parameter arguments.
-    """    
+    """XAgent Parameters"""
     __tablename__ = "interaction_parameters"
 
     id = Column(Integer, primary_key=True, index=True)
@@ -102,24 +54,7 @@ class Parameter(Base):
 
 
 class SharedInteraction(Base):
-    """
-    Represents the structure of the 'shared_interactions' table in the database. 
-    Models the attributes and behaviors of a SharedInteraction object.
-    
-    Attributes:
-        id (Integer): Unique identifier for the shared interaction.
-        interaction_id (String): ID of the interaction being shared.
-        user_name (String): Name of the user who shared the interaction.
-        create_time (String): Creation time of the shared interaction.
-        update_time (String): When the shared interaction was last updated.
-        description (String): Short explanation about the shared interaction.
-        agent (String): Agent involved in the shared interaction.
-        mode (String): Mode of the shared interaction.
-        is_deleted (Boolean): Indicates if the shared interaction has been deleted.
-        star (Integer): Star rating given to the shared interaction. Default is 0.
-        record_dir (Text): Directory where records for the shared interaction are held.
-    """    
-
+    """Commnunity Shared Interactions"""
     __tablename__ = "shared_interactions"
 
     id = Column(Integer, primary_key=True, index=True)
@@ -132,4 +67,90 @@ class SharedInteraction(Base):
     mode = Column(String(255))
     is_deleted = Column(Boolean, default=False)
     star = Column(Integer, default=0)
-    record_dir = Column(Text)
+    is_audit = Column(Boolean, default=False)
+
+
+class Raw(Base):
+    """Raw Data"""
+    __tablename__ = "raw"
+    # id/id
+    id = Column(Integer, primary_key=True, index=True)
+    # node_id
+    node_id = Column(String(255))
+    # 交互id/interaction_id
+    interaction_id = Column(String(255))
+    # 当前节点/current
+    current = Column(String(128))
+    # step/step
+    step = Column(Integer, default=0)
+    # 数据/agent data
+    data = Column(JSON)
+    # workspace文件列表/workspace file list
+    file_list = Column(JSON)
+    # 状态/status
+    status = Column(String(20))
+    # 是否中断/interrupt or not
+    do_interrupt = Column(Boolean, default=False)
+    # 已等待时间/wait seconds
+    wait_seconds = Column(Integer, default=0)
+    # 是否需要人工干预/ask for human help or not
+    ask_for_human_help = Column(Boolean, default=False)
+    # 创建时间/create time
+    create_time = Column(String(255))
+    # 更新时间/update time
+    update_time = Column(String(255))
+    # 是否删除/is deleted or not
+    is_deleted = Column(Boolean, default=False)
+    # 是否人工已经输入/has human input or not
+    is_human = Column(Boolean, default=False)
+    # 人工输入数据/human data
+    human_data = Column(JSON)
+    # 人工文件列表/agent file list
+    human_file_list = Column(JSON)
+    # 是否推送前端/has send to frontend or not
+    is_send = Column(Boolean, default=False)
+    # 是否接收前端消息/has receive message from frontend or not
+    is_receive = Column(Boolean, default=False)
+    # 是否包含png/has png or not
+    include_pictures = Column(Boolean, default=False)
+
+
+class RunningRecord(Base):
+    """Running Record"""
+    __tablename__ = "running_record"
+    # id/id
+    id = Column(Integer, primary_key=True, index=True)
+    # record_id/record_id
+    record_id = Column(String(255))
+    # 当前节点/current
+    current = Column(String(255))
+    # 节点id/node_id
+    node_id = Column(String(255))
+    # 节点类型/node_type, options: [now_subtask_id, llm_input_pair, tool_server_pair, query, config]
+    node_type = Column(String(255))
+    # data/agent data
+    data = Column(JSON)
+    # 创建时间/create time
+    create_time = Column(String(255))
+    # 更新时间/update time
+    update_time = Column(String(255))
+    # 是否删除/is deleted or not
+    is_deleted = Column(Boolean, default=False)
+    
+    def create_mysql_table_sql(self):
+        """create mysql table"""
+        return """
+        CREATE TABLE IF NOT EXISTS `running_record` (
+          `id` int(11) NOT NULL AUTO_INCREMENT,
+          `record_id` varchar(255) NOT NULL,
+          `interaction_id` varchar(255) NOT NULL,
+          `current` varchar(255) NOT NULL,
+          `node_id` varchar(255) NOT NULL,
+          `node_type` varchar(255) NOT NULL,
+          `data` json DEFAULT NULL,
+          `create_time` varchar(255) NOT NULL,
+          `update_time` varchar(255) NOT NULL,
+          PRIMARY KEY (`id`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;"""
+    
+    

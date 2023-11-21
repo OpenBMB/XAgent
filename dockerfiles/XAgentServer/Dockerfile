@@ -9,6 +9,14 @@ RUN npm run build
 
 FROM python:3.10 AS XAgentServer
 EXPOSE 8090
+# 添加清华源
+# If you are not in China,
+# you can comment out the following two lines of code to improve the mirrored builds
+COPY sources.list /etc/apt/sources.list
+RUN rm -rf /etc/apt/sources.list.d/debian.sources
+
+# 更新 apt-get
+RUN apt-get update
 RUN pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple
 RUN apt-get update --fix-missing
 RUN apt-get install -y nginx systemctl

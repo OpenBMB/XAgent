@@ -158,7 +158,7 @@ class OBJGenerator:
             if not isinstance(arguments,str):
                 arguments = json5.dumps(arguments)
             # give one opportunity to fix the json string
-            response = self.dynamic_json_fixes(arguments,function_schema,messages,str(e))
+            response = self.dynamic_json_fixs(arguments,function_schema,messages,str(e))
             arguments = response['choices'][0]['message']['function_call']['arguments']
             validate()
 

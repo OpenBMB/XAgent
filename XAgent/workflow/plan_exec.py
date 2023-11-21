@@ -7,13 +7,11 @@ from copy import deepcopy
 
 from XAgent.logs import logger
 from XAgent.workflow.base_query import BaseQuery
-from XAgent.global_vars import agent_dispatcher
 from XAgent.utils import TaskSaveItem, RequiredAbilities, PlanOperationStatusCode, TaskStatusCode
 from XAgent.message_history import Message
 from XAgent.data_structure.plan import Plan
 from XAgent.ai_functions import  function_manager
-from XAgent.running_recorder import recorder
-from XAgent.tool_call_handle import toolserver_interface
+from XAgent.core import XAgentCoreComponents
 from XAgent.agent.summarize import summarize_plan,clip_text
 from XAgent.config import CONFIG
 
@@ -68,7 +66,7 @@ class PlanRefineChain():
         })
         self.plans.append(deepcopy(new_plan))
 
-        recorder.regist_plan_modify(
+        XAgentCoreComponents.global_recorder.regist_plan_modify(
             refine_function_name = function_name,
             refine_function_input = function_input,
             refine_function_output = function_output,
@@ -143,7 +141,7 @@ class PlanAgent():
 
         self.refine_chains: List[PlanRefineChain] = []
 
-    def initial_plan_generation(self):
+    def initial_plan_generation(self, agent_dispatcher):
         """Generates the initial plan.
 
         This method generates the initial plan by calling the plan generation agent.
@@ -204,7 +202,7 @@ class PlanAgent():
         """
         return self.plan
 
-    def plan_refine_mode(self, now_dealing_task: Plan):
+    def plan_refine_mode(self, now_dealing_task: Plan, toolserver_interface, agent_dispatcher):
         """Enters the plan refine mode.
 
         This method enters the plan refine mode and performs plan refinements based on user suggestions.

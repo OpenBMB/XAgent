@@ -2,7 +2,6 @@ from typing import List, Dict
 from enum import Enum, unique
 
 from XAgent.utils import RequiredAbilities
-from XAgent.global_vars import agent_dispatcher
 from XAgent.data_structure.node import Node
 from XAgent.message_history import Message
 
@@ -174,7 +173,7 @@ class SummarizationTrieTree:
         return message_list
 
 
-    def generate_summary(self, message_list, recursive_mode=True):
+    def generate_summary(self, message_list, recursive_mode=True, agent_dispatcher=None):
         """Generates a summary for the given list of messages.
 
         Args:

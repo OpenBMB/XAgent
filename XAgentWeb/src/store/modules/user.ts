@@ -16,7 +16,8 @@ interface UserState {
 export const useUserStore = defineStore('user', {
   state: (): UserState => {
     return {
-      userInfo: null,
+      // 用户信息
+      userInfo: useGetLocalCache<UserInfo>(USER_INFO) || null,
       roleList: [],
       lastUpdateTime: 0,
       showKey: false,

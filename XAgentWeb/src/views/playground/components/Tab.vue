@@ -6,7 +6,7 @@
     <span> Outer Loop：</span>
   </div>
   <div
-    v-if="subTasks.length === 0 && isLatest && pageMode !== 'review'"
+    v-if="subTasks.length === 0 && isLatest && pageMode !== 'review' && isLoading"
     class="loading-skeleton-wrapper"
   >
     <el-skeleton :rows="5" animated />
@@ -56,7 +56,7 @@
                 "
                 :disabled="!currentGoalStr"
                 class="subtask-run-btn"
-                @click="subtaskRun(goal)"
+                @click="subtaskRun(index)"
               >
                 <VideoPlay />
               </el-button>
@@ -112,7 +112,7 @@
               >
                 <template #title>
                   <span class="box-subtask-title">
-                    <b>🤖️ Step {{ innerIndex + 1 }}: </b>{{ item.thoughts }}
+                    <b>🤖️ Step {{ innerIndex + 1 }} </b>
                   </span>
                 </template>
                 <Inferencing
@@ -155,7 +155,7 @@
           </el-collapse>
         </div>
       </el-tab-pane>
-    </el-tabs>
+    </el-tabs>  
   </div>
   <div v-if="subTasks.length === 0 && !isLatest" class="no-data-placeholder">
     No generated data.
@@ -167,6 +167,7 @@
 import { ref } from "vue";
 import Inferencing from "./Inferencing.vue";
 import TaskRefineInfo from "./TaskRefineInfo.vue";
+import { router } from "/@/router";
 
 const route = useRoute();
 
@@ -177,12 +178,14 @@ const props = defineProps([
   "mode",
   "isLatest",
   "pageMode",
+  "isLoading",
 ]);
 
 const emit = defineEmits(["runSubtask", "runInner", "disconnect"]);
 
 const taskStore = useTaskStore();
 const taskInfo = storeToRefs(taskStore);
+const { subtasks: subTasks } = storeToRefs(taskStore);
 
 const isOnlyExpandLastInner = ref(false);
 
@@ -213,9 +216,9 @@ const tabIndex = ref("0" as string);
 const setting = chatMsgInfoStore.getSetting(conversationIdN.value);
 
 const isSubtaskGenerating = ref(false);
-
 const isInnerNodeGenerating = ref(true);
 const isInnerNodeEditabled = ref(props?.mode === "auto" ? false : true);
+const isLoading = computed(() => props.isLoading);
 
 const { isCompleted: isTaskCompleted } = storeToRefs(taskStore);
 
@@ -224,7 +227,7 @@ const {
   current_inner_index: currentInnerIndex,
 } = storeToRefs(taskStore);
 
-const { subtasks: subTasks } = storeToRefs(taskStore);
+
 
 const currentGoalStr = computed({
   get: () => {
@@ -240,9 +243,13 @@ const showTaskDetail = ref(true);
 
 
 watch(currentInnerIndex, (val) => {
-  const inners = taskInfo.subtasks.value[parseInt(tabIndex.value)].inner;
+  const _sub_task = taskInfo.subtasks.value[parseInt(tabIndex.value)];
+  if(!_sub_task) {
+    router.push("/playground");
+    return;
+  } 
+  const inners = _sub_task.inner;
   const len = inners.length;
-
   if (isOnlyExpandLastInner.value) {
     if (inners && len < 2) {
       activeKeys.value = inners.map((item: any, index: number) => (index + ""));
@@ -321,16 +328,27 @@ const changeShow = () => {
 
 const tabClick = (val: string) => {};
 
-const subtaskRun = (querystr: any) => {
+const subtaskRun = (_index: number) => {
+  const querystr = subTasks.value[_index].goal;
   emit("runSubtask", querystr);
-  isSubtaskGenerating.value = true;
+  isSubtaskGenerating.value = true; 
   if (currentInnerIndex.value === 0 || props.mode === "auto") {
     isInnerNodeGenerating.value = true;
   }
 };
 
-const runToNext = (query: any) => {
-  emit("runInner", query);
+const runToNext = (_i: any) => {
+  const _inner_index = _i.innerNumber;
+  const _subtask_index = _i.subTaskNumber;
+  const query = subTasks.value[_subtask_index].inner[_inner_index]
+
+  emit("runInner", {
+    thoughts: query.thoughts,
+    reasoning: query.reasoning,
+    plan: query.plan,
+    criticism: query.criticism,
+  });
+  
   isInnerNodeGenerating.value = true;
 };
 
@@ -564,6 +582,7 @@ defineExpose({
         line-clamp: 1;
         height: 48px;
         background-color: #fff;
+        user-select: none;
       }
       .is-active {
         .el-collapse-item__wrap {

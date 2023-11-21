@@ -56,7 +56,7 @@
                 "
                 :disabled="!currentGoalStr"
                 class="subtask-run-btn"
-                @click="subtaskRun(goal)"
+                @click="subtaskRun(index)"
               >
                 <VideoPlay />
               </el-button>
@@ -112,7 +112,7 @@
               >
                 <template #title>
                   <span class="box-subtask-title">
-                    <b>🤖️ Step {{ innerIndex + 1 }}: </b>{{ item.thoughts }}
+                    <b>🤖️ Step {{ innerIndex + 1 }} </b>
                   </span>
                 </template>
                 <Inferencing
@@ -155,7 +155,7 @@
           </el-collapse>
         </div>
       </el-tab-pane>
-    </el-tabs>
+    </el-tabs>  
   </div>
   <div v-if="subTasks.length === 0 && !isLatest" class="no-data-placeholder">
     No generated data.
@@ -183,6 +183,7 @@ const emit = defineEmits(["runSubtask", "runInner", "disconnect"]);
 
 const taskStore = useTaskStore();
 const taskInfo = storeToRefs(taskStore);
+const { subtasks: subTasks } = storeToRefs(taskStore);
 
 const isOnlyExpandLastInner = ref(false);
 
@@ -224,7 +225,7 @@ const {
   current_inner_index: currentInnerIndex,
 } = storeToRefs(taskStore);
 
-const { subtasks: subTasks } = storeToRefs(taskStore);
+
 
 const currentGoalStr = computed({
   get: () => {
@@ -321,16 +322,27 @@ const changeShow = () => {
 
 const tabClick = (val: string) => {};
 
-const subtaskRun = (querystr: any) => {
+const subtaskRun = (_index: number) => {
+  const querystr = subTasks.value[_index].goal;
   emit("runSubtask", querystr);
-  isSubtaskGenerating.value = true;
+  isSubtaskGenerating.value = true; 
   if (currentInnerIndex.value === 0 || props.mode === "auto") {
     isInnerNodeGenerating.value = true;
   }
 };
 
-const runToNext = (query: any) => {
-  emit("runInner", query);
+const runToNext = (_i: any) => {
+  const _inner_index = _i.innerNumber;
+  const _subtask_index = _i.subTaskNumber;
+  const query = subTasks.value[_subtask_index].inner[_inner_index]
+
+  emit("runInner", {
+    thoughts: query.thoughts,
+    reasoning: query.reasoning,
+    plan: query.plan,
+    criticism: query.criticism,
+  });
+  
   isInnerNodeGenerating.value = true;
 };
 
@@ -564,6 +576,7 @@ defineExpose({
         line-clamp: 1;
         height: 48px;
         background-color: #fff;
+        user-select: none;
       }
       .is-active {
         .el-collapse-item__wrap {

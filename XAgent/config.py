@@ -3,6 +3,7 @@ import os
 import yaml
 from copy import deepcopy
 
+
 class XAgentConfig(dict):
     """
     A dictionary-like configuration class with attribute-style access.
@@ -10,6 +11,7 @@ class XAgentConfig(dict):
     Inherited from dictionary, this class provides methods for accessing and modifying
     dictionary items using attributes and methods.
     """
+
     def __init__(self, *args, **kwargs):
         """
         Initialize class instance.
@@ -75,7 +77,7 @@ class XAgentConfig(dict):
         """
         if safe:
             right_value = deepcopy(self)
-            right_value.pop("api_keys","")
+            right_value.pop("api_keys", "")
             return right_value
         else:
             return self
@@ -91,12 +93,14 @@ class XAgentConfig(dict):
         """
         config_file = os.getenv('CONFIG_FILE', config_file)
         print('---config file---\n'+str(config_file))
-        self.__init__(**yaml.load(open(config_file, 'r'), Loader=yaml.FullLoader))
+        self.__init__(
+            **yaml.load(open(config_file, 'r'), Loader=yaml.FullLoader))
         # check environment variables
-        self['selfhost_toolserver_url'] = os.getenv('TOOLSERVER_URL', self['selfhost_toolserver_url'])
+        self['selfhost_toolserver_url'] = os.getenv(
+            'TOOLSERVER_URL', self['selfhost_toolserver_url'])
         print('---args---\n'+str(ARGS))
         self.update(ARGS)
-        
+
     @staticmethod
     def get_default_config(config_file='assets/config.yml'):
         """
@@ -116,10 +120,12 @@ class XAgentConfig(dict):
             cfg = {}
         return XAgentConfig(**cfg)
 
+
 CONFIG = XAgentConfig.get_default_config()
 ARGS = {}
 
-def get_model_name(model_name:str=None):
+
+def get_model_name(model_name: str = None):
     """
     Get the normalized model name for a given input model name.
 
@@ -143,7 +149,7 @@ def get_model_name(model_name:str=None):
             normalized_model_name = 'gpt-4-32k'
         case 'gpt-3.5-turbo-16k':
             normalized_model_name = 'gpt-3.5-turbo-16k'
-            
+
         case 'gpt4':
             normalized_model_name = 'gpt-4'
         case 'gpt4-32':
@@ -156,6 +162,7 @@ def get_model_name(model_name:str=None):
             raise Exception(f"Unknown model name {model_name}")
 
     return normalized_model_name
+
 
 def get_apiconfig_by_model(model_name: str) -> dict:
     """
@@ -172,5 +179,6 @@ def get_apiconfig_by_model(model_name: str) -> dict:
     """
     normalized_model_name = get_model_name(model_name)
     apiconfig = deepcopy(CONFIG.api_keys[normalized_model_name][0])
-    CONFIG.api_keys[normalized_model_name].append(CONFIG.api_keys[normalized_model_name].pop(0))
+    CONFIG.api_keys[normalized_model_name].append(
+        CONFIG.api_keys[normalized_model_name].pop(0))
     return apiconfig

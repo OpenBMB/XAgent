@@ -7,16 +7,20 @@ interface subtask {
     isFinished?: boolean
     isRunning?: boolean
     refinement: any
-    isShowRefinement?: boolean
+    isShowRefinement?: boolean,
 }
 
 
 interface TaskState {
     current_subtask_index : number
     current_inner_index : number
+    currentTaskId: null | string
+    currentNewTalkId?: null | string
     subtasks: subtask[]
     isCompleted: boolean
     isAutoMode: boolean
+    workspaceFiles: any[]
+    last_step_id: null | string
 }
 
 export const useTaskStore = defineStore('task', {
@@ -26,7 +30,11 @@ export const useTaskStore = defineStore('task', {
             current_subtask_index: 0,
             current_inner_index: 0,
             isCompleted: false,
+            currentTaskId: null,
+            currentNewTalkId: null,
             isAutoMode: false,
+            workspaceFiles: [],
+            last_step_id: ''
         }
     },
 
@@ -40,6 +48,13 @@ export const useTaskStore = defineStore('task', {
             this.current_subtask_index = 0
         },
         
+        setCurrentTaskId(data: string) {
+            this.currentTaskId = data
+        },
+
+        setCurrentNewTalkId(data: string) {
+            this.currentNewTalkId = data
+        },
 
         addInner(data: any) {
             if(this.isCompleted) {
@@ -71,6 +86,9 @@ export const useTaskStore = defineStore('task', {
             this.subtasks[this.current_subtask_index].isShowRefinement = true;
         },
 
+        setLastStepId(data: string) {
+            this.last_step_id = data
+        },
 
         nextsubtask(data: any) {
             if(this.isCompleted) {
@@ -132,6 +150,14 @@ export const useTaskStore = defineStore('task', {
             this.current_subtask_index = 0
             this.current_inner_index = 0
             this.isCompleted = false
+        },
+
+        addWorkspaceFiles(data: any) {
+            this.workspaceFiles?.push(data)
+        },
+
+        setWorkspaceFiles(data: any[]) {
+            this.workspaceFiles = data
         }
 
     },
@@ -158,8 +184,24 @@ export const useTaskStore = defineStore('task', {
             return this.isCompleted
         },
 
+        getCurrentTaskId(): string | null {
+            return this.currentTaskId
+        },
+
+        getCurrentNewTalkId(): any {
+            return this.currentNewTalkId
+        },
+
         getSubtasks(): subtask[] {
             return this.subtasks
+        },
+
+        getLastStepId(): string | null {
+            return this.last_step_id
+        },
+
+        getWorkspaceFiles(): any[] {
+            return this.workspaceFiles || []
         }
     }
 })

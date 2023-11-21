@@ -7,7 +7,7 @@ export const createPermissionGuard = (router: Router) => {
     // return
     const isMobile = /Mobi|Android|iPhone/i.test(navigator.userAgent)
     if (isMobile && to.path !== '/mobile') {
-      // current device is mobile
+      // 当前设备是移动设备
       next('/mobile')
       return
     }
@@ -16,19 +16,40 @@ export const createPermissionGuard = (router: Router) => {
       next('/playground')
       return
     }
+
+    const userStore = useUserStore()
+    const userInfo = userStore.getUserInfo
+    
     const isLogin = authStore.getLoginState
     const token = authStore.getToken
+    
+    const isBetaUser = userInfo?.is_beta === true;
+    
     if (token) {
       if (isLogin) {
-        to.path === '/login' ? next('/playground') : next()
-        // to.path === '/login' ? next('/share') : next()
+            if(to.path === '/login') {
+              next(isBetaUser ? '/playground' : '/share')
+            } else if(isBetaUser) {
+              next()
+              // to.path === '/share' ? next('/playground') : next()
+            } else {
+              to.meta.isBetaOnly === true ? next('/share') : next()
+            }
+
       } else {
         const loginState = await authStore.checkAuthAction().catch(() => next('/404'))
         if (loginState) {
-          // to.path === '/login' ? next('/share') : next()
-          to.path === '/login' ? next('/playground') : next()
+          
+            if(to.path === '/login') {
+              next(isBetaUser ? '/playground' : '/share')
+            } else if(isBetaUser) {
+              next()
+              // to.path === '/share' ? next('/playground') : next()
+            } else {
+              to.meta.isBetaOnly === true ? next('/share') : next()
+            }
+
         } else {
-          // to.path === '/login' ? next() : next('/login')
           to.path === '/login' ? next() : next('/login')
         }
       }

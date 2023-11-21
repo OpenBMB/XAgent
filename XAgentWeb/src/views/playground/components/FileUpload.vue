@@ -1,7 +1,7 @@
 <template>
   <div class="file-uploader-wrapper">
       <el-upload
-            accept=".txt"
+            accept=".txt, .pdf, .doc, .docx, .xls, .xlsx, .ppt, .pptx, .png, .jpeg, .gif, .py, .zip"
             v-model:file-list="fileList"
             class="upload-demo"
             :limit="5"
@@ -39,18 +39,21 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue'
+import { Upload } from '@element-plus/icons-vue';
 import axios from 'axios';
-import type { UploadProps, UploadUserFile, UploadInstance } from 'element-plus'
-import { Upload } from '@element-plus/icons-vue'
-import BACKEND_URL from '/@/api/backend.ts';
+import type { UploadInstance, UploadProps, UploadUserFile } from 'element-plus';
+import { ref } from 'vue';
+
 import { ElMessage } from 'element-plus';
 
 const fileList = ref<UploadUserFile[]>([ ])
 const uploadFileRef = ref<UploadInstance | null>(null)
 const uploadFinished = ref(false)
 
-const url = BACKEND_URL + '/upload';  
+const BACKEND_URL = (
+  import.meta.env.VITE_BACKEND_URL as string
+  ).replace(/\/api/, '');
+const url = BACKEND_URL + '/workspace/upload';  
 
 const handleChange: UploadProps['onChange'] = (uploadFile, uploadFiles) => {
 }
@@ -58,7 +61,7 @@ const handleChange: UploadProps['onChange'] = (uploadFile, uploadFiles) => {
 watch(() => fileList.value, (newVal) => {
 
   let pattern = /\.([a-zA-Z0-9]+)$/;
-  let allowFileType = ['png', 'jpeg', 'gif', 'pdf', 'txt', 'pptx', 'xlsx', 'doc', 'ppt', 'xls']
+  let allowFileType = ['png', 'jpeg', 'gif', 'pdf', 'txt', 'pptx', 'xlsx', 'doc', 'ppt', 'xls', "py", "zip"]
   let allowList:any = [],allowTag = true,tipFileName = ``
   // 校验文件类型
   for (let i = 0; i < newVal.length;i++) {
@@ -83,9 +86,7 @@ watch(() => fileList.value, (newVal) => {
         message: `The  file "${tipFileName}" type is not supported`
     });
   }
-  if (allowList.length !== fileList.value.length) {
-    fileList.value = allowList
-  }
+  fileList.value = allowList
 });
 
 const configStore = useConfigStore()
@@ -111,7 +112,7 @@ const uploadFile = (param: any) => {
     timeout: 5000
   }).then((res) => {
     if(res.data.success === true) {
-      const _file = res.data.data.file_list as string[];
+      const _file = res.data.data.file_list as object[];
       configStore.addFiles(_file);
       uploadFinished.value = true;
       ElMessage({ 

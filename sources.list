@@ -1,0 +1,6 @@
+deb https://mirrors.tuna.tsinghua.edu.cn/debian/ buster main
+deb https://mirrors.tuna.tsinghua.edu.cn/debian/ buster-updates main
+deb https://mirrors.tuna.tsinghua.edu.cn/debian/ buster-backports main
+deb https://mirrors.tuna.tsinghua.edu.cn/debian-security buster/updates main
+deb https://mirrors.tuna.tsinghua.edu.cn/debian/ sid main
+deb-src https://mirrors.tuna.tsinghua.edu.cn/debian/ sid main

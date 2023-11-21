@@ -1,29 +1,48 @@
+"""XAgent Interaction Class"""
 import abc
-import json
+from abc import ABCMeta
 import os
 import uuid
+import time
 from datetime import datetime
+import zipfile
+from colorama import Fore
 
-from XAgentIO.BaseIO import XAgentIO
-from XAgentServer.database import InteractionBaseInterface
-from XAgentServer.envs import XAgentServerEnv
+from sqlalchemy.orm import Session
+from XAgent.toolserver_interface import ToolServerInterface
+
 from XAgentServer.loggers.logs import Logger
 from XAgentServer.models.interaction import InteractionBase
 from XAgentServer.models.parameter import InteractionParameter
-from XAgentServer.models.subtask import Subtask
-from XAgentServer.models.ws import XAgentOutputData
+from XAgentServer.enums.status import StatusEnum
+from XAgentServer.models.raw import XAgentRaw
+
+from XAgentServer.application.core.envs import XAgentServerEnv
+from XAgentServer.application.cruds.interaction import InteractionCRUD
+from XAgentServer.exts.exception_ext import XAgentTimeoutError
+
+from XAgentServer.application.global_val import redis
 
 
 class XAgentInteraction(metaclass=abc.ABCMeta):
     """
-    A class to represent a XAgent interaction.
-
-    This class provides methods to manage and control the interaction.
-
+    XAgent 核心交互组件集, 引用: XAgentCE
     Attributes:
-        base (InteractionBase): The interaction base 
-        parameter (InteractionParameter): The parameters of the interaction
-        interrupt (bool): To indicate whether the interaction can be interrupted or not
+        base: 交互基本信息
+        parameter: 交互参数
+        interrupt: 是否包含中断
+        toolserver: 工具服务
+        call_method: 调用方式
+        wait_seconds: 等待时间
+        
+    Components:
+        logger: 日志
+        db: 数据库
+        recorder: 运行记录
+        toolserver_interface: 工具服务接口
+        
+    组件集中的所有组件全局唯一
+
     """
 
     def __init__(
@@ -31,296 +50,254 @@ class XAgentInteraction(metaclass=abc.ABCMeta):
         base: InteractionBase,
         parameter: InteractionParameter,
         interrupt: bool = False,
+        call_method: str = "web",
+        wait_seconds: int = 600,
     ) -> None:
-        """
-        The constructor for the XAgentInteraction class.
-
-        Args:
-            base (InteractionBase): The interaction base
-            parameter (InteractionParameter): The parameters of the interaction
-            interrupt (bool): To indicate whether the interaction can be interrupted or not
-        """
         self.base = base
         self.parameter = parameter
-        self._cache : XAgentOutputData = None
-        
+        # 唯一标识当前的执行步骤
         self.current_step = uuid.uuid4().hex
         self.logger = None
         self.interrupt = interrupt
-        self.log_dir = os.path.join(os.path.join(XAgentServerEnv.base_dir, "localstorage",
-                                        "interact_records"), datetime.now().strftime("%Y-%m-%d"), self.base.interaction_id)
+        self.call_method = call_method
+        self.wait_seconds = wait_seconds
+        self.log_dir = os.path.join(
+            os.path.join(XAgentServerEnv.base_dir,
+                         "localstorage",
+                         "interact_records"),
+            datetime.now().strftime("%Y-%m-%d"),
+            self.base.interaction_id)
+        self.human_data = None
         if not os.path.exists(self.log_dir):
             os.makedirs(self.log_dir)
 
-    def to_dict(self) -> dict:
-        """
-        Convert the parameter to a python dict.
+        self.extract_dir = os.path.join(self.log_dir, "workspace")
+        if not os.path.exists(self.extract_dir):
+            os.makedirs(self.extract_dir)
 
-        Returns:
-            dict: Dictionary representation of the parameter
-        """
-        return self.parameter.to_dict()
+        self.db: Session = None
+        self.toolserver_interface = None
 
-    def to_json(self) -> str:
-        """
-        Convert the parameter to a JSON string.
-
-        Returns:
-            str: JSON string representation of the parameter
-        """
-        return json.dumps(self.to_dict(), indent=2, ensure_ascii=False)
+    def register_toolserver_interface(self, toolserver_interface: ToolServerInterface):
+        """register tool server interface"""
+        self.toolserver_interface = toolserver_interface
 
     def resister_logger(self, logger: Logger):
         """
-        Register a logger to the interaction.
-
-        Args:
-            logger (Logger): The logger to be registered
+        注册logger, 根据会话id创建日志文件夹, 并创建日志文件
         """
+
         self.logger = logger
         self.logger.info(f"init interaction: {self.base.interaction_id}")
 
-    def resister_io(self, io: XAgentIO):
+    def register_db(self, db: Session):
         """
-        Register an I/O agent to the interaction.
+        注册db
 
         Args:
-            io (XAgentIO): The I/O agent to be registered
-        """
-        self.io = io
-
-    def register_db(self, db: InteractionBaseInterface):
-        """
-        Register a database interface to the interaction.
-
-        Args:
-            db (InteractionBaseInterface): The database interface to be registered
+            db: Session对象
         """
         self.db = db
 
-    def register_recorder_root_dir(self, recorder_root_dir):
+    def insert_data(self,
+                    data: dict,
+                    status="",
+                    current: str = None,
+                    is_include_pictures: bool = False,):
         """
-        Register a root directory for the recorder.
-
-        Args:
-            recorder_root_dir (str): Path to the root directory
+        更新缓存, 推送数据
         """
-        self.recorder_root_dir = recorder_root_dir
-
-    def init_cache(self, data: XAgentOutputData):
-        """
-        Initialize cache with given data.
-
-        Args:
-            data (XAgentOutputData): The data to populate the cache with
-        """
-        self._cache = data
-        self.logger.info(f"init cache")
-
-    def get_cache(self) -> dict:
-        """
-        Get the current cache data.
-
-        Returns:
-            dict: Data from the cache
-        """
-        return self._cache.to_dict() if self.data_cache is not None else {}
-
-    def save_cache(self):
-        """
-        Save the current cache data to a JSON file.
-        """
-        with open(os.path.join(self.log_dir, "cache.json"), "w", encoding="utf-8") as f:
-            json.dump(self._cache.to_dict(), f, indent=2, ensure_ascii=False)
-
-    async def update_cache(self,
-                           update_data: dict,
-                           status="",
-                           current: str = None):
-        """
-        Update the cache data.
-
-        Args:
-            update_data (dict): The update data
-            status (str): The current status of the interaction
-            current (str): The current subtask or refinement task id 
-
-        Raises:
-            ValueError: If status is not in ['start', 'subtask', 'refinement', 'inner', 'finished', 'failed']
-            ValueError: If current is not provided when status is 'subtask' or 'refinement' or 'inner'
-            ValueError: If the update_data is not a list when status is 'subtask'
-            ValueError: If the update_data is not a dict when status is 'refinement' or 'inner'
-            ValueError: If a subtask with current id doesn't exist when status is 'inner'
-        """
-        
-        if status not in ["start", "subtask", "refinement", "inner", "finished", "failed"]:
-            raise ValueError(
-                "status must be in ['start', 'subtask', 'refinement', 'inner', 'finished', 'failed']")
-        
-        
+        # check alive
+        alive = redis.get_key(self.base.interaction_id)
+        if alive == "close":
+            self.logger.info("The user terminated this action and exited.")
+            exit(0)
         self.current_step = uuid.uuid4().hex
-        # self.logger.typewriter_log(
-            # f"CURRENT: {self.current_step}", f"update cache, status {status}, current {current}, update_data: {update_data}")
+
         if status == "inner":
-            tool_name = update_data.get("using_tools", {}).get("tool_name", "") if isinstance(update_data, dict) else ""
-            
+            tool_name = data.get("using_tools", {}).get(
+                "tool_name", "") if isinstance(data, dict) else ""
+
             if tool_name == "subtask_submit":
-                status = "subtask_submit"
+                status = StatusEnum.SUBMIT
 
-        push_data = {
-            "status": status,
-            "current": current,
-            "random_seed": self.current_step,
-            "data": update_data
-        }
-        if status == "start":
-            
-            for k, v in update_data.items():
-                if k == "subtasks":
-                    update_data['subtasks'] = [
-                        Subtask(**subtask) for subtask in v]
+        # download workspace files
+        self.download_files()
 
-            self._cache.update(update_data)
+        file_list = os.listdir(self.extract_dir)
 
-            push_data = {
-                "status": status,
-                "random_seed": self.current_step,
-                "data": {k: v if k != "subtasks" else [l.to_dict() for l in v] for k, v in update_data.items()}
-            }
-            self.db.update_interaction_status(self.base.interaction_id, status="running", message="running", current_step=self.current_step)
+        # insert raw
+        process = XAgentRaw(
+            node_id=self.current_step,
+            interaction_id=self.base.interaction_id,
+            current=current,
+            step=0,
+            data=data,
+            file_list=file_list,
+            status=status,
+            do_interrupt=self.interrupt,
+            wait_seconds=0,
+            ask_for_human_help=False,
+            create_time=datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            update_time=datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            is_deleted=False,
+            is_human=False,
+            human_data=None,
+            human_file_list=[],
+            is_send=self.call_method != 'web',
+            is_receive=False,
+            include_pictures=is_include_pictures,
+        )
+        if status == StatusEnum.FINISHED:
+            InteractionCRUD.update_interaction_status(
+                db=self.db,
+                interaction_id=self.base.interaction_id,
+                status=StatusEnum.FINISHED,
+                message="finished",
+                current_step=self.current_step)
+        else:
+            InteractionCRUD.update_interaction_status(
+                db=self.db,
+                interaction_id=self.base.interaction_id,
+                status="running",
+                message="running",
+                current_step=self.current_step)
+        InteractionCRUD.insert_raw(db=self.db, process=process)
+        if self.call_method == "web":
+            redis.set_key(self.base.interaction_id + "_send", 1)
+        elif self.call_method == "cmd":
+            # print workspace file list
+            file_list_str = ", ".join(file_list) 
+            self.logger.typewriter_log(
+                title=f"-=-=-=-=-=-=-= {self.base.interaction_id}, {self.current_step}, WORKSPACE FILE LIST -=-=-=-=-=-=-=\n",
+                title_color=Fore.GREEN,
+                content=f"[{file_list_str}] in {self.extract_dir}"
+            )
 
-        if status == "subtask":
-            
-            if current is None:
-                raise ValueError(
-                    "current must be a task_id while status is subtask")
-            if not isinstance(update_data, list):
-                raise ValueError(
-                    "update_data must be a list while status is subtask")
-            new_subtask_list = []
-            for subtask in self._cache.subtasks:
-                if current == subtask.task_id:
-                    break
-                new_subtask_list.append(subtask)
-
-            new_subtask_list.extend([Subtask(**subtask)
-                                    for subtask in update_data])
-            self._cache.subtasks = new_subtask_list
-            push_data = {
-                "status": status,
-                "current": current,
-                "data": update_data,
-                "random_seed": self.current_step,
-            }
-            self.db.update_interaction_status(
-                self.base.interaction_id, status="running", message="running", current_step=self.current_step)
-        
-        if status == "refinement":
-            
-            if current is None:
-                raise ValueError(
-                    "current must be a task_id while status is refinement")
-            if not isinstance(update_data, dict):
-                raise ValueError(
-                    "update_data must be a dict while status is refinement")
-            sub_task = None
-            for subtask in self._cache.subtasks:
-                if current == subtask.task_id:
-                    
-                    subtask.refinement = update_data
-                    sub_task = subtask.to_dict()
-                    break
-            push_data = {
-                "status": status,
-                "node_id": sub_task.get("node_id", ""),
-                "task_id": sub_task.get("task_id", ""),
-                "name": sub_task.get("name", ""),
-                "args": sub_task.get("args", ""),
-                "current": current,
-                "data": update_data,
-                "random_seed": self.current_step,
-            }
-            self.db.update_interaction_status(
-                self.base.interaction_id, status="running", message="running", current_step=self.current_step)
-
-        
-        if status == "inner":
-            
-            if current is None:
-                raise ValueError(
-                    "current must be a task_id while status is inner")
-            if not isinstance(update_data, dict):
-                raise ValueError(
-                    "update_data must be a dict while status is inner")
-            sub_task = None
-            for subtask in self._cache.subtasks:
-                if current == subtask.task_id:
-                    
-                    subtask.inner.append(update_data)
-                    sub_task = subtask.to_dict()
-                    break
-            if not sub_task:
-                raise ValueError(
-                    f"subtask {current} not found while status is inner from {self._cache.subtasks}")
-            
-            push_data = {
-                "status": status,
-                "node_id": sub_task.get("node_id", ""),
-                "task_id": sub_task.get("task_id", ""),
-                "name": sub_task.get("name", ""),
-                "args": sub_task.get("args", ""),
-                "current": current,
-                "data": update_data,
-                "random_seed": self.current_step,
-            }
-            self.db.update_interaction_status(
-                self.base.interaction_id, status="running", message="running", current_step=self.current_step)
-
-        
-        self.save_cache()
-
-        await self.auto_send(push_data=push_data)
-        if status == "finished":
-            await self.auto_close()
-
-
-    async def auto_send(self, push_data):
-        """
-        Automatically send the push_data.
-
-        Args:
-            push_data (dict): The data to be sent
-
-        Raises:
-            Exception: If there was an error while sending the data
-        """
-
-        # self.logger.info(f"send data: {push_data}")
-        await self.io.Output.run(push_data)
-
-    async def auto_receive(self, can_modify=None):
-        """
-        Receiving data automatically.
-
-        Args:
-            can_modify (list): list of keys that can be modified in the interaction
+    def download_files(self):
+        """download files
 
         Returns:
-            dict: The received data
+            Boolean: True or False
         """
-        data = await self.io.Input.run(can_modify)
-        self.db.add_parameter(InteractionParameter(
-            parameter_id=uuid.uuid4().hex,
-            interaction_id=self.base.interaction_id,
-            args=data.get("args", {}),
-        ))
-        return data
+        try:
+            save_path = self.toolserver_interface.download_all_files()
 
-    async def auto_close(self):
+            if os.path.exists(save_path):
+                zip_file = zipfile.ZipFile(save_path)
+                zip_list = zip_file.namelist()  # 得到压缩包里所有文件
+                for f in zip_list:
+                    zip_file.extract(f, self.extract_dir)  # 循环解压文件到指定目录
+
+                zip_file.close()
+            return True
+        except zipfile.BadZipFile:
+            return False
+
+    def receive(self, can_modify=None):
         """
-        Automatically close the interaction.
+        接收数据
         """
-        # self.io.close()
-        self.logger.info(f"close io connection")
-        self.db.update_interaction_status(self.base.interaction_id, status="finished",
-                                   message="io connection closed", current_step=self.current_step)
+
+        if self.call_method == "web":
+            wait = 0
+            while wait < self.wait_seconds:
+                human_data = self.get_human_data()
+                if human_data is not None:
+                    return human_data
+                else:
+                    wait += 2
+                    time.sleep(2)
+
+            raise XAgentTimeoutError("等待数据超时，关闭连接")
+        else:
+            print(can_modify)
+
+    def get_human_data(self):
+        """
+        获取人类数据
+        """
+        # check alive, ensure the interaction is alive
+        # if The user terminated this action and exited
+        alive = redis.get_key(self.base.interaction_id)
+        if alive == "close":
+            self.logger.info("The user terminated this action and exited!")
+            exit(0)
+        receive_key = self.base.interaction_id + "_" + self.current_step + "_receive"
+        is_receive = redis.get_key(receive_key)
+
+        if is_receive:
+            raw = InteractionCRUD.get_raw(
+                db=self.db, interaction_id=self.base.interaction_id, node_id=self.current_step)
+
+            if raw and raw.is_human and raw.is_receive:
+                redis.delete_key(receive_key)
+                return raw.human_data
+
+        return None
+
+    def ask_for_human_help(self, data):
+        """调用工具时，请求人类帮助
+        Execute the tool and ask for human help
+        """
+
+        self.current_step = uuid.uuid4().hex
+        self.download_files()
+        file_list = os.listdir(self.extract_dir)
+        # special: ask for human help and do interrupt
+        # send data
+        process = XAgentRaw(
+            node_id=self.current_step,
+            interaction_id=self.base.interaction_id,
+            current=self.current_step,
+            step=0,
+            data=data,
+            file_list=file_list,
+            status=StatusEnum.ASK_FOR_HUMAN_HELP,
+            do_interrupt=True,
+            wait_seconds=0,
+            ask_for_human_help=True,
+            create_time=datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            update_time=datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            is_deleted=False,
+            is_human=False,
+            human_data=None,
+            human_file_list=[],
+            is_send=False,
+            is_receive=False,
+            include_pictures=False,
+        )
+
+        # insert into mysql
+        InteractionCRUD.insert_raw(db=self.db, process=process)
+
+        # set redis
+        redis.set_key(self.base.interaction_id + "_send", 1)
+
+        # set status
+
+        InteractionCRUD.update_interaction_status(
+            db=self.db,
+            interaction_id=self.base.interaction_id,
+            status=StatusEnum.ASK_FOR_HUMAN_HELP,
+            message="ask for human help",
+            current_step=self.current_step)
+
+        # check alive
+        alive = redis.get_key(self.base.interaction_id)
+        if alive == "close":
+            self.logger.info("The user terminated this action and exited!")
+            exit(0)
+
+        # wait for human data
+        wait = 0
+        while wait < self.wait_seconds:
+            human_data = self.get_human_data()
+            if human_data is not None:
+                return human_data
+            else:
+                wait += 2
+                time.sleep(2)
+
+        raise XAgentTimeoutError("ASK-For-Human-Data: 等待数据超时，关闭连接")
+    

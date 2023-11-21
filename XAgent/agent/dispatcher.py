@@ -201,4 +201,4 @@ class XAgentDispatcher(AgentDispatcher):
         return agent
 
 
-agent_dispatcher = XAgentDispatcher(CONFIG, enable=False)
+# agent_dispatcher = XAgentDispatcher(CONFIG, enable=False)

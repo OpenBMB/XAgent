@@ -38,7 +38,7 @@ class RunningRecoder():
     Attributes:
         record_root_dir (str): The root directory of the running records.
         newly_start (bool): A flag to indicate whether or not a new task has started.
-        tool_server_interface_id (int): The id of the tool server interface.
+        toolserver_interface_id (int): The id of the tool server interface.
         tool_call_id (int): The id of the tool call.
         plan_refine_id (int): The id of the plan refinement.
         llm_server_cache (dict): The cache for the llm server.
@@ -65,7 +65,7 @@ class RunningRecoder():
 
         self.newly_start = True  
 
-        self.tool_server_interface_id = 0
+        self.toolserver_interface_id = 0
 
         self.tool_call_id = 0
         self.plan_refine_id = 0
@@ -233,7 +233,7 @@ class RunningRecoder():
             tool_output (Any): The output from the tool.
             response_status_code (int): The response status code.
         """
-        with open(os.path.join(self.record_root_dir, "tool_server_pair", f"{self.tool_server_interface_id:05d}.json"),"w",encoding="utf-8",) as writer:
+        with open(os.path.join(self.record_root_dir, "tool_server_pair", f"{self.toolserver_interface_id:05d}.json"),"w",encoding="utf-8",) as writer:
             tool_record = {
                 "url": dump_common_things(url.split("/")[-1]),
                 "payload": dump_common_things(payload),
@@ -242,7 +242,7 @@ class RunningRecoder():
             }
             json.dump(tool_record, writer, indent=2, ensure_ascii=False)
 
-        self.tool_server_interface_id += 1
+        self.toolserver_interface_id += 1
 
     def query_tool_server_cache(self, url, payload):
         """
@@ -257,10 +257,10 @@ class RunningRecoder():
         """
         if self.newly_start:
             return None
-        if self.tool_server_interface_id >= len(self.tool_server_cache):
+        if self.toolserver_interface_id >= len(self.tool_server_cache):
             return None
 
-        cache = self.tool_server_cache[self.tool_server_interface_id]
+        cache = self.tool_server_cache[self.toolserver_interface_id]
 
         if cache["url"] == url.split("/")[-1] and cache["payload"] == dump_common_things(payload):
             logger.typewriter_log(

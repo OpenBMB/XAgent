@@ -2,8 +2,8 @@
   <div class="main-page-container history-list">
     <div class="main-page-wrapper">
       <h3>Conversations Shared by Our Community</h3>
+
       <div>
-        <!-- by zhpeng -->
         <el-pagination
           v-model:current-page="currentPage"
           v-model:page-size="pageSize"
@@ -14,8 +14,8 @@
           :hide-on-single-page="true"
         />
       </div>
+
       <div class="conversations-list-wrapper" id="main-page-convs-list-wrapper">
-        
         <div
           v-for="(item, index) in sharedTalksArr"
           :key="item.interaction_id"
@@ -46,6 +46,7 @@
               by: {{ item.user_name || "Community User" }}
             </span>
           </div>
+
           <span class="delete_btn flex-row">
             <span
               class="playback-icon"
@@ -57,14 +58,24 @@
           </span>
         </div>
       </div>
+
+      <div v-show="isContentLoading">
+        <el-skeleton :loading="isContentLoading" animated style="width: 100%;" class="loading-skeleton-container">
+            <template #template>
+              <el-skeleton-item variant="rect" class="skeleton-item"/>
+              <el-skeleton-item variant="rect" class="skeleton-item"/>
+              <el-skeleton-item variant="rect" class="skeleton-item"/>
+            </template>
+        </el-skeleton>
+      </div>
       
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { ElMessage } from "element-plus";
 import { ref } from "vue";
+import { ElMessage } from "element-plus";
 
 const route = useRoute();
 const router = useRouter();
@@ -101,6 +112,8 @@ const currentPage = ref(1);
 const pageSize = ref(20);
 const total = ref(0);
 
+const isContentLoading = ref(false);
+
 const handleSizeChange = async (val: number) => {
   pageSize.value = val;
   currentPage.value = 1;
@@ -113,6 +126,22 @@ const handleCurrentChange = async (val: number) => {
 };
 
 const getSharedData = async () => {
+
+  if(sharedTalksArr.value.length > 0) {
+    return;
+  }
+
+  // if(sessionStorage.getItem("sharedTalksLoaded") === "true") {
+  //   return;
+  // }
+
+  // if(localStorage.getItem("sharedTalks")) {
+  //   chatMsgInfoStore.setSharedArr(JSON.parse(localStorage.getItem("sharedTalks") || "[]"));
+  //   return;
+  // }
+
+  isContentLoading.value = true;
+
   const res = await useSharedConvsRequest({
     user_id: userInfo?.user_id,
     token: userInfo?.token,
@@ -123,8 +152,18 @@ const getSharedData = async () => {
   if (res?.success === true || res?.message === "success") {
     chatMsgInfoStore.setSharedArr(res?.data?.rows || []);
     total.value = res?.data?.total || 0;
+    sessionStorage.setItem("sharedTalksLoaded", "true");
+    
+    if(res?.data?.rows ) {
+      localStorage.setItem("sharedTalks", JSON.stringify(res?.data?.rows));
+    } else {
+      localStorage.setItem("sharedTalks", JSON.stringify([]));
+    }
+
+    isContentLoading.value = false;
   } else {
     ElMessage({ type: "error", message: res?.message || "Failed to get data" });
+    isContentLoading.value = false;
   }
 };
 
@@ -224,6 +263,28 @@ $convs-list-item-width: 250px;
     }
   }
 }
+.loading-skeleton-container {
+  padding: 0;
+  height: auto;
+  width: 100%;
+  max-width: 80vw;
+  display: grid !important;
+  grid-template-columns: repeat(
+    auto-fill,
+    minmax($convs-list-item-width, 1fr)
+  );
+  grid-gap: 20px;
+
+    .skeleton-item {
+      display: inline-block;
+      padding: 0.8em !important;
+      height: 120px;
+      width: 100%;
+      max-width: 80vw;
+      margin: 20px auto 0 auto;
+    }  
+}
+
 
 .history-list {
   overflow-y: auto;

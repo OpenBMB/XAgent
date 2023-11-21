@@ -39,7 +39,7 @@ xmltodict
 docstring_parser
 json5
 inputimeout
-openai==0.28.1
+openai
 yagmail
 sqlalchemy
 python-multipart
@@ -48,3 +48,5 @@ pinecone-client
 python-dotenv
 markdown2
 apscheduler
+pymysql
+redis

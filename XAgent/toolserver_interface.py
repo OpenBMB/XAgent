@@ -89,8 +89,9 @@ class ToolServerInterface():
             self.url = config.selfhost_toolserver_url
         else:
             raise NotImplementedError('Please use selfhost toolserver')
-        logger.typewriter_log("ToolServer connected in", Fore.RED, self.url)
+        logger.typewriter_log("Trying to connect to ToolServer at", Fore.RED, self.url)
         response = requests.post(f'{self.url}/get_cookie',)
+        logger.typewriter_log("ToolServer connected in", Fore.RED, self.url)
         self.cookies = response.cookies
 
     def close(self):
@@ -325,7 +326,7 @@ class ToolServerInterface():
 
         cache_output = self.recorder.query_tool_server_cache(url, payload)
 
-        if self.config['experiment']['redo_action'] or cache_output is None:
+        if ("redo_action" in self.config["experiment"] and self.config['experiment']['redo_action']) or cache_output is None:
             response = requests.post(url, json=payload, cookies=self.cookies)
             response_status_code = response.status_code
             if response.status_code == 200 or response.status_code == 450:

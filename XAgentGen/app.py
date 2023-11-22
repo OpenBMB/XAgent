@@ -46,7 +46,7 @@ engine_configs = AsyncEngineArgs(
     quantization=None,
     revision=None,
     tokenizer_revision=None,
-    seed=0,
+    seed=42,
     gpu_memory_utilization=0.9,
     swap_space=4,
     disable_log_requests=True,
@@ -156,4 +156,5 @@ async def chat_function(response:Response,request: Request):
     }
     return response_model
 
-uvicorn.run(app, host="127.0.0.1", port=args.port)
+if __name__ == "__main__":
+    uvicorn.run(app, host="0.0.0.0", port=int(args.port))

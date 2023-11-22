@@ -7,3 +7,6 @@ docker buildx build --push --platform linux/arm64,linux/amd64 -t xagentteam/tool
 docker buildx build --push --platform linux/arm64,linux/amd64 -t xagentteam/toolserver-monitor -f dockerfiles/ToolServerMonitor/Dockerfile .
 docker buildx build --push --platform linux/arm64,linux/amd64 -t xagentteam/xagent-server:0.3 -f dockerfiles/XAgentServer/Dockerfile .
 docker buildx build --push --platform linux/arm64,linux/amd64 -t xagentteam/xagent-server -f dockerfiles/XAgentServer/Dockerfile .
+
+# docker buildx build --push --platform linux/arm64,linux/amd64 -t xagentteam/xagentgen:0.1 -f dockerfiles/XAgentGen/Dockerfile .
+# docker buildx build --push --platform linux/arm64,linux/amd64 -t xagentteam/xagentgen -f dockerfiles/XAgentGen/Dockerfile .

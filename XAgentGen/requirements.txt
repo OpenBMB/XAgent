@@ -22,3 +22,8 @@ referencing==0.30.2
 torch==2.1.0
 deepspeed==0.12.2
 addict==2.4.0
+cachetools==5.3.0
+datasets==2.11.0
+ray
+pandas 
+pyarrow

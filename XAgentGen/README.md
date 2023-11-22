@@ -8,30 +8,34 @@ Currently, XAgentGen supports the following models:
 
 
 # 🛠️ 1. Setup for XAgentGen
+After you download the models, you can host a interference service for the model by following the instructions below.
+## Install Cuda Container Toolkit
+XAgentGen requires the [Cuda Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html#docker) to run.
+You should follow the guide to install the Cuda Container Toolkit before running the XAgentGen.
+
+## Pull or Build the XAgentGen image
 You can either pull the pre-built docker image or build the docker image by yourself.
 We do recommend you to pull the pre-built docker image, which is more convenient.
 
-## Pull the pre-built docker image
+### Pull the pre-built docker image
 ```shell
-docker pull xagentteam/xagentgen:test
-docker run -it -p 13520:13520  -v ./XAgenGen:/app:rw -v /host/model/path:/model:rw --gpus all --ipc=host --name xagentgen xagentteam/xagentgen:test python app.py --model-path /model --port 13520
+docker pull xagentteam/xagentgen:latest
 ```
-**Note:** Change the `/host/model/path` to the path of your model directory. The service should be listening on port `13520`.
 
-## Build the docker image by yourself
+### Build the docker image by yourself
 Make sure you are at the root dir of the project, and run the following command:
 ```shell
-docker build -f dockerfiles/XAgentGen/Dockerfile -t xagentgen:test . 
+docker build -f dockerfiles/XAgentGen/Dockerfile -t xagentteam/xagentgen . 
 ```
 Note that the building process may take a long time and the default setting requires at least 64GB memory to build.
 You can low down the memory requirement by changing the `MAX_JOBS` in the dockerfile.
 
 
-After the building process, you can run the docker image by:
+## Run the docker image
+Start the docker image by:
 ```shell
-docker run -it -p 13520:13520  -v ./XAgenGen:/app:rw -v /host/model/path:/model:rw --gpus all --ipc=host --name xagentgen xagentgen:test python app.py --model-path /model --port 13520
+docker run -it -p 13520:13520  -v /host/model/path:/model:rw --gpus all --ipc=host xagentteam/xagentgen:latest python app.py --model-path /model --port 13520
 ```
-
 **Note:** Change the `/host/model/path` to the path of your model directory. The service should be listening on port `13520`.
 
 

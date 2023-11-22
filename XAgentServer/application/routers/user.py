@@ -65,9 +65,6 @@ async def auth(user_id: str = Query(...),
     user auth
     """
     user = UserCRUD.get_user(db=db, user_id=user_id)
-    if (XAgentServerEnv.default_login and user_id == "admin" and token == "xagent-admin"):
-        return ResponseBody(data=user.to_dict(), success=True, message="auth success")
-
     if user is None:
         return ResponseBody(success=False, message="user is not exist")
 
@@ -96,8 +93,6 @@ async def login(email: str = Form(...),
     login
     """
     user = UserCRUD.get_user(db=db, email=email)
-    if (XAgentServerEnv.default_login and email == "admin" and token == "xagent-admin"):
-        return ResponseBody(data=user.to_dict(), success=True, message="auth success")
     if user is None:
         return ResponseBody(success=False, message="user is not exist")
 

@@ -22,15 +22,13 @@ pip install -r requirements.txt
 ```
 
 ## Project subject dependence
-1. The project uses FastAPI as the WEB framework, Websocket to build a long link communication service, and Redis as the state management middleware;
+1. The project uses FastAPI as the WEB framework, Websocket to build a long connection communication service, and Redis as the state management middleware;
 2. Use Mysql to store interactive process data and SQLAlchemy as ORM framework
-3. The XAgent interface is located at /XAgentServer/server.py; Core interactive logic in the/XAgentServer/interaction.py.
+3. The XAgent interface is located at XAgentServer/server.py; Core interactive logic in the XAgentServer/interaction.py
 
 
 ## project directory[Chinese / English]
 Only core business modules are listed
->- XAgent [XAgent 核心业务组件 / XAgent Core Components]
->   - 待补充
 >- XAgentServer [XAgent 交互组件 / XAgent Interactive Components]
 >   - application [应用 / Application]
 >       - core [应用启动核心配置文件 / Configuration File]
@@ -38,7 +36,7 @@ Only core business modules are listed
 >       - routers [FastAPI 核心路由文件 / FastAPI Routers]
 >       - schemas [FastAPI 请求响应结构体 / FastAPI Request & Response Schemas]
 >       - websockets [XAgent 前后端数据交互框架 / XAgent Websocket Framework]
->       - dependencies.py [FastAPI 依赖注入 / FastAPI Dependencies]
+>       - dependence.py [FastAPI 依赖注入 / FastAPI Dependencies]
 >       - main.py [FastAPI 启动入口 / FastAPI Entrance]
 >       - global_val.py [全局变量 / Global Variables]
 >   - dockerfiles [Docker 镜像构建文件 / Docker Image Build Files]
@@ -49,7 +47,7 @@ Only core business modules are listed
 >   - models [业务模块定义 / Modules]
 >   - interaction.py [核心交互逻辑 / Core Interactive Module]
 >   - server.py [交互入口 / Entrance for XAgent]
->- XAgentWeb
+
 
 
 ## Launching XAgent-Server

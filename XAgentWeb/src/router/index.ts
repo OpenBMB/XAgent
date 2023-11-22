@@ -13,6 +13,7 @@ Object.keys(modules).forEach((key) => {
 })
 
 const PAGE_NOT_FOUND = 'page_not_found'
+
 const PAGE_NOT_FOUND_ROUTE = {
   name: PAGE_NOT_FOUND,
   path: '/:path(.*)*',
@@ -39,11 +40,41 @@ const routes: Readonly<RouteRecordRaw[]> = [
     component: Login,
     meta: { requireAuth: false },
   },
+  { 
+    name: 'SharedTalks',
+    path: '/share',
+    component: Layout,
+    meta: {
+      requireAuth: true,
+      isBetaOnly: false,
+      title: 'Our Shared Talks ｜ X-Agent',
+    },
+    children: [
+      {
+        name: 'SharedTalks',
+        path: '/share',
+        meta: {
+          isBetaOnly: false,
+          title: 'Our Shared Talks ｜ X-Agent',
+        },
+        component: () => import('/@/views/playground/layout.vue'),
+        children: [
+          {
+            name: 'SharedTalks',
+            path: '/share',
+            component: () => import('/@/views/playground/share.vue'),
+          },
+        ]
+      }
+    ]
+  },
   {
     name: 'Playground',
     path: '/playground',
     component: Layout,
-    meta: { title: 'Demo Playground ｜ X-Agent' },
+    meta: { 
+      title: 'Demo Playground ｜ X-Agent',
+    },
     children: [
       {
         path: '/playground',
@@ -53,25 +84,22 @@ const routes: Readonly<RouteRecordRaw[]> = [
           {
             path: '/playground',
             name: 'Playground',
-            component: () => import('../views/playground/index.vue')
+            component: () => import('../views/playground/index.vue'),
+            meta: {
+              title: 'Demo Playground ｜ X-Agent',
+              isBetaOnly: true,
+            },
           },
           { 
             path: '/playground/chat',
             name: 'Talk',
             component: () => import('../views/playground/chat.vue')
           },
-
           { 
             name: 'NewTalk',
-            path: '/playground/chat/:mode/:id',
+            path: '/playground/chat/:mode/:id?',
             component: () => import('../views/playground/chat.vue')
           },
-
-          // { 
-          //   name: 'SharedTalks',
-          //   path: '/share',
-          //   component: () => import('../views/playground/share.vue')
-          // },
         ],
       },
     ],

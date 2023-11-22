@@ -11,17 +11,14 @@
 
 <script lang="js" setup>
 
-import { ref, onMounted, reactive } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 
 const props = defineProps({
     datasource: {
         type: Object,
-        required: true
+        required: true,
+        default: () => ({})
     }
-})
-
-watch(() => props.datasource, (newVal) => {
-    window.load_nb_file(newVal);
 })
 
 const notebookContainer = ref(null)
@@ -41,6 +38,12 @@ onMounted(() => {
         window.render_notebook(notebookContainer.value, file);
     };
 
+});
+
+watch(() => props.datasource, (newVal) => {
+    if(window && window.load_nb_file && Object.keys(newVal).length > 0) {
+        window.load_nb_file(newVal);
+    }
 });
 
 

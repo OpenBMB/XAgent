@@ -36,8 +36,8 @@
                 :isLineWrapping = "true"
                 v-if="fileTypeClassify(currentActiveFileType) === 'unknown'"
             />
-            <python-notebook-viewer 
-                :datasource="fileWrapper.file"
+            <python-notebook-viewer  
+                :datasource="fileWrapper"
                 v-show="fileTypeClassify(currentActiveFileType) === 'jpt'" />
             <images-viewer  
                 :dataList="imagesArr"
@@ -62,9 +62,7 @@ const userInfo = userStore.getUserInfo;
 const currentActiveFileNames = ref('')
 const currentActiveFileType = ref('')
 const imagesArr = ref<any[]>([])
-const fileWrapper = reactive({
-    file: {}
-})
+const fileWrapper = ref<any>({})
 
 const {
     workspaceFiles: workspaceFiles
@@ -97,7 +95,7 @@ const openFile = (file: any) => {
         file_name: file?.name
     }).then((res: any) => {
         if(file.suffix === 'ipynb') {
-            fileWrapper.file = res;
+            fileWrapper.value = res;
         } else if(['png', 'jpg', 'jpeg', 'gif', 'bmp'].includes(file.suffix)) {
             const rawImageResponse = res.data;
             imagesArr.value = singleObjectToArray({

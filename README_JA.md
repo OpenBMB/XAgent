@@ -76,12 +76,17 @@ ToolServer は、タスクを解決するための強力で安全なツールを
 
 ToolServer は、XAgent の動作が行われる場所です。これは、XAgent が実行するための安全な環境を提供する Docker コンテナになります。
 そのため、まず `docker` と `docker-compose` をインストールする必要があります。
-その後、ToolServer 用の docker イメージをビルドし、docker コンテナを起動します。
-```bash
+次に、ToolServerイメージを構築する必要があります。 ToolServer`ディレクトリでは、私たちのサービスのイメージを構築する2つの方法があります：
+以下のコマンドを実行することで、docker hubからイメージを取得し、dockerネットワークを構築することができます：
+bash
+docker-compose up
+```
+あるいは、以下のコマンドを実行してローカルソースからイメージを構築することもできます：
+バッシュ
 docker-compose up --build
 ```
 これによりツールサーバーのイメージが構築され、ツールサーバーのコンテナが起動します。
-コンテナをバックグラウンドで実行したい場合は、`docker-compose up -d --build` を使用してください。
+コンテナをバックグラウンドで実行したい場合は、`docker-compose up -d`、`docker-compose up -d --build` を使用してください。
 ToolServer の詳細については、[こちら](ToolServer/README.md)を参照してください。
 
 ToolServer が更新された場合、イメージを再構築する必要があります:

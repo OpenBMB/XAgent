@@ -77,11 +77,16 @@ XAgent由三部分组成：
 
 工具服务器是XAgent的行动发生的地方。它是一个docker容器，为XAgent提供一个安全的运行环境。
 因此，您应该首先安装`docker`和`docker-compose`。
-然后，您需要构建工具服务器的镜像。在`ToolServer`目录下，运行以下命令：
+然后，您需要构建工具服务器的镜像。在`ToolServer`目录下，您有两种方式构建我们的服务镜像：
+您可以通过运行以下命令从docker hub拉取镜像构建docker网络：
+```bash
+docker-compose up
+```
+或者您可以通过运行以下命令从本地源代码构建镜像：
 ```bash
 docker-compose up --build
 ```
-这将构建工具服务器的镜像并启动工具服务器的容器。如果您想在后台运行容器，请使用`docker-compose up -d --build`。
+这将构建工具服务器的镜像并启动工具服务器的容器。如果您想在后台运行容器，请相应使用`docker-compose up -d`或者`docker-compose up -d --build`。
 参考[ToolServer](ToolServer/README_ZH.md)获取更多信息。
 
 如果需要更新工具服务器或您想重新构建工具服务器的镜像，请使用以下命令：

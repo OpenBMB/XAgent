@@ -118,7 +118,7 @@ async def startup():
     await startup_event()
     if XAgentServerEnv.default_login:
         logger.typewriter_log(
-            title="Default user: admin, token: xagent-admin, you can use it to login",
+            title="Default user: Guest, token: xagent, you can use it to login",
             title_color=Fore.RED)
     await print_start_message()
 

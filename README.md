@@ -77,15 +77,25 @@ You can also easily add new tools to ToolServer to enhance XAgent's abilities.
 
 ToolServer is where XAgent's action takes place. It is a docker container that provides a safe environment for XAgent to run.
 So you should install `docker` and `docker-compose` first. 
-After that, you should build the docker image for ToolServer and start the docker container.
+Then, you need to build the ToolServer image. In the `ToolServer` directory, you have two ways to build an image of our service:
+You can build a docker network by pulling the image from docker hub by running the following command:
 ```bash
-docker-compose up --build
+docker compose up
+```
+Or you can build an image from local sources by running the following command:
+```bash
+docker compose build
+docker compose up
 ```
 This will build the image for the ToolServer and start the ToolServer's container. 
-If you want to run the container in the background, please use `docker-compose up -d --build`.
+If you want to run the container in the background, please use `docker compose up -d`.
 Refer [here](ToolServer/README.md) for detailed information about our ToolServer.
 
-If the ToolServer is updated, you have to rebuild the images:
+If the ToolServer is updated, you have to repull/rebuild the images:
+```bash
+docker compose pull
+```
+Or
 ```bash
 docker compose build
 ```
@@ -127,14 +137,9 @@ python run.py --task "put your task here" --model "gpt-4" --config_file "assets/
    
 
 - Run XAgent with GUI
-```bash
-## We ran the web ui docker when building the ToolServer network
-## run nginx in docker
-docker exec XAgent-Server systemctl start nginx
-```
-Build the docker image for XAgent-Server and start the docker container.
-You will see the XAgent Server listening on port `8090`.
+The container `XAgent-Server` is started with nginx and a web server listening on port `5173`.
 You could visit `http://localhost:5173` to interact with XAgent by using web UI.
+The default username and password are `guest` and `xagent`, respectively.
 Refer [here](XAgentServer/README.md) for the detailed information about our GUI Demo.
 
 <div><a id="Demo"></a></div>

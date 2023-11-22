@@ -1,30 +1,25 @@
 import json
 import uuid
-from typing import Dict, List
 
 from colorama import Fore
 
-from XAgent.global_vars import agent_dispatcher,config
 from XAgent.inner_loop_search_algorithms.ReACT import ReACTChainSearch
 from XAgent.logs import logger, print_task_save_items
-from XAgent.ai_functions import function_manager
-from XAgent.running_recorder import recorder
-from XAgent.tool_call_handle import function_handler, toolserver_interface
-from XAgent.agent.summarize import summarize_plan 
+from XAgent.agent.summarize import summarize_plan
 from XAgent.utils import (RequiredAbilities, SearchMethodStatusCode,
                           TaskSaveItem, TaskStatusCode)
-from .base_query import BaseQuery
+from XAgent.ai_functions import function_manager
+from XAgent.core import XAgentCoreComponents, XAgentParam
+from XAgentServer.enums.status import StatusEnum
 from .plan_exec import Plan, PlanAgent
 from .reflection import get_posterior_knowledge
-from XAgentServer.interaction import XAgentInteraction
-from XAgentServer.models.ws import XAgentOutputData
 from .working_memory import working_memory_agent
 
 
 class TaskHandler():
     """
     Main class for handling tasks within the XAgent system.
-    
+
     Attributes:
         config: The configuration settings for the task handler.
         function_list: List of available functions for the current task.
@@ -34,40 +29,43 @@ class TaskHandler():
         plan_agent: Instance of PlanAgent class which is used for generating and handling plan for the current task.
         interaction: Instance of XAgentInteraction class for interacting with outer world.
     """
-    
-    def __init__(self, config,
-                 query: BaseQuery,
-                 function_list: List[Dict],
-                 tool_functions_description_list: List[dict],
-                 interaction: XAgentInteraction):
+
+    def __init__(self,
+                 xagent_core: XAgentCoreComponents,
+                 xagent_param: XAgentParam):
         """
         Initializes TaskHandler with the provided input parameters.
 
         Args:
-            config: The configuration settings for the TaskHandler
-            query (BaseQuery): Query with the task information
-            function_list (List[Dict]): List of available functions for the current task
-            tool_functions_description_list (List[dict]): List of available tool functions description for the current task
-            interaction (XAgentInteraction): Interface for the agent's interaction with the outer world
+            xaagent_core (XAgentCoreComponents): Instance of XAgentCoreComponents class.
+            xaagent_param (XAgentParam): Instance of XAgentParam class.
         """
-        self.config = config
-        self.function_list = function_list
-        self.tool_functions_description_list = tool_functions_description_list
-        self.query = query
+        self.xagent_core = xagent_core
+        self.xagent_param = xagent_param
+        self.config = xagent_param.config
+        self.function_list = self.xagent_core.function_list
+        self.tool_functions_description_list = self.xagent_core.tool_functions_description_list
+        self.query = self.xagent_param.query
         self.tool_call_count = 0
         self.plan_agent = PlanAgent(
-            config=config,
+            config=self.config,
             query=self.query,
             avaliable_tools_description_list=self.tool_functions_description_list,
         )
         # self.avaliable_tools_description_list = tool_functions_description_list
 
-        self.interaction = interaction
-    
-    async def outer_loop_async(self):
+        self.interaction = self.xagent_core.interaction
+        self.recorder = self.xagent_core.recorder
+        self.agent_dispatcher = self.xagent_core.agent_dispatcher
+        self.function_list = self.xagent_core.function_list
+        self.function_handler = self.xagent_core.function_handler
+        self.toolserver_interface = self.xagent_core.toolserver_interface
+        self.now_dealing_task = None
+
+    def outer_loop(self):
         """
         Executes the main sequence of tasks in the outer loop.
-        
+
         Raises:
             AssertionError: Raised if a not expected status is encountered while handling the plan.
 
@@ -81,56 +79,63 @@ class TaskHandler():
         )
         self.query.log_self()
 
-        self.plan_agent.initial_plan_generation()
+        self.plan_agent.initial_plan_generation(
+            agent_dispatcher=self.agent_dispatcher)
 
         print(summarize_plan(self.plan_agent.latest_plan.to_json()))
 
         print_data = self.plan_agent.latest_plan.to_json()
-        self.interaction.init_cache(
-            data=XAgentOutputData(
-                tool_recommendation="",
-                task_id="",
-                name="",
-                goal="",
-                handler="",
-                tool_budget=0,
-                subtasks=[])
-        )
-        await self.interaction.update_cache(update_data={
-            "node_id": uuid.uuid4().hex,
+        self.interaction.insert_data(data={
             "task_id": print_data.get("task_id", ""),
             "name": print_data.get("name", ""),
             "goal": print_data.get("goal", ""),
             "handler": print_data.get("handler", ""),
             "tool_budget": print_data.get("tool_budget", ""),
-            "subtasks": print_data.get("subtask", [])
-        }, status="start", current=print_data.get("task_id", ""))
-
+            "subtasks": [{**sub, "inner": []} for sub in print_data.get("subtask", [])]
+        }, status=StatusEnum.START, current=print_data.get("task_id", ""))
 
         self.plan_agent.plan_iterate_based_on_memory_system()
 
         def rewrite_input_func(old, new):
-            if not isinstance(new, dict):
-                pass
-            if new is None:
-                return old
+            if new is None or not isinstance(new, dict):
+                return old, False
             else:
-                goal = new.get("args", {}).get("goal", "")
+                goal = new.get("goal", "")
                 if goal != "":
-                    old.data.goal = goal
-                return old
+                    old = goal
+                return old, True
 
         self.now_dealing_task = self.plan_agent.latest_plan.children[0]
-        # workspace_hash_id = "" 
+        # workspace_hash_id = ""
         while self.now_dealing_task:
             task_id = self.now_dealing_task.get_subtask_id(to_str=True)
-            recorder.change_now_task(task_id)
+            self.recorder.change_now_task(task_id)
             if self.interaction.interrupt:
                 goal = self.now_dealing_task.data.goal
-                receive_data = await self.interaction.auto_receive({"args": {"goal": goal}})
-                self.now_dealing_task = rewrite_input_func(
+                receive_data = self.interaction.receive(
+                    {"args": {"goal": goal}})
+                new_intput, flag = rewrite_input_func(
                     self.now_dealing_task, receive_data)
-            search_method = await self.inner_loop_async(self.now_dealing_task)
+
+                if flag:
+                    logger.typewriter_log(
+                        "-=-=-=-=-=-=-= USER INPUT -=-=-=-=-=-=-=",
+                        Fore.GREEN,
+                        "",
+                    )
+                    logger.typewriter_log(
+                        "goal: ",
+                        Fore.YELLOW,
+                        f"{new_intput}",
+                    )
+                    self.now_dealing_task.data.goal = new_intput
+                    logger.typewriter_log(
+                        "-=-=-=-=-=-=-= USER INPUT -=-=-=-=-=-=-=",
+                        Fore.GREEN,
+                        "",
+                    )
+
+            search_method = self.inner_loop(self.now_dealing_task)
 
             self.now_dealing_task.process_node = search_method.get_finish_node()
 
@@ -138,7 +143,6 @@ class TaskHandler():
 
             working_memory_agent.register_task(self.now_dealing_task)
 
-            
             refinement_result = {
                 "name": self.now_dealing_task.data.name,
                 "goal": self.now_dealing_task.data.goal,
@@ -151,14 +155,14 @@ class TaskHandler():
                 "task_id": task_id,
             }
 
-            await self.interaction.update_cache(update_data=refinement_result, status="refinement", current=task_id)
-
+            self.interaction.insert_data(
+                data=refinement_result, status=StatusEnum.REFINEMENT, current=task_id)
             if search_method.need_for_plan_refine:
                 self.plan_agent.plan_refine_mode(
-                    self.now_dealing_task)
+                    self.now_dealing_task, self.toolserver_interface, self.agent_dispatcher)
             else:
                 logger.typewriter_log(
-                    f"subtask submitted as no need to refine the plan, continue",
+                    "subtask submitted as no need to refine the plan, continue",
                     Fore.BLUE,
                 )
 
@@ -166,7 +170,8 @@ class TaskHandler():
                 self.now_dealing_task)
 
             if self.now_dealing_task is None:
-                await self.interaction.update_cache(update_data=[], status="finished")
+                self.interaction.insert_data(
+                    data=[], status=StatusEnum.FINISHED, current="")
             else:
                 current_task_id = self.now_dealing_task.get_subtask_id(
                     to_str=True)
@@ -180,12 +185,13 @@ class TaskHandler():
                     raw_data["node_id"] = uuid.uuid4().hex
                     subtask_list.append(raw_data)
 
-                await self.interaction.update_cache(update_data=subtask_list, status="subtask", current=current_task_id)
+                self.interaction.insert_data(
+                    data=subtask_list, status=StatusEnum.SUBTASK, current=current_task_id)
 
         logger.typewriter_log("ALL Tasks Done", Fore.GREEN)
         return
 
-    async def inner_loop_async(self, plan: Plan, ):
+    def inner_loop(self, plan: Plan, ):
         """
         Generates search plan and process it for the current task.
 
@@ -206,7 +212,7 @@ class TaskHandler():
         )
         print_task_save_items(plan.data)
 
-        agent = agent_dispatcher.dispatch(
+        agent = self.agent_dispatcher.dispatch(
             RequiredAbilities.tool_tree_search,
             json.dumps(plan.data.to_json(), indent=2, ensure_ascii=False),
             # avaliable_tools_description_list=self.avaliable_tools_description_list
@@ -214,27 +220,30 @@ class TaskHandler():
 
         plan.data.status = TaskStatusCode.DOING
 
-        if self.config.rapidapi_retrieve_tool_count > 0:  
+        if self.config.rapidapi_retrieve_tool_count > 0:
             retrieve_string = summarize_plan(plan.to_json())
-            rapidapi_tool_names, rapidapi_tool_jsons = toolserver_interface.retrieve_rapidapi_tools(
+            rapidapi_tool_names, rapidapi_tool_jsons = self.toolserver_interface.retrieve_rapidapi_tools(
                 retrieve_string, top_k=self.config.rapidapi_retrieve_tool_count)
             if rapidapi_tool_names is not None:
-                function_handler.change_subtask_handle_function_enum(
-                    function_handler.tool_names + rapidapi_tool_names)
-                function_handler.avaliable_tools_description_list += rapidapi_tool_jsons
+                self.function_handler.change_subtask_handle_function_enum(
+                    self.function_handler.tool_names + rapidapi_tool_names)
+                self.function_handler.avaliable_tools_description_list += rapidapi_tool_jsons
             else:
                 print("bug: no rapidapi tool retrieved, need to fix here")
 
-        search_method = ReACTChainSearch()
-        
-        arguments = function_manager.get_function_schema('action_reasoning')['parameters']
-        await search_method.run_async(config=self.config,
-                                      agent=agent,
-                                      task_handler=self,
-                                      arguments=arguments,
-                                      functions=function_handler.intrinsic_tools(
-                                          self.config.enable_ask_human_for_help),
-                                      task_id=task_ids_str)
+        search_method = ReACTChainSearch(
+            xagent_core_components=self.xagent_core,)
+
+        arguments = function_manager.get_function_schema('action_reasoning')[
+            'parameters']
+        search_method.run(config=self.config,
+                          agent=agent,
+                          arguments=arguments,
+                          functions=self.function_handler.intrinsic_tools(
+                              self.config.enable_ask_human_for_help),
+                          task_id=task_ids_str,
+                          now_dealing_task=self.now_dealing_task,
+                          plan_agent=self.plan_agent)
 
         if search_method.status == SearchMethodStatusCode.SUCCESS:
             plan.data.status = TaskStatusCode.SUCCESS
@@ -253,7 +262,7 @@ class TaskHandler():
         else:
             assert False, f"{plan.data.name}"
         return search_method
-    
+
     def posterior_process(self, terminal_plan: Plan):
         """
         Performs the post-processing steps on the terminal plan including extraction of posterior knowledge
@@ -267,7 +276,7 @@ class TaskHandler():
         """
 
         logger.typewriter_log(
-            f"-=-=-=-=-=-=-= POSTERIOR_PROCESS, working memory, summary, and reflection -=-=-=-=-=-=-=",
+            "-=-=-=-=-=-=-= POSTERIOR_PROCESS, working memory, summary, and reflection -=-=-=-=-=-=-=",
             Fore.BLUE,
         )
         posterior_data = get_posterior_knowledge(
@@ -276,6 +285,7 @@ class TaskHandler():
             finish_node=terminal_plan.process_node,
             tool_functions_description_list=self.tool_functions_description_list,
             config=self.config,
+            agent_dispatcher=self.agent_dispatcher,
         )
 
         summary = posterior_data["summary"]
@@ -289,4 +299,3 @@ class TaskHandler():
 
         # Insert the plan into vector DB
         # vector_db_interface.insert_sentence(terminal_plan.data.raw)
-

@@ -6,11 +6,15 @@ from copy import deepcopy
 from XAgent.utils import RequiredAbilities
 from XAgent.data_structure.node import ToolNode
 from XAgent.workflow.plan_exec import Plan
-from XAgent.global_vars import agent_dispatcher
 from XAgent.agent.summarize import summarize_action,summarize_plan
 from XAgent.ai_functions import function_manager
 
-def get_posterior_knowledge(all_plan: Plan, terminal_plan: Plan, finish_node: ToolNode, tool_functions_description_list: List[dict], config):
+def get_posterior_knowledge(all_plan: Plan,
+                            terminal_plan: Plan,
+                            finish_node: ToolNode,
+                            tool_functions_description_list: List[dict],
+                            config,
+                            agent_dispatcher):
     """
     Reflects on the previous actions and generates the posterior knowledge.
 
@@ -20,6 +24,7 @@ def get_posterior_knowledge(all_plan: Plan, terminal_plan: Plan, finish_node: To
         finish_node (ToolNode): The node that represents the finishing tool.
         tool_functions_description_list (List[dict]): A list of dictionaries that describe tool functions.
         config (object): The configuration object with settings.
+        agent_dispatcher (AgentDispatcher): The agent dispatcher.
 
     Returns:
         dict: A dictionary with the generated posterior knowledge.

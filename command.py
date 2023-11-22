@@ -1,20 +1,88 @@
 import asyncio
+from contextlib import contextmanager
+import json
 import os
+import threading
+import traceback
 import uuid
 from datetime import datetime
 from typing import List
 
 from colorama import Fore
 
-from XAgentIO.BaseIO import XAgentIO
-from XAgentIO.input.CommandLineInput import CommandLineInput
-from XAgentIO.output.CommandLineOutput import CommandLineOutput
-from XAgentServer.envs import XAgentServerEnv
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from apscheduler.schedulers.blocking import BlockingScheduler
+
+
+from XAgentServer.application.core.envs import XAgentServerEnv
+from XAgentServer.database.connect import SessionLocal
+from XAgentServer.enums.status import StatusEnum
+from XAgentServer.exts.exception_ext import XAgentError
 from XAgentServer.interaction import XAgentInteraction
 from XAgentServer.loggers.logs import Logger
 from XAgentServer.models.interaction import InteractionBase
 from XAgentServer.models.parameter import InteractionParameter
+from XAgentServer.models.raw import XAgentRaw
 from XAgentServer.server import XAgentServer
+from XAgentServer.application.cruds.interaction import InteractionCRUD
+from XAgentServer.application.global_val import redis
+from command_input import CommandLineInput
+
+
+@contextmanager
+def get_db():
+    """
+    Provide a transactional scope around a series of operations.
+    """
+    session = SessionLocal()
+    try:
+        yield session
+        session.commit()
+    except:
+        session.rollback()
+        raise
+    finally:
+        session.close()
+        
+
+class CommandLineParam:
+    """Command line parameters.
+    
+    Attributes:
+            task: Task description.
+            role: Role name (default is "Assistant").
+            plan: List of steps to perform (default is empty list).
+            upload_files: List of files to upload (default is empty list).
+            download_files: List of files to download (default is empty list).
+            record_dir: Directory to store records (default is `None`).
+            mode: Run mode. Can be "auto" (default is "auto").
+            max_wait_seconds: Maximum wait time in seconds (default is 600).
+            description: Description of the interaction (default is "XAgent-Test").
+            agent: Agent name (default is "XAgent").
+    """
+    def __init__(self,
+                 task,
+                role="Assistant",
+                plan=[],
+                upload_files: List[str] = [],
+                download_files: List[str] = [],
+                record_dir: str = None,
+                mode: str = "auto",
+                max_wait_seconds: int = 600,
+                description: str = "XAgent-Test",
+                agent: str = "XAgent",
+                ):
+        self.task = task
+        self.plan = plan
+        self.role = role
+        self.upload_files = upload_files
+        self.download_files = download_files
+        self.record_dir = record_dir
+        # auto is supported only in cmd
+        self.mode = "auto"
+        self.max_wait_seconds = max_wait_seconds
+        self.description = description
+        self.agent = agent
 
 
 class CommandLine():
@@ -31,14 +99,18 @@ class CommandLine():
             database (SQLite, MySQL, PostgreSQL) or a local storage file, depending
             on the configuration of `env`.
     """
-    def __init__(self, env: XAgentServerEnv):
+
+    def __init__(self, args: CommandLineParam = None):
         """
         Initialize the CommandLine instance.
 
         Args:
-            env: An instance of the XAgentServer environment.
+            args (CommandLineParam) : parameters.
+            task is required,
+            mode options: ["auto"]
         """
-        self.env = env
+
+        self.args = args
         self.client_id = uuid.uuid4().hex
         self.date_str = datetime.now().strftime("%Y-%m-%d")
         self.log_dir = os.path.join(os.path.join(XAgentServerEnv.base_dir, "localstorage",
@@ -51,182 +123,186 @@ class CommandLine():
         self.logger.typewriter_log(
             title=f"XAgentServer is running on cmd mode",
             title_color=Fore.RED)
-        self.logger.info(title=f"XAgentServer log:", title_color=Fore.RED, message=f"{self.log_dir}")
+        self.logger.info(title=f"XAgentServer log:",
+                         title_color=Fore.RED, message=f"{self.log_dir}")
+        self.interrupt = self.args.mode != "auto"
+        self.init_conv_env()
+        self.max_wait_seconds = self.args.max_wait_seconds
+        self.scheduler = AsyncIOScheduler()
+        self.input = None
+        if self.interrupt:
+            self.input = CommandLineInput(
+                do_interrupt=True,
+                max_wait_seconds=self.max_wait_seconds,
+                logger=self.logger)
 
-        if env.DB.db_type in ["sqlite", "mysql", "postgresql"]:
-            from XAgentServer.database.connect import DBConnection
-            from XAgentServer.database.dbi import InteractionDBInterface
+    def init_conv_env(self):
+        """initialize the conversation environment, 
+        Share the same database resource with webui.
+        If you have initiated a session on the front end but it has not been executed, 
+        this ID will be shared.
+        """
+        user_id = "guest"
+        token = "xagent"
+        description = self.args.description
+        file_list = self.args.upload_files
+        record_dir = self.args.record_dir
+        agent = self.args.agent
+        goal = self.args.task
+        mode = self.args.mode
+        plan = self.args.plan
+        
+        with get_db() as db:
+            interaction = InteractionCRUD.get_ready_interaction(
+                db=db, user_id=user_id)
+            self.continue_flag = True
+            if interaction is None:
+                base = InteractionBase(interaction_id=self.client_id,
+                                       user_id=user_id,
+                                       create_time=datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                                       description=description,
+                                       agent=agent,
+                                       mode=mode,
+                                       file_list=file_list if file_list else [],
+                                       recorder_root_dir="",
+                                       status="ready",
+                                       message="ready...",
+                                       current_step="-1",
+                                       update_time=datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                                       call_method="cmd")
+                InteractionCRUD.create_interaction(db=db, base=base)
+            else:
+                self.client_id = interaction.interaction_id
+            
+            parameter = InteractionParameter(
+                interaction_id=self.client_id,
+                parameter_id=uuid.uuid4().hex,
+                args={
+                    "goal": goal,
+                    "plan": plan
+                    },
+            )
+            InteractionCRUD.add_parameter(db=db, parameter=parameter)
 
-            connection = DBConnection(env)
-            self.logger.info("init db connection")
 
-            self.interactionDB = InteractionDBInterface(env)
-            self.logger.info("init interaction db")
-            self.interactionDB.register_db(connection)
-
-        else:
-            from XAgentServer.database.lsi import \
-                InteractionLocalStorageInterface
-            self.logger.info(
-                "init localstorage connection: interaction.json")
-            self.interactionDB = InteractionLocalStorageInterface(env)
-
-    def run(self, args: dict):
+    def run(self):
         """
         Runs the interaction with the XAgentServer with the provided arguments.
+        """
+
+        # Create a new raw data to record
+        with get_db() as db:
+            InteractionCRUD.insert_raw(db=db, process=XAgentRaw(
+                interaction_id=self.client_id,
+                node_id=uuid.uuid4().hex,
+                status=StatusEnum.RUNNING,
+                create_time=datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                update_time=datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                current="",
+                step=-1,
+                data=None,
+                file_list=[],
+                do_interrupt=self.interrupt,
+                wait_seconds=0,
+                ask_for_human_help=False,
+                is_human=True,
+                human_data={"goal": self.args.task, "plan": self.args.plan},
+                human_file_list=self.args.upload_files,
+                is_send=True,
+                is_receive=False,
+                is_deleted=False
+            ))
+            redis.set_key(f"{self.client_id}_send", 1)
+            
+            parameter = InteractionCRUD.get_init_parameter(
+                db=db, interaction_id=self.client_id)
+        
+        self.task_handler(parameter=parameter)
+
+    def task_handler(self, parameter: InteractionParameter):
+        """
+        define a long task to run interaction
 
         Args:
-            args: A dictionary of arguments for the interaction.
-
-        Raises:
-            ValueError: If `args` is not a dictionary.
-            Exception: If there is already a running interaction for the user.
+            parameter (InteractionParameter): The parameter of interaction
         """
-        if args is None or not isinstance(args, dict):
-            raise ValueError("args must be a dict")
 
-        user_id = "admin"
-        token = "xagent-admin"
-        description = args.get("description", "XAgent-user")
-        file_list = args.get("file_list", [])
-        record_dir = args.get("record_dir", "")
-        goal = args.get("goal", "")
-        mode = args.get("mode", "auto")
-        plan = args.get("plan", [])
-        max_wait_seconds = args.get("max_wait_seconds", 600)
+        try:
+            current_step = uuid.uuid4().hex
+            with get_db() as db:
+                base = InteractionCRUD.get_interaction(db=db,
+                                                    interaction_id=self.client_id)
+                InteractionCRUD.update_interaction_status(db=db,
+                                                        interaction_id=base.interaction_id,
+                                                        status="running",
+                                                        message="running",
+                                                        current_step=current_step)
 
-        self.logger.typewriter_log(
-            title=f"Receive args from {self.client_id}: ",
-            title_color=Fore.RED,
-            content=f"user_id: {user_id}, token: {token}, description: {description}")
+            # if mode is not auto, we will interrupt the interaction
+            # and you can change the wait_seconds
+            # default 10 min.
+            interaction = XAgentInteraction(
+                base=base,
+                parameter=parameter,
+                interrupt=base.mode != "auto",
+                call_method="cmd")
 
-        # check running, you can edit it by yourself in envs.py to skip this check
-        if XAgentServerEnv.check_running:
-            if self.interactionDB.is_running(user_id=user_id):
-                raise Exception(
-                    "You have a running interaction, please wait for it to finish!")
+            # Register logger, dbinto interaction
+            interaction.resister_logger(self.logger)
+            self.logger.info(
+                f"Register logger into interaction of {base.interaction_id}, done!")
 
-        base = InteractionBase(interaction_id=self.client_id,
-                               user_id=user_id,
-                               create_time=datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-                               description=description if description else "XAgent",
-                               agent="XAgent",
-                               mode=mode,
-                               file_list=file_list,
-                               recorder_root_dir=record_dir,
-                               status="waiting",
-                               message="waiting...",
-                               current_step=uuid.uuid4().hex,
-                               update_time=datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                               )
-        self.interactionDB.create_interaction(base)
-        self.logger.typewriter_log(
-            title=f"Receive data from {self.client_id}: ",
-            title_color=Fore.RED,
-            content=goal)
-        # in this step, we need to update interaction to register agent, mode, file_list
+            interaction.register_db(db=db)
+            self.logger.info(
+                f"Register db into interaction of {base.interaction_id}, done!")
+            # Create XAgentServer
+            server = XAgentServer(logger=self.logger)
+            self.logger.info(
+                f"Register logger into XAgentServer of {base.interaction_id}, done!")
+            self.logger.info(
+                f"Start a new thread to run interaction of {base.interaction_id}, done!")
+            # await server.interact(interaction=interaction)
+            server.interact(interaction=interaction)
+        except XAgentError as e:
+            traceback.print_exc()
+            self.logger.error(
+                f"Error in task_handler of {self.client_id}: {e}")
+            with get_db() as db:
+                InteractionCRUD.insert_error(
+                    db=db, interaction_id=self.client_id, message=str(e))
+                redis.set_key(self.client_id + "_send", 1)
+                InteractionCRUD.update_interaction_status(db=db,
+                                                        interaction_id=self.client_id,
+                                                        status="failed",
+                                                        message=str(e),
+                                                        current_step=current_step)
+        
+    def start(self):
 
-        parameter = InteractionParameter(
-            interaction_id=self.client_id,
-            parameter_id=uuid.uuid4().hex,
-            args=args,
-        )
-        self.interactionDB.add_parameter(parameter)
-        self.logger.info(
-            f"Register parameter: {parameter.to_dict()} into interaction of {self.client_id}, done!")
-
-        current_step = uuid.uuid4().hex
-        self.interactionDB.update_interaction_status(
-            interaction_id=base.interaction_id, status="running", message="running", current_step=current_step)
-
-        interaction = XAgentInteraction(
-            base=base, parameter=parameter, 
-            interrupt=base.mode != "auto")
-
-        io = XAgentIO(input=CommandLineInput(do_interrupt=base.mode != "auto", max_wait_seconds=max_wait_seconds),
-                      output=CommandLineOutput())
-        interaction.resister_logger(self.logger)
-        self.logger.info(
-            f"Register logger into interaction of {base.interaction_id}, done!")
-
-        io.set_logger(logger=interaction.logger)
-        interaction.resister_io(io)
-        self.logger.info(
-            f"Register io into interaction of {base.interaction_id}, done!")
-        interaction.register_db(self.interactionDB)
-        self.logger.info(
-            f"Register db into interaction of {base.interaction_id}, done!")
-        # Create XAgentServer
-        server = XAgentServer()
-        server.set_logger(logger=self.logger)
-        self.logger.info(
-            f"Register logger into XAgentServer of {base.interaction_id}, done!")
-        self.logger.info(
-            f"Start a new thread to run interaction of {base.interaction_id}, done!")
-        asyncio.run(server.interact(interaction=interaction))
-
-    def start(self,
-              task,
-              role="Assistant",
-              plan=[],
-              upload_files: List[str] = [],
-              download_files: List[str] = [],
-              record_dir: str = None,
-              mode: str = "auto",
-              max_wait_seconds: int = 600,
-              description: str = "XAgent-Test",):
-        """
-        Start an interaction with the XAgentServer.
-
-        Args:
-            task: Task description.
-            role: Role name (default is "Assistant").
-            plan: List of steps to perform (default is empty list).
-            upload_files: List of files to upload (default is empty list).
-            download_files: List of files to download (default is empty list).
-            record_dir: Directory to store records (default is `None`).
-            mode: Run mode. Can be "auto" or "manual" (default is "auto").
-            max_wait_seconds: Maximum wait time in seconds (default is 600).
-            description: Description of the interaction (default is "XAgent-Test").
-        """
-        print("-=-=--=-=-=-=-=-=-= Current Instruction =-=-=-=-=-=-=-=-=-=-=-=-=-=-")
-        print(task)
-
-        self.run({
-            "description": description,
-            "role_name": role,
-            "download_files": download_files,
-            "file_list": upload_files,
-            "record_dir": record_dir,
-            "goal": task,
-            "mode": mode,
-            "plan": plan,
-            "max_wait_seconds": max_wait_seconds
-        })
+        self.run()
 
 
 if __name__ == "__main__":
-    cmd = CommandLine(XAgentServerEnv)
     import sys
+    args = CommandLineParam()
     if len(sys.argv) >= 2:
         print(sys.argv[1])
         if len(sys.argv) >= 3:
             original_stdout = sys.stdout
             from XAgent.running_recorder import recorder
-            sys.stdout = open(os.path.join(recorder.record_root_dir,"command_line.ansi"),"w",encoding="utf-8")
-            
-        cmd.start(
-            sys.argv[1],
-            role="Assistant",
-            mode="auto",
-        )
+            sys.stdout = open(os.path.join(
+                recorder.record_root_dir, "command_line.ansi"), "w", encoding="utf-8")
+
+        args.task = sys.argv[1],
+        args.role="Assistant",
+        args.mode="auto",
         if len(sys.argv) >= 3:
             sys.stdout.close()
             sys.stdout = original_stdout
-        
+
     else:
-        cmd.start(
-            "I will have five friends coming to visit me this weekend, please find and recommend some restaurants for us.",
-            role="Assistant",
-            mode="auto",
-        )
+        args.task = "I will have five friends coming to visit me this weekend, please find and recommend some restaurants for us.",
+        args.role="Assistant",
+        args.mode="auto",
+        
+    cmd = CommandLine(XAgentServerEnv, args)

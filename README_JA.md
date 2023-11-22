@@ -76,15 +76,26 @@ ToolServer は、タスクを解決するための強力で安全なツールを
 
 ToolServer は、XAgent の動作が行われる場所です。これは、XAgent が実行するための安全な環境を提供する Docker コンテナになります。
 そのため、まず `docker` と `docker-compose` をインストールする必要があります。
-その後、ToolServer 用の docker イメージをビルドし、docker コンテナを起動します。
+次に、ToolServerイメージを構築する必要があります。 ToolServer`ディレクトリでは、私たちのサービスのイメージを構築する2つの方法があります：
+以下のコマンドを実行することで、docker hubからイメージを取得し、dockerネットワークを構築することができます：
 ```bash
-docker-compose up --build
+docker compose up
+```
+あるいは、以下のコマンドを実行してローカルソースからイメージを構築することもできます：
+バッシュ
+```bash
+docker compose build
+docker compose up
 ```
 これによりツールサーバーのイメージが構築され、ツールサーバーのコンテナが起動します。
-コンテナをバックグラウンドで実行したい場合は、`docker-compose up -d --build` を使用してください。
+コンテナをバックグラウンドで実行したい場合は、`docker compose up -d` を使用してください。
 ToolServer の詳細については、[こちら](ToolServer/README.md)を参照してください。
 
 ToolServer が更新された場合、イメージを再構築する必要があります:
+```bash
+docker compose pull
+```
+Or
 ```bash
 docker compose build
 ```
@@ -127,14 +138,9 @@ python run.py --task "put your task here" --model "gpt-4" --config_file "assets/
 
 
 - GUI で XAgent を実行する
-```bash
-## ToolServer ネットワークを構築する際に、Web ui docker を実行しました
-## docker で nginx を実行する
-docker exec XAgent-Server systemctl start nginx
-```
-XAgent-Server 用の docker イメージをビルドし、docker コンテナを起動します。
-ポート `8090` で XAgent Server がリッスンしているのが見えると思います。
-Web UI を使用して XAgent と対話するには、`http://localhost:5173` にアクセスしてください。
+コンテナ XAgent-Server は、nginxとポート 5173 でリッスンしているウェブサーバーと共に起動しています。
+Web UI を使用して XAgent とやり取りするには、http://localhost:5173 を訪れることができます。
+デフォルトのユーザー名とパスワードはそれぞれ guest と xagent です。
 GUI デモの詳細については、[こちら](XAgentServer/README.md) を参照してください。
 
 <div><a id="デモ"></a></div>

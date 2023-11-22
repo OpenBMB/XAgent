@@ -77,14 +77,24 @@ XAgent由三部分组成：
 
 工具服务器是XAgent的行动发生的地方。它是一个docker容器，为XAgent提供一个安全的运行环境。
 因此，您应该首先安装`docker`和`docker-compose`。
-然后，您需要构建工具服务器的镜像。在`ToolServer`目录下，运行以下命令：
+然后，您需要构建工具服务器的镜像。在`ToolServer`目录下，您有两种方式构建我们的服务镜像：
+您可以通过运行以下命令从docker hub拉取镜像构建docker网络：
 ```bash
-docker-compose up --build
+docker compose up
 ```
-这将构建工具服务器的镜像并启动工具服务器的容器。如果您想在后台运行容器，请使用`docker-compose up -d --build`。
+或者您可以通过运行以下命令从本地源代码构建镜像：
+```bash
+docker compose build
+docker compose up
+```
+这将构建工具服务器的镜像并启动工具服务器的容器。如果您想在后台运行容器，请相应使用`docker compose up -d`。
 参考[ToolServer](ToolServer/README_ZH.md)获取更多信息。
 
 如果需要更新工具服务器或您想重新构建工具服务器的镜像，请使用以下命令：
+```bash
+docker compose pull
+```
+或者
 ```bash
 docker compose build
 ```
@@ -113,14 +123,9 @@ python run.py --task "put your task here" --model "gpt-4"
 在运行结束后，`ToolServerNode`中的完整`worksapce`也将被打包下载到其中。
 
 - 使用GUI运行XAgent
-```bash
-## 在ToolServer docker 时已经开启web ui docker了
-## 只需新开一个命令行，开启docker中的 nginx
-docker exec XAgent-Server systemctl start nginx
-```
-构建XAgent-Server的docker镜像并启动docker容器。
-您将看到XAgent Server在端口`8090`上监听。
+容器`XAgent-Server`内包含一个监听`5173`端口的网页服务器，用于提供XAgent的GUI。
 您可以在浏览器中打开`http://localhost:5173`来访问XAgent的GUI。
+默认账号和密码是`guest`和`xagent`。
 参考[XAgentServer](XAgentServer/README_zh.md)获取更多信息。
 
 

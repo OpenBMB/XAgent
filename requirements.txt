@@ -15,8 +15,14 @@ tiktoken
 tqdm
 uvicorn
 json5
-inputimeout
-openai==0.28.1
+openai
 python-dotenv
 sqlalchemy
 tenacity
+redis
+pymysql
+yagmail
+python-multipart
+apscheduler
+pinecone-client
+websockets

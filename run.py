@@ -3,7 +3,7 @@ import sys
 import argparse
 from copy import deepcopy
 from XAgent.config import CONFIG,ARGS
-from command import CommandLine,XAgentServerEnv
+from command import CommandLine,CommandLineParam
 
 
 def parse_args():
@@ -43,9 +43,8 @@ if __name__ == '__main__':
     args = parse_args()
     os.environ['CONFIG_FILE'] = args.config_file
 
-    cmd = CommandLine(XAgentServerEnv)
-    
-    if args.quiet:
+    quiet_mode = args.quiet
+    if quiet_mode:
         original_stdout = sys.stdout
         from XAgent.running_recorder import recorder
         sys.stdout = open(os.path.join(recorder.record_root_dir,"command_line.ansi"),"w",encoding="utf-8")
@@ -60,14 +59,16 @@ if __name__ == '__main__':
                 ARGS['default_completion_kwargs']['model'] = value
             else:
                 ARGS[key] = value
-
-    cmd.start(
-        args['task'],
-        role="Assistant",
-        mode=args['mode'],
+    param = CommandLineParam(
+        task=args['task'],
         upload_files=args['upload_files'],
+        role="Assistant",
+        mode=args["mode"],
     )
+    cmd = CommandLine(param)
+
+    cmd.start()
     
-    if args['quiet']:
+    if quiet_mode:
         sys.stdout.close()
         sys.stdout = original_stdout

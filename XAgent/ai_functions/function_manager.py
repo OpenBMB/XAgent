@@ -6,7 +6,7 @@ import json5
 from typing import Optional, Tuple
 from colorama import Fore
 
-from XAgent.config import CONFIG
+from XAgent.config import CONFIG,get_apiconfig_by_model
 from XAgent.logs import logger
 from .request import objgenerator
 
@@ -95,7 +95,14 @@ class FunctionManager:
         
         logger.typewriter_log(f'Executing AI Function: {function_name}', Fore.YELLOW)
 
-        completions_kwargs:dict = function_cfg.get('completions_kwargs',CONFIG.default_completion_kwargs)
+        completions_kwargs:dict = function_cfg.get('completions_kwargs',{})
+        if 'model' in completions_kwargs:
+            # check whether model is configured
+            try:
+                get_apiconfig_by_model(completions_kwargs['model'])
+            except:
+                logger.typewriter_log("Fallback",Fore.YELLOW,f"Model {completions_kwargs['model']} is not configured. Using default model instead.")
+                completions_kwargs = {}
         function_prompt = str(function_cfg['function_prompt'])
         function_prompt = function_prompt.format(**kwargs)
         messages = [{'role':'user','content':function_prompt}]

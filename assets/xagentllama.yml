@@ -1,0 +1,46 @@
+api_keys:
+  xagentllm:
+    - temperature: 0.2
+      top_p: 1.0
+      repetition_penalty: 1.2
+      frequency_penalty: 0.5
+      max_tokens: 16384
+      api_base: http://127.0.0.1:13520/chat/completions
+
+
+default_request_type: xagent # or xagent
+default_completion_kwargs:
+  model: xagentllm
+  temperature: 0.2
+  top_p: 1.0
+  request_timeout: 300
+  repetition_penalty: 1.2
+  frequency_penalty: 0.5
+  max_tokens: 16384
+
+enable_summary: true
+summary:
+  single_action_max_length: 4096
+  max_return_length: 8192
+
+use_selfhost_toolserver: true
+selfhost_toolserver_url: http://localhost:8080
+
+max_retry_times: 5
+max_subtask_chain_length: 15
+max_plan_refine_chain_length: 3
+max_plan_tree_depth: 3
+max_plan_tree_width: 5
+max_plan_length: 4096
+
+rapidapi_retrieve_tool_count: 0
+
+enable_ask_human_for_help: False
+
+tool_blacklist:
+  - FileSystemEnv_print_filesys_struture
+
+record_dir:
+
+experiment:
+  redo_action: false

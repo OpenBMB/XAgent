@@ -21,6 +21,7 @@ export interface UserInfo {
   orgCode?: string
   token?: string
   userId?: string | number
+  is_beta?: boolean
 }
 
 export enum RoleEnum {

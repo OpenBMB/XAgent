@@ -17,7 +17,7 @@ class NodeConfig:
         Updates the configuration dictionary with new configurations.
     """
     def __init__(self,
-                 config_file_path="assets/config.yml",):
+                 config_file_path="./assets/config/node.yml",):
         """
         The constructor for NodeConfig class that loads the configuration details.
 

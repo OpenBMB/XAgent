@@ -2,13 +2,14 @@ version: '3'
 
 services:
   ToolServerManager:
-    image: tool-server-manager:0.2
+    image: xagentteam/toolserver-manager:latest
     build:
       context: ./
       dockerfile: dockerfiles/ToolServerManager/Dockerfile
     ports:
       - 8080:8080
     volumes:
+      - toolserverconfig:/app/assets/config
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
      DB_HOST: db
@@ -22,19 +23,20 @@ services:
 
   # This will create a test node that will never be used by XAgent
   ToolServerNode:
-    image: tool-server-node:0.2
+    image: xagentteam/toolserver-node:latest
     build:
       context: ./
       dockerfile: dockerfiles/ToolServerNode/Dockerfile
-    entrypoint: /bin/sh -c 'echo "Build complete. Exiting..." && exit 0'
-    command: echo "Build complete. Exiting..."
-
+    volumes:
+      - "toolserverconfig:/app/assets/config"
+      
   ToolServerMonitor:
-    image: tool-server-monitor:0.1
+    image: xagentteam/toolserver-monitor:latest
     build:
       context: ./
       dockerfile: dockerfiles/ToolServerMonitor/Dockerfile
     volumes:
+      - toolserverconfig:/app/assets/config
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
      DB_HOST: db
@@ -47,7 +49,6 @@ services:
 
   db:
     image: mongo
-    restart: always
     volumes:
       - xagentmongodb:/data/db
     environment:
@@ -57,7 +58,7 @@ services:
       driver: "none"
 
   XAgentServer:
-    image: xagent-server:0.3
+    image: xagentteam/xagent-server:latest
     build:
       context: ./
       dockerfile: dockerfiles/XAgentServer/Dockerfile
@@ -66,15 +67,60 @@ services:
       - .env
     environment:
       - TOOLSERVER_URL=http://ToolServerManager:8080
+      - MYSQL_DB_URL=mysql+pymysql://root:xagent@xagent-mysql:3306/xagent
+      - REDIS_HOST=xagent-redis
     volumes:
       - ./assets:/app/assets:ro
     ports:
       - "5173:5173"
       - "8090:8090"
+    depends_on:
+      xagent-mysql:
+        condition: service_healthy
+      xagent-redis:
+        condition: service_healthy
+
+  xagent-mysql:
+    image: mysql
+    command:
+      # - --default-authentication-plugin=caching_sha2_password
+      - --default-authentication-plugin=mysql_native_password
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+    environment:
+      MYSQL_ROOT_PASSWORD: xagent
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./XAgentServer/database/sql:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: [ "CMD", "mysqladmin","ping", "-h", "localhost" ]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  xagent-redis:
+    image: redis
+    ports:
+      - "6379:6379"
+    command: redis-server --requirepass xagent
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+
 
 volumes:
   xagentmongodb:
-
+  toolserverconfig:
+    name: toolserverconfig
+    driver: local
+    driver_opts:
+      type: none
+      device: ${PWD}/assets/config
+      o: bind
 networks:
   default:
     name: tool-server-network

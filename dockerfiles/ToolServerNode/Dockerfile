@@ -6,6 +6,8 @@ EXPOSE 31942
 
 WORKDIR /app
 
+RUN apt-get update
+
 RUN apt update && apt install -y build-essential make openjdk-17-jdk-headless curl docker.io docker-compose psmisc sudo
 
 RUN pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple
@@ -21,10 +23,6 @@ RUN rm -rf /tmp/* /var/tmp/*
 COPY ToolServer/ToolServerNode .
 
 RUN mkdir -p assets
-
-COPY assets/config/node.yml ./assets/config.yml
-
-HEALTHCHECK --interval=1s --timeout=10s --retries=3 CMD ["bash", "-c", "curl -sS 'http://localhost:31942/' > /dev/null || exit 1"]
 
 RUN mkdir -p workspace
 

@@ -1,19 +1,19 @@
 import orjson
 import json5
 import jsonschema
+import jsonschema.exceptions
 import importlib
 import traceback
 
 from copy import deepcopy
 from colorama import Fore
 
-from openai.error import AuthenticationError, PermissionError, InvalidRequestError
-from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_not_exception_type, wait_chain, wait_none
+from tenacity import retry, stop_after_attempt, retry_if_exception_type
 
 from .error import FunctionCallSchemaError
 
 from XAgent.logs import logger
-from XAgent.config import CONFIG,get_model_name,get_apiconfig_by_model
+from XAgent.config import CONFIG
 from XAgent.running_recorder import recorder
 
 
@@ -28,11 +28,13 @@ class OBJGenerator:
         self.chatcompletion_request_funcs = {}
         
     @retry(
-        retry=retry_if_not_exception_type((AuthenticationError, PermissionError, InvalidRequestError, AssertionError)),
-        stop=stop_after_attempt(CONFIG.max_retry_times+3), 
-        wait=wait_chain(*[wait_none() for _ in range(3)]+[wait_exponential(min=61, max=293)]),
-        reraise=True,)
-    def chatcompletion(self,**kwargs):
+        stop=stop_after_attempt(3),
+        retry=retry_if_exception_type((
+            jsonschema.exceptions.ValidationError,
+            FunctionCallSchemaError
+            )),
+        )
+    def chatcompletion(self,*,schema_validation=True,**kwargs):
         """Processes chat completion requests and retrieves responses.
 
         Args:
@@ -63,14 +65,15 @@ class OBJGenerator:
             recorder.decrease_query_id()
             raise e
 
-        # refine the response
-        match request_type:
-            case 'openai':                
-                response = self.function_call_refine(kwargs,response)
-            case 'xagent':
-                pass
-            case _:
-                raise NotImplementedError(f"Request type {request_type} not implemented")
+        if schema_validation:
+            # refine the response
+            match request_type:
+                case 'openai':                
+                    response = self.function_call_refine(kwargs,response)
+                case 'xagent':
+                    pass
+                case _:
+                    raise NotImplementedError(f"Request type {request_type} not implemented")
         
         return response
         
@@ -105,6 +108,8 @@ class OBJGenerator:
         logger.typewriter_log(
             f'Schema Validation for Function call {function_schema["name"]} failed, trying to fix it...', Fore.YELLOW)
         repair_req_kwargs = deepcopy(CONFIG.default_completion_kwargs)
+        if messages[-1]["role"] == 'system' and 'Your last function call result in error' in messages[-1]["content"]:
+            messages = messages[:-1]
         repair_req_kwargs['messages'] = [*messages,
                                   {
                                       'role': 'system',
@@ -124,7 +129,7 @@ class OBJGenerator:
                                   }]
         repair_req_kwargs['functions'] = [function_schema]
         repair_req_kwargs['function_call'] = {'name': function_schema['name']}
-        return self.chatcompletion(**repair_req_kwargs)
+        return self.chatcompletion(schema_validation=False,**repair_req_kwargs)
     
     def load_args_with_schema_validation(self,function_schema:dict,args:str,messages:list=[],*,return_response=False,response=None):
         """Validates arguments against the function schema.
@@ -206,10 +211,9 @@ class OBJGenerator:
                 'content': f"Error: Your last function calling call function {response['choices'][0]['message']['function_call']['name']} that is not in the provided functions. Make sure function name in list: {list(map(lambda x:x['name'],req_kwargs['functions']))}"
             }
             
-            if req_kwargs['messages'][-1]['role'] != 'system' and 'Your last function calling call function' not in req_kwargs['messages'][-1]['content']:
-                req_kwargs['messages'].append(error_message)
-            elif req_kwargs['messages'][-1]['role'] == 'system' and 'Your last function calling call function' in req_kwargs['messages'][-1]['content']:
-                req_kwargs['messages'][-1] = error_message
+            if req_kwargs['messages'][-1]['role'] == 'system' and 'Your last function calling call function' in req_kwargs['messages'][-1]['content']:
+                req_kwargs['messages'] = req_kwargs['messages'][:-1]
+            req_kwargs['messages'].append(error_message)
                 
             logger.typewriter_log(f"FunctionCallSchemaError: Function {response['choices'][0]['message']['function_call']['name']} not found in the provided functions.",Fore.RED)
             raise FunctionCallSchemaError(f"Function {response['choices'][0]['message']['function_call']['name']} not found in the provided functions: {list(map(lambda x:x['name'],req_kwargs['functions']))}")

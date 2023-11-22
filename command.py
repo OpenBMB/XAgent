@@ -142,8 +142,8 @@ class CommandLine():
         If you have initiated a session on the front end but it has not been executed, 
         this ID will be shared.
         """
-        user_id = "admin"
-        token = "xagent-admin"
+        user_id = "guest"
+        token = "xagent"
         description = self.args.description
         file_list = self.args.upload_files
         record_dir = self.args.record_dir

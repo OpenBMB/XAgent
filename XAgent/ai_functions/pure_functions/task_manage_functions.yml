@@ -39,7 +39,7 @@ functions:
           description: "Which subtask do you want to modify. This must be a inter split by '.', like '1.2' '2.3.3' or '4'. You must ensure this subtask exists and is a FAIL task"
         subtasks:
           type: array
-          description: "Max 4 items, min 2 items. Array of the splited subtasks, length of 2-4"
+          description: "Max 3 items, min 1 items. Array of the splited subtasks, length of 1-3"
           items: *task_item
       required: ["target_subtask_id", "subtasks"]
   - name: subtask_operations

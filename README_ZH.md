@@ -123,14 +123,9 @@ python run.py --task "put your task here" --model "gpt-4"
 在运行结束后，`ToolServerNode`中的完整`worksapce`也将被打包下载到其中。
 
 - 使用GUI运行XAgent
-```bash
-## 在ToolServer docker 时已经开启web ui docker了
-## 只需新开一个命令行，开启docker中的 nginx
-docker exec XAgent-Server systemctl start nginx
-```
-构建XAgent-Server的docker镜像并启动docker容器。
-您将看到XAgent Server在端口`8090`上监听。
+容器`XAgent-Server`内包含一个监听`5173`端口的网页服务器，用于提供XAgent的GUI。
 您可以在浏览器中打开`http://localhost:5173`来访问XAgent的GUI。
+默认账号和密码是`guest`和`xagent`。
 参考[XAgentServer](XAgentServer/README_zh.md)获取更多信息。
 
 

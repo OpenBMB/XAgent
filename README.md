@@ -137,14 +137,9 @@ python run.py --task "put your task here" --model "gpt-4" --config_file "assets/
    
 
 - Run XAgent with GUI
-```bash
-## We ran the web ui docker when building the ToolServer network
-## run nginx in docker
-docker exec XAgent-Server systemctl start nginx
-```
-Build the docker image for XAgent-Server and start the docker container.
-You will see the XAgent Server listening on port `8090`.
+The container `XAgent-Server` is started with nginx and a web server listening on port `5173`.
 You could visit `http://localhost:5173` to interact with XAgent by using web UI.
+The default username and password are `guest` and `xagent`, respectively.
 Refer [here](XAgentServer/README.md) for the detailed information about our GUI Demo.
 
 <div><a id="Demo"></a></div>

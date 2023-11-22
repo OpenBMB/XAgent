@@ -9,6 +9,7 @@ services:
     ports:
       - 8080:8080
     volumes:
+      - toolserverconfig:/app/assets/config
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
      DB_HOST: db
@@ -26,15 +27,16 @@ services:
     build:
       context: ./
       dockerfile: dockerfiles/ToolServerNode/Dockerfile
-    entrypoint: /bin/sh -c 'echo "Build complete. Exiting..." && exit 0'
-    command: echo "Build complete. Exiting..."
-
+    volumes:
+      - "toolserverconfig:/app/assets/config"
+      
   ToolServerMonitor:
     image: xagentteam/toolserver-monitor:0.1
     build:
       context: ./
       dockerfile: dockerfiles/ToolServerMonitor/Dockerfile
     volumes:
+      - toolserverconfig:/app/assets/config
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
      DB_HOST: db
@@ -114,7 +116,13 @@ services:
 
 volumes:
   xagentmongodb:
-
+  toolserverconfig:
+    name: toolserverconfig
+    driver: local
+    driver_opts:
+      type: none
+      device: ${PWD}/assets/config
+      o: bind
 networks:
   default:
     name: tool-server-network

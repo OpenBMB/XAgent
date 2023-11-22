@@ -6,8 +6,6 @@ EXPOSE 31942
 
 WORKDIR /app
 
-
-# 更新 apt-get
 RUN apt-get update
 
 RUN apt update && apt install -y build-essential make openjdk-17-jdk-headless curl docker.io docker-compose psmisc sudo
@@ -25,10 +23,6 @@ RUN rm -rf /tmp/* /var/tmp/*
 COPY ToolServer/ToolServerNode .
 
 RUN mkdir -p assets
-
-COPY assets/config/node.yml ./assets/config.yml
-
-HEALTHCHECK --interval=1s --timeout=10s --retries=3 CMD ["bash", "-c", "curl -sS 'http://localhost:31942/' > /dev/null || exit 1"]
 
 RUN mkdir -p workspace
 

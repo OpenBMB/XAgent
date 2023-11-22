@@ -91,6 +91,7 @@ class ToolServerInterface():
             raise NotImplementedError('Please use selfhost toolserver')
         logger.typewriter_log("Trying to connect to ToolServer at", Fore.RED, self.url)
         response = requests.post(f'{self.url}/get_cookie',)
+        response.raise_for_status()
         logger.typewriter_log("ToolServer connected in", Fore.RED, self.url)
         self.cookies = response.cookies
 

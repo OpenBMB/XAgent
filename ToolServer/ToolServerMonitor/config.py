@@ -12,7 +12,7 @@ class ManagerConfig:
         cfg (Dict): Dictionary holding configuration settings read from file and environment.
     """
 
-    def __init__(self, config_file_path="./assets/config.yml"):
+    def __init__(self, config_file_path="./assets/config/monitor.yml"):
         """
         Initializes ManagerConfig with configuration settings read from a YAML file 
         and overrides these settings with environment variables if they exist.

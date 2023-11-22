@@ -1,4 +1,5 @@
 import os
+import shutil
 import yaml
 import logging
 from typing import Dict, Any, Union
@@ -14,7 +15,7 @@ class ManagerConfig:
         cfg: A dictionary containing all configuration settings.
     """
 
-    def __init__(self, config_file_path="./assets/config.yml"):
+    def __init__(self, config_file_path="./assets/config/manager.yml"):
         """
         Initializes a new instance of the ManagerConfig class.
 
@@ -23,7 +24,6 @@ class ManagerConfig:
             Defaults to "./assets/config.yml".
         """
         self.cfg:Dict = yaml.load(open(config_file_path,"r",encoding="utf-8").read(), Loader=yaml.FullLoader)
-
         for k in os.environ.keys():
             if k in self.cfg:
                 self.cfg[k] = os.environ[k]  # overwrite the config with environment variables

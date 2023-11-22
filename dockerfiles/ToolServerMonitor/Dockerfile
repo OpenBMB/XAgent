@@ -14,6 +14,4 @@ COPY ToolServer/ToolServerMonitor .
 
 RUN mkdir -p assets
 
-COPY assets/config/monitor.yml ./assets/config.yml
-
 ENTRYPOINT [ "python", "main.py"]

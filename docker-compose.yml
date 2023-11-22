@@ -95,9 +95,9 @@ services:
       - ./XAgentServer/database/sql:/docker-entrypoint-initdb.d
     healthcheck:
       test: [ "CMD", "mysqladmin","ping", "-h", "localhost" ]
-      interval: 20s
-      timeout: 10s
-      retries: 10
+      interval: 5s
+      timeout: 3s
+      retries: 20
 
   xagent-redis:
     image: redis
@@ -106,9 +106,9 @@ services:
     command: redis-server --requirepass xagent
     healthcheck:
       test: [ "CMD", "redis-cli", "ping" ]
-      interval: 30s
-      timeout: 10s
-      retries: 3
+      interval: 5s
+      timeout: 3s
+      retries: 20
 
 
 

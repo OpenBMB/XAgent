@@ -2,7 +2,7 @@ version: '3'
 
 services:
   ToolServerManager:
-    image: xagentteam/toolserver-manager:0.2
+    image: xagentteam/toolserver-manager:latest
     build:
       context: ./
       dockerfile: dockerfiles/ToolServerManager/Dockerfile
@@ -23,7 +23,7 @@ services:
 
   # This will create a test node that will never be used by XAgent
   ToolServerNode:
-    image: xagentteam/toolserver-node:0.2
+    image: xagentteam/toolserver-node:latest
     build:
       context: ./
       dockerfile: dockerfiles/ToolServerNode/Dockerfile
@@ -31,7 +31,7 @@ services:
       - "toolserverconfig:/app/assets/config"
       
   ToolServerMonitor:
-    image: xagentteam/toolserver-monitor:0.1
+    image: xagentteam/toolserver-monitor:latest
     build:
       context: ./
       dockerfile: dockerfiles/ToolServerMonitor/Dockerfile
@@ -59,7 +59,7 @@ services:
       driver: "none"
 
   XAgentServer:
-    image: xagentteam/xagent-server:0.3
+    image: xagentteam/xagent-server:latest
     restart: always
     build:
       context: ./

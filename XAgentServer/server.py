@@ -44,7 +44,7 @@ class XAgentServer:
             xagent_param.build_query({
                 "role_name": "Assistant",
                 "task": args.get("goal", ""),
-                "plan": args.get("plan", ["所有的subtask请使用中文输出!"]),
+                "plan": args.get("plan", [""]),
             })
             xagent_param.build_config(config)
             xagent_core = XAgentCoreComponents()

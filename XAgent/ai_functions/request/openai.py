@@ -130,15 +130,24 @@ else:
         chatcompletion_kwargs = get_apiconfig_by_model(model_name)
 
         request_timeout = kwargs.pop("request_timeout", 60)
-        if "base_url" in chatcompletion_kwargs:
-            base_url = chatcompletion_kwargs.pop("base_url", None)
+        if "azure_endpoint" in chatcompletion_kwargs:
+            azure_endpoint = chatcompletion_kwargs.pop("azure_endpoint", None)
+            api_version = chatcompletion_kwargs.pop("api_version", None)
+            api_key = chatcompletion_kwargs.pop("api_key", None)
+            chatcompletion_kwargs.update(kwargs)
+            client = openai.AzureOpenAI(
+                api_key=api_key, azure_endpoint=azure_endpoint, api_version=api_version, timeout=request_timeout
+            )
         else:
-            base_url = chatcompletion_kwargs.pop("api_base", None)
-        api_key = chatcompletion_kwargs.pop("api_key", None)
-        chatcompletion_kwargs.update(kwargs)
-        client = openai.OpenAI(
-            api_key=api_key, base_url=base_url, timeout=request_timeout
-        )
+            if "base_url" in chatcompletion_kwargs:
+                base_url = chatcompletion_kwargs.pop("base_url", None)
+            else:
+                base_url = chatcompletion_kwargs.pop("api_base", None)
+            api_key = chatcompletion_kwargs.pop("api_key", None)
+            chatcompletion_kwargs.update(kwargs)
+            client = openai.OpenAI(
+                api_key=api_key, base_url=base_url, timeout=request_timeout
+            )
         try:
             completions = client.chat.completions.create(**chatcompletion_kwargs)
             response = completions.model_dump()

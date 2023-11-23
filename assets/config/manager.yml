@@ -12,7 +12,7 @@ node:
   idling_close_minutes: 30
   health_check: true
   creation_kwargs:
-    image: "xagentteam/toolserver-node:0.2"
+    image: "xagentteam/toolserver-node:latest"
     network: "tool-server-network"
     privileged: true
     detach: true

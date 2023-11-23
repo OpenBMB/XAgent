@@ -69,7 +69,7 @@ When you see the following output, it means the image has been successfully comp
 
 ## Using XAgent-Server
 
-After completing the above steps, you can access the frontend interface by visiting http://localhost:5173 in a web browser. Default user: admin, token: xagent-admin, you can use it to login. An example of the interface is shown below:
+After completing the above steps, you can access the frontend interface by visiting http://localhost:5173 in a web browser. Default user: Guest, token: xagent, you can use it to login. An example of the interface is shown below:
 
 ![login](https://gitee.com/sailaoda/pic2/raw/master/2023/202309272130865.png)
 

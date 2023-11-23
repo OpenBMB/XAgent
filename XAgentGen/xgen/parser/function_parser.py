@@ -287,9 +287,6 @@ class FunctionParser:
 
 
         def models_to_regex(self):
-                """
-                        将所有的model专成regex str,填入regex str的列表,返回一个Regex
-                """
                 self.regex_strs = []
                 for function in self.functionCallModels:
                     if hasattr(function, "model_json_schema"):

@@ -17,6 +17,7 @@ from fastapi import FastAPI, Response, status, Request
 from fastapi.middleware.cors import CORSMiddleware
 import argparse
 import uvicorn
+from transformers import AutoTokenizer
 
 app = FastAPI()
 
@@ -54,6 +55,11 @@ engine_configs = AsyncEngineArgs(
     max_model_len=16384,
 )
 engine = AsyncLLMEngine.from_engine_args(engine_configs)
+
+tokenizer = AutoTokenizer.from_pretrained(
+            model_path,
+            trust_remote_code='auto',
+            tokenizer_revision=None)
 
 print("loading model finished! Service start!")
 
@@ -110,6 +116,9 @@ async def chat_function(response:Response,request: Request):
     )
     # make request
     request_id = random_uuid()
+    # tokenize prompt
+    input_ids = tokenizer.encode(task_prompt, return_tensors="pt")
+    prompt_tokens = input_ids.shape[1]  
     results_generator = engine.generate(task_prompt, sampling_params, request_id)
     final_output = None
     async for request_output in results_generator:
@@ -119,6 +128,9 @@ async def chat_function(response:Response,request: Request):
             return Response(status_code=499)
         final_output = request_output
     sequence = final_output.outputs[0].text
+    # tokenizer output
+    output_ids = tokenizer.encode(sequence, return_tensors="pt")
+    completion_tokens = output_ids.shape[1]
     try:
         sequence = json.loads(sequence)
         if "extra_parameters" in sequence:
@@ -131,9 +143,9 @@ async def chat_function(response:Response,request: Request):
             "status": "success",
             "function_res": sequence,
             "usage":{
-                "prompt_tokens": processor.generator.model.tokenizer.prompt_tokens,
-                "completion_tokens": processor.generator.model.tokenizer.completion_tokens,
-                "total_tokens": processor.generator.model.tokenizer.prompt_tokens + processor.generator.model.tokenizer.completion_tokens
+                "prompt_tokens": prompt_tokens,
+                "completion_tokens": completion_tokens,
+                "total_tokens": prompt_tokens + completion_tokens
             }
         }
 

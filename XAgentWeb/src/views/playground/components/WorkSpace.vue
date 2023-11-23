@@ -50,7 +50,7 @@
 
 <script setup lang="ts">
 
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, toRefs } from 'vue'
 import CodeViewer from './CodeViewer.vue'
 import PythonNotebookViewer from './PythonNotebookViewer.vue'
 import ImagesViewer from './ImagesViewer.vue'

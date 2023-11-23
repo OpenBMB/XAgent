@@ -35,7 +35,6 @@ httpService.interceptors.response.use(
   (res: AxiosResponse) => {
     const authStore = useAuthStore()
     const userStore = useUserStore()
-    const router = useRouter()
     // 1009 无效token 1005 用户不存在  1008 无效的token 1017用户不存在
     if ( res.status === 401
       // unauthorized
@@ -45,9 +44,8 @@ httpService.interceptors.response.use(
       // res?.data?.code === 1017 || 
       // res?.data?.code === 1018
     ) {
-      authStore.clearLoginState()
-      userStore.clearUserInfo()
-      router.push('/login')
+      authStore.clearLoginState();
+      userStore.clearUserInfo();
     }
     return res?.data
   },

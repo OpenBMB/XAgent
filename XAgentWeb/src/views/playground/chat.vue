@@ -125,8 +125,6 @@ import throttle from '/@/utils/throttle'
 import Tab from './components/Tab.vue'
 import WorkSpace from './components/WorkSpace.vue'
 
-const { proxy: global_instance } = getCurrentInstance() as any
-
 const route = useRoute()
 const router = useRouter()
 const taskStore = useTaskStore()
@@ -179,7 +177,7 @@ let pageMode = computed(() => {
     }
   }
   return route.query.mode as string || '';
-}); // Redirected from other page, playback, review, or start a new conversation
+}); // 从其他页面跳转进来，是回放模式 还是浏览模式 还是开启一个新对话
 
 
 if(pageMode.value === "recorder") {
@@ -549,7 +547,7 @@ const newTalkConnection = () => {
   }
 }
 
-// Input answer
+// 输入回答
 const sendMessage = async (val: string) => {
   if (!val) return
   chatMsgInfoStore.setCurrentInput(val)
@@ -966,7 +964,7 @@ const wormText = (params: IChatRequest, {tasks, costTime, msgId }: {tasks: any; 
       costTimeMilli: costTime,
       subTasks: [],
       isLatest: true
-      // Is the current inner the latest message
+      // 当前的inenr是不是最新的那条信息
     }
     chatMsgInfo.value.forEach((item) => {
       item.isLatest = false
@@ -986,7 +984,7 @@ const wormText = (params: IChatRequest, {tasks, costTime, msgId }: {tasks: any; 
 }
 
 
-// Regenerate the message
+// 执行重新生成操作
 const regenerate = () => {
   const input = currentInput.value
   sendMessage(input)

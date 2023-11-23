@@ -173,6 +173,12 @@ const isBetaUser = computed(() => true)
 
 
 
+const {
+  userInfo: userInfo
+} = storeToRefs(userStore)
+
+const isBetaUser = true;
+
 const { isRequestingAi } = storeToRefs(chatMsgInfoStore)
 const emits = defineEmits<{ (e: 'createTalk'): void; (e: 'clear'): void }>();
 

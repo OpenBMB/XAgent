@@ -12,6 +12,7 @@ XAgentServer/logs/
 XAgentServer/prod_server_envs.py
 
 XAgentWeb/node_modules
+**/node_modules/
 XAgentWeb/dist
 
 .DS_Store

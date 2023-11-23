@@ -31,7 +31,7 @@ class Interaction(Base):
     user_id = Column(String(255))
     create_time = Column(String(255))
     update_time = Column(String(255))
-    description = Column(String(255))
+    description = Column(Text)
     agent = Column(String(255))
     mode = Column(String(255))
     recorder_root_dir = Column(Text)
@@ -62,7 +62,7 @@ class SharedInteraction(Base):
     user_name = Column(String(255))
     create_time = Column(String(255))
     update_time = Column(String(255))
-    description = Column(String(255))
+    description = Column(Text)
     agent = Column(String(255))
     mode = Column(String(255))
     is_deleted = Column(Boolean, default=False)
@@ -136,21 +136,3 @@ class RunningRecord(Base):
     update_time = Column(String(255))
     # 是否删除/is deleted or not
     is_deleted = Column(Boolean, default=False)
-    
-    def create_mysql_table_sql(self):
-        """create mysql table"""
-        return """
-        CREATE TABLE IF NOT EXISTS `running_record` (
-          `id` int(11) NOT NULL AUTO_INCREMENT,
-          `record_id` varchar(255) NOT NULL,
-          `interaction_id` varchar(255) NOT NULL,
-          `current` varchar(255) NOT NULL,
-          `node_id` varchar(255) NOT NULL,
-          `node_type` varchar(255) NOT NULL,
-          `data` json DEFAULT NULL,
-          `create_time` varchar(255) NOT NULL,
-          `update_time` varchar(255) NOT NULL,
-          PRIMARY KEY (`id`)
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;"""
-    
-    

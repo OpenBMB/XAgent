@@ -168,7 +168,8 @@ class MainServer(WebSocketEndpoint):
                                                    "interaction_id": self.client_id,
                                                    "status": "connected",
                                                    "message": "connected",
-                                                   "current_step": "0"}
+                                                   "current_step": "0",
+                                                   "description" :description}
                                                )
 
         except XAgentWebSocketConnectError as e:
@@ -242,7 +243,6 @@ class MainServer(WebSocketEndpoint):
                                                        "agent": agent,
                                                        "mode": mode,
                                                        "file_list": file_list,
-                                                       "description": data.get("description", "XAgent"),
                                                        "create_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
                                                    )
                 # Create a new raw data to record

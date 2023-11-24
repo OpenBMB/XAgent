@@ -24,7 +24,9 @@
           </template>
           <template #tip>
               <div class="el-upload__tip">
-                You can upload up to 5 .txt files of up to 1MB each.
+                You can upload up to 5 files of up to 1MB each. 
+                <br>
+                .txt, .pdf, .doc, .docx, .xls, .xlsx, .ppt, .pptx, .png, .jpeg, .gif, .py, .zip formats are supported.
               </div>
           </template>
       </el-upload>

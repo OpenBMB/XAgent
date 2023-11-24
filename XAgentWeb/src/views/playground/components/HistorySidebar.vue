@@ -168,15 +168,6 @@ const {
   userInfo: userInfo
 } = storeToRefs(userStore)
 
-// const isBetaUser = computed(() => userInfo.value?.is_beta === true ? true : false)
-const isBetaUser = computed(() => true)
-
-
-
-const {
-  userInfo: userInfo
-} = storeToRefs(userStore)
-
 const isBetaUser = true;
 
 const { isRequestingAi } = storeToRefs(chatMsgInfoStore)

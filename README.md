@@ -77,12 +77,16 @@ You can also easily add new tools to ToolServer to enhance XAgent's abilities.
 
 ToolServer is where XAgent's action takes place. It is a docker container that provides a safe environment for XAgent to run.
 So you should install `docker` and `docker-compose` first. 
-Then, you need to build the ToolServer image. In the `ToolServer` directory, you have two ways to build an image of our service:
-You can build a docker network by pulling the image from docker hub by running the following command:
+Then, you need to build the ToolServer image. Construct referring to any one of the following methods:
+
+#### Pull the image from docker hub by running the following command:
+
 ```bash
 docker compose up
 ```
-Or you can build an image from local sources by running the following command:
+
+#### Build an image from local sources by running the following command:
+
 ```bash
 docker compose build
 docker compose up

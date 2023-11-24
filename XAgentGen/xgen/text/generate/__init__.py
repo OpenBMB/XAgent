@@ -1,1 +1,1 @@
-from .regex import choice, float, integer, json, regex
+from .regex import multi_regex

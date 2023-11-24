@@ -4,7 +4,7 @@ from typing import Any, List, Optional,Dict,Union
 from enum import Enum
 import json
 import copy
-from xgen.text.json_schema import build_regex_from_schema
+from outlines.text.json_schema import build_regex_from_object
 import xgen.models as models
 import xgen.text.generate as generate
 import torch
@@ -296,7 +296,7 @@ class FunctionParser:
 
                     json_schema = self.post_process(json_schema)
                     schema = json.dumps(json_schema)
-                    self.regex_strs.append(build_regex_from_schema(schema))
+                    self.regex_strs.append(build_regex_from_object(schema))
                 return self.regex_strs
 
 
@@ -331,7 +331,7 @@ class FunctionParser:
                 
                 return com_schema
 
-        def create_generator(self,model:models.Transformers,function_info:Dict[str,Any],generate_params:Dict = {}):
+        def create_generator(self,model:models.XTransformers,function_info:Dict[str,Any],generate_params:Dict = {}):
                 """
                 @param: model: the transformer model
                 @param: functions: a list of functions
@@ -348,7 +348,7 @@ class FunctionParser:
                 self.model = model
                 # temperature and so on
                 self.model.add_logits_processor(generate_params)
-                self.generator = generate.choice(self.model, regex_list,generate_params.get("max_tokens"))
+                self.generator = generate.multi_regex(self.model, regex_list,generate_params.get("max_tokens"))
                 return self.generator
         
         def check(self,call_info:str):

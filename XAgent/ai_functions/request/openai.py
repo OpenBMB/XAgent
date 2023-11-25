@@ -134,9 +134,14 @@ else:
             azure_endpoint = chatcompletion_kwargs.pop("azure_endpoint", None)
             api_version = chatcompletion_kwargs.pop("api_version", None)
             api_key = chatcompletion_kwargs.pop("api_key", None)
+            organization = chatcompletion_kwargs.pop("organization", None)
             chatcompletion_kwargs.update(kwargs)
             client = openai.AzureOpenAI(
-                api_key=api_key, azure_endpoint=azure_endpoint, api_version=api_version, timeout=request_timeout
+                api_key=api_key, 
+                organization=organization,
+                azure_endpoint=azure_endpoint, 
+                api_version=api_version, 
+                timeout=request_timeout
             )
         else:
             if "base_url" in chatcompletion_kwargs:
@@ -144,9 +149,13 @@ else:
             else:
                 base_url = chatcompletion_kwargs.pop("api_base", None)
             api_key = chatcompletion_kwargs.pop("api_key", None)
+            organization = chatcompletion_kwargs.pop("organization", None)
             chatcompletion_kwargs.update(kwargs)
             client = openai.OpenAI(
-                api_key=api_key, base_url=base_url, timeout=request_timeout
+                api_key=api_key, 
+                organization=organization,
+                base_url=base_url, 
+                timeout=request_timeout
             )
         try:
             completions = client.chat.completions.create(**chatcompletion_kwargs)

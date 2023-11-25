@@ -20,4 +20,5 @@ functions:
                 type: array
                 items:
                   type: string
+              required: [target_tool_name, reflection]
       required: [summary]

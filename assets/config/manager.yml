@@ -1,16 +1,15 @@
 version: "0.2"
-logger: "uvicorn"
+logger: "gunicorn.error"
 logger_level: 20
 
-database:
-  sqlite_db: /data/server.db
-
-builtin_monitor: false
+builtin_monitor: True
 
 node:
   creation_wait_seconds: 30
   idling_close_minutes: 30
   health_check: true
+  health_check_interval: 1
+  port: 31942
   creation_kwargs:
     image: "xagentteam/toolserver-node:latest"
     network: "tool-server-network"

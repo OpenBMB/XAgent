@@ -1,7 +1,0 @@
-version: "0.1"
-logger: "root"
-logger_level: 20
-node:
-  idling_close_minutes: 30
-  health_check: true
-  check_interval_seconds: 1

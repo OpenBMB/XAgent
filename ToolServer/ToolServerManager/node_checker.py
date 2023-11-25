@@ -4,10 +4,8 @@ import docker.errors
 import datetime
 
 from config import CONFIG, logger
-from connections import DB_TYPE, db, docker_client
-
-if DB_TYPE == 'sqlite3':
-    db_cursor = db.cursor()
+from connections import docker_client
+from models import ToolServerNode
 
 
 async def check_nodes_status():
@@ -19,39 +17,15 @@ async def check_nodes_status():
         docker.errors.NotFound: Raised when a Node is not found in Docker
         docker.errors.APIError: Raised when it fails to get Node info from Docker
     """
-    
-    # If the Database type is mongodb, find all nodes
-    if DB_TYPE == 'mongodb':
-        nodes = db['nodes'].find()
-        nodes = [node async for node in nodes]
-    
-    # If the Database type is sqlite3, select all nodes and convert them into dictionaries
-    if DB_TYPE == 'sqlite3':
-        db_cursor.execute("SELECT * FROM nodes")
-        nodes = db_cursor.fetchall()
-
-        def convert_to_dict(node):
-            return {
-                'node_id':node[0],
-                'node_short_id':node[1],
-                'node_status':node[2],
-                'node_ip':node[3],
-                'node_last_req_time':node[4]
-            }
-        nodes = list(map(convert_to_dict,nodes))
-
     # Check if each node exists in Docker
-    for node in nodes:
+    async for node in ToolServerNode.find_all():
         container = None
         try:
-            container = docker_client.containers.get(node['node_id'])
+            container = docker_client.containers.get(node.id)
         except docker.errors.NotFound:
             # Delete from db if not found in Docker
-            if DB_TYPE == 'sqlite3':
-                db_cursor.execute("DELETE FROM nodes WHERE node_id = ?",(node['node_id'],))
-            if DB_TYPE == 'mongodb':
-                await db['nodes'].delete_one({'node_id': node['node_id']})
-            logger.info("Node deleted from db: " + node['node_id'] + '(not in docker)')
+            await node.delete()
+            logger.info("Node deleted from db: " + node.id + '(not in docker)')
             continue
         except docker.errors.APIError:
             logger.warning("Failed to get node info from docker: " + node['node_id'])
@@ -60,25 +34,24 @@ async def check_nodes_status():
         if container is not None:
             # Update the node state in db
             node_status = container.attrs["State"]["Status"]
-            if DB_TYPE == 'sqlite3':
-                db_cursor.execute("UPDATE nodes SET node_status = ? WHERE node_id = ?", (node_status, node['node_id']))
-                if CONFIG['node']['health_check']:
-                    db_cursor.execute("UPDATE nodes SET node_health = ? WHERE node_id = ?", (container.attrs['State']['Health']['Status'], node['node_id']))
  
-            if DB_TYPE == 'mongodb':
-                await db['nodes'].update_one({'node_id': node['node_id']}, {'$set': {'node_status': node_status}})
-                if CONFIG['node']['health_check']:
-                    await db['nodes'].update_one({'node_id': node['node_id']}, {'$set': {'node_health': container.attrs['State']['Health']['Status']}})
+            if node_status != node.status:
+                logger.info(f"Node {node.short_id} status updated: " + node.status + " -> " + node_status)
+            node.status = node_status
+                
+            if CONFIG['node']['health_check']:
+                health = container.attrs['State']['Health']['Status']
+                if health != node.health:
+                    logger.info(f"Node {node.short_id} health updated: " + node.health + " -> " + health)
+                node.health = health
+                
+            await node.replace()
 
             # Check if node is running
             if node_status == "running":
-                last_req_time = datetime.datetime.fromisoformat(node['node_last_req_time'])
-                if datetime.datetime.utcnow() - last_req_time >= datetime.timedelta(minutes=CONFIG['node']['idling_close_minutes']):
+                if datetime.datetime.utcnow() - node.last_req_time >= datetime.timedelta(minutes=CONFIG['node']['idling_close_minutes']):
                     container.stop()
                     logger.info("Stopping node: " + node['node_id'] + " due to idling time used up")
-
-    if DB_TYPE == 'sqlite3':
-        db.commit()
 
 
 async def check_nodes_status_loop():
@@ -87,7 +60,7 @@ async def check_nodes_status_loop():
     """
     while True:
         await check_nodes_status()
-        await asyncio.sleep(1)
+        await asyncio.sleep(CONFIG['node'].get('health_check_interval',1))
 
 
 if __name__ == '__main__':

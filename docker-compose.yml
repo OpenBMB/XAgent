@@ -19,7 +19,7 @@ services:
      DB_COLLECTION: ${DB_COLLECTION}
     depends_on:
       - db
-    command: ["--workers","4","-t","600"]
+    command: ["--workers","2","-t","600"]
 
   # This will create a test node that will never be used by XAgent
   ToolServerNode:
@@ -29,23 +29,6 @@ services:
       dockerfile: dockerfiles/ToolServerNode/Dockerfile
     volumes:
       - "toolserverconfig:/app/assets/config"
-      
-  ToolServerMonitor:
-    image: xagentteam/toolserver-monitor:latest
-    build:
-      context: ./
-      dockerfile: dockerfiles/ToolServerMonitor/Dockerfile
-    volumes:
-      - toolserverconfig:/app/assets/config
-      - /var/run/docker.sock:/var/run/docker.sock
-    environment:
-     DB_HOST: db
-     DB_PORT: 27017
-     DB_USERNAME: ${DB_USERNAME}
-     DB_PASSWORD: ${DB_PASSWORD}
-     DB_COLLECTION: ${DB_COLLECTION}
-    depends_on:
-      - db
 
   db:
     image: mongo
@@ -83,8 +66,7 @@ services:
   xagent-mysql:
     image: mysql
     command:
-      # - --default-authentication-plugin=caching_sha2_password
-      - --default-authentication-plugin=mysql_native_password
+      - --default-authentication-plugin=caching_sha2_password
       - --character-set-server=utf8mb4
       - --collation-server=utf8mb4_unicode_ci
     environment:

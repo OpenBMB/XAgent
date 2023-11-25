@@ -3,6 +3,7 @@ import shutil
 import yaml
 import logging
 from typing import Dict, Any, Union
+import uuid
 
 class ManagerConfig:
     """
@@ -64,3 +65,4 @@ class ManagerConfig:
 CONFIG = ManagerConfig()
 logger = logging.getLogger(CONFIG['logger'])
 logger.setLevel(CONFIG['logger_level'])
+MANAGER_ID = uuid.uuid4().hex

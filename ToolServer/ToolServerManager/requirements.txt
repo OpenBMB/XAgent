@@ -5,3 +5,4 @@ httpx
 PyYAML
 motor
 gunicorn
+beanie

@@ -26,4 +26,5 @@ python-multipart
 apscheduler
 pinecone-client
 websockets
+
 cryptography

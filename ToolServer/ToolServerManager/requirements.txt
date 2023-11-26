@@ -6,3 +6,4 @@ PyYAML
 motor
 gunicorn
 beanie
+psutil

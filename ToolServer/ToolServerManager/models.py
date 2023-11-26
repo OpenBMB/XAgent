@@ -17,3 +17,4 @@ class ToolServerNode(Document):
 class NodeChecker(Document):
     manager_id: str
     interval: float
+    pid: int

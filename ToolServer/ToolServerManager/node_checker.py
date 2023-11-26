@@ -51,7 +51,7 @@ async def check_nodes_status():
             if node_status == "running":
                 if datetime.datetime.utcnow() - node.last_req_time >= datetime.timedelta(minutes=CONFIG['node']['idling_close_minutes']):
                     container.stop()
-                    logger.info("Stopping node: " + node['node_id'] + " due to idling time used up")
+                    logger.info("Stopping node: " + node.id + " due to idling time used up")
 
 
 async def check_nodes_status_loop():
@@ -59,7 +59,11 @@ async def check_nodes_status_loop():
     An infinite loop that checks the status of the nodes and waits 1 second before each iteration.
     """
     while True:
-        await check_nodes_status()
+        try:
+            await check_nodes_status()
+        except:
+            import traceback
+            traceback.print_exc()
         await asyncio.sleep(CONFIG['node'].get('health_check_interval',1))
 
 

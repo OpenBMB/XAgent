@@ -27,3 +27,4 @@ apscheduler
 pinecone-client
 websockets
 cryptography
+inputimeout

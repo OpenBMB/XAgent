@@ -1,9 +1,9 @@
 from xgen.parser import FunctionParser
 from xgen.server.datamodel import *
 from xgen.server.message_formater import format
-from xgen.parser import FunctionParser
 import xgen.text.generate as generate
-from xgen.models.transformers import Transformers, TransformersTokenizer
+from xgen.models.transformers import XTransformers
+from outlines.models.transformers import TransformersTokenizer
 from vllm.sampling_params import LogitsProcessor
 from vllm.engine.arg_utils import AsyncEngineArgs
 from vllm.engine.async_llm_engine import AsyncLLMEngine
@@ -18,6 +18,7 @@ from fastapi.middleware.cors import CORSMiddleware
 import argparse
 import uvicorn
 from transformers import AutoTokenizer
+
 
 app = FastAPI()
 
@@ -72,10 +73,10 @@ class ConstrainedLogitsProcessor(LogitsProcessor):
         outline_tokenizer = TransformersTokenizer(tokenizer_path)
         fake_model = Dict()
         fake_model.device = device
-        model = Transformers(fake_model, outline_tokenizer)
+        model = XTransformers(fake_model, outline_tokenizer)
         self.dp.create_all_functions_model(extra_arguments, functions, function_call)
         regex_list = self.dp.models_to_regex()
-        self.generator = generate.choice(model, regex_list)
+        self.generator = generate.multi_regex(model, regex_list)
 
     def __call__(self, generated_token_ids: List[int], logits: torch.Tensor) -> torch.Tensor:
         generated_token_ids = torch.LongTensor(generated_token_ids).view(1, -1).to(logits.device)

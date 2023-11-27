@@ -101,7 +101,7 @@ volumes:
     driver: local
     driver_opts:
       type: none
-      device: ${PWD}/assets/config
+      device: ./assets/config
       o: bind
 networks:
   default:

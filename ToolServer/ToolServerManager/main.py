@@ -1,7 +1,7 @@
 import os
+import psutil
 import uvicorn
 import httpx
-import sqlite3
 import asyncio
 import traceback
 import datetime
@@ -30,13 +30,19 @@ async def startup():
     # create subprocess to update node status
     if CONFIG['builtin_monitor']:
         from node_checker import check_nodes_status_loop
-        checker = await NodeChecker.find_one()
+        
+        checker = None
+        async for checker in NodeChecker.find_all():
+            if not psutil.pid_exists(checker.pid):
+                checker.delete()
+        
         if checker is None:
             checker = NodeChecker(
                 manager_id=MANAGER_ID,
-                interval=float(CONFIG['node'].get('health_check_interval',1))
+                interval=float(CONFIG['node'].get('health_check_interval',1)),
+                pid=os.getpid()
                 )
-            await checker.insert()
+            await checker.save()
 
             loop = asyncio.get_running_loop()
             loop.create_task(check_nodes_status_loop())

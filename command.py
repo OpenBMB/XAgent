@@ -145,25 +145,33 @@ class CommandLine():
         user_id = "guest"
         token = "xagent"
         description = self.args.description
-        file_list = self.args.upload_files
+        upload_files = self.args.upload_files
         record_dir = self.args.record_dir
         agent = self.args.agent
         goal = self.args.task
         mode = self.args.mode
         plan = self.args.plan
-        
+
         with get_db() as db:
             interaction = InteractionCRUD.get_ready_interaction(
                 db=db, user_id=user_id)
             self.continue_flag = True
+            upload_files = upload_files if upload_files else []
+            file_list = []
+            for file in upload_files:
+                file_list.append({
+                    "uuid": file,
+                    "name": file
+                })
             if interaction is None:
+
                 base = InteractionBase(interaction_id=self.client_id,
                                        user_id=user_id,
                                        create_time=datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
                                        description=description,
                                        agent=agent,
                                        mode=mode,
-                                       file_list=file_list if file_list else [],
+                                       file_list=file_list,
                                        recorder_root_dir="",
                                        status="ready",
                                        message="ready...",

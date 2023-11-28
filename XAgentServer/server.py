@@ -63,7 +63,10 @@ class XAgentServer:
             for file in file_list:
                 file_uuid = file.get("uuid", "")
                 file_name = file.get("name", "")
-                file_path = os.path.join(XAgentServerEnv.Upload.upload_dir,
+                if file_uuid.startswith("/"):
+                    file_path = file_uuid
+                else:
+                    file_path = os.path.join(XAgentServerEnv.Upload.upload_dir,
                                          interaction.base.user_id, file_uuid)
 
                 upload_dir = os.path.join(
@@ -72,7 +75,12 @@ class XAgentServer:
                     os.makedirs(upload_dir)
                 # 拷贝到workspace
                 if os.path.exists(file_path):
-                    shutil.copy(file_path, os.path.join(upload_dir, file_name))
+                    if os.path.samefile(file_path, os.path.join(upload_dir, file_name)):
+                        # 文件路径相同,跳过复制
+                        pass
+                    else:
+                        shutil.copy(file_path, os.path.join(upload_dir, file_name))
+                    # shutil.copy(file_path, os.path.join(upload_dir, file_name))
 
                 new_file = os.path.join(upload_dir, file_name)
                 try:

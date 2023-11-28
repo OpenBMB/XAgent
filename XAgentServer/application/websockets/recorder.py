@@ -293,7 +293,7 @@ class RecorderServer(WebSocketEndpoint):
                     self.logger.typewriter_log(
                         title=f"Send data to {self.client_id}: ",
                         title_color=Fore.RED,
-                        content=f"已发送{row.node_id}节点的数据, 长度：{len(json.dumps(row.data))}"
+                        content=f"Send {row.node_id}data to client, length: {len(json.dumps(row.data))}."
                     )
                     if row.status in [StatusEnum.FAILED]:
                         # when interaction is falied, we will send the message to client

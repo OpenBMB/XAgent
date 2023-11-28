@@ -10,7 +10,6 @@ from typing import List
 from colorama import Fore, Style
 from concurrent.futures import ThreadPoolExecutor
 
-from XAgent.logs import logger
 from XAgent.data_structure.node import ToolNode
 from XAgent.toolserver_interface import ToolServerInterface
 from XAgent.utils import ToolCallStatusCode
@@ -28,8 +27,9 @@ class FunctionHandler():
                  toolserver_interface: ToolServerInterface,
                  config,
                  interaction: XAgentInteraction,
-                 recorder: RunningRecoder):
-
+                 recorder: RunningRecoder,
+                 logger=None):
+        self.logger = logger
         self.toolserver_interface = toolserver_interface
         self.config = config
         self.interaction = interaction
@@ -52,31 +52,31 @@ class FunctionHandler():
         Args:
             arguments: The arguments of the task submission.
         """
-        logger.typewriter_log(
+        self.logger.typewriter_log(
             f"-=-=-=-=-=-=-= SUBTASK SUBMITTED -=-=-=-=-=-=-=",
             Fore.YELLOW,
             "",
         )
-        logger.typewriter_log(
+        self.logger.typewriter_log(
             f"submit_type:", Fore.YELLOW, f"{arguments['submit_type']}"
         )
-        logger.typewriter_log(
+        self.logger.typewriter_log(
             f"success:", Fore.YELLOW, f"{arguments['result']['success']}"
         )
-        logger.typewriter_log(
+        self.logger.typewriter_log(
             f"conclusion:", Fore.YELLOW, f"{arguments['result']['conclusion']}"
         )
         if "milestones" in arguments["result"].keys():
-            logger.typewriter_log(
+            self.logger.typewriter_log(
                 f"milestones:", Fore.YELLOW
             )
             for milestone in arguments["result"]["milestones"]:
                 line = milestone.lstrip("- ")
-                logger.typewriter_log("- ", Fore.GREEN, line.strip())
-        logger.typewriter_log(
+                self.logger.typewriter_log("- ", Fore.GREEN, line.strip())
+        self.logger.typewriter_log(
             f"need_for_plan_refine:", Fore.YELLOW, f"{arguments['suggestions_for_latter_subtasks_plan']['need_for_plan_refine']}"
         )
-        logger.typewriter_log(
+        self.logger.typewriter_log(
             f"plan_suggestions:", Fore.YELLOW, f"{arguments['suggestions_for_latter_subtasks_plan']['reason']}"
         )
 
@@ -192,7 +192,7 @@ class FunctionHandler():
         command_name = node.data["command"]["properties"]["name"]
         arguments = node.data["command"]["properties"]["args"]
 
-        logger.typewriter_log(
+        self.logger.typewriter_log(
             "NEXT ACTION: ",
             Fore.CYAN,
             f"COMMAND: {Fore.CYAN}{command_name}{Style.RESET_ALL}  \n"
@@ -242,11 +242,11 @@ class FunctionHandler():
         # node.workspace_hash_id = output_hash_id
         if result is not None:
             node.history.add("system", result, "action_result")
-            logger.typewriter_log("SYSTEM: ", Fore.YELLOW, result)
+            self.logger.typewriter_log("SYSTEM: ", Fore.YELLOW, result)
         else:
             node.history.add(
                 "system", "Unable to execute command", "action_result")
-            logger.typewriter_log(
+            self.logger.typewriter_log(
                 "SYSTEM: ", Fore.YELLOW, "Unable to execute command"
             )
 
@@ -259,7 +259,7 @@ class FunctionHandler():
         else:
             color = Fore.RED
 
-        logger.typewriter_log(
+        self.logger.typewriter_log(
             "TOOL STATUS CODE: ", Fore.YELLOW, f"{color}{tool_output_status_code.name}{Style.RESET_ALL}"
         )
 
@@ -323,7 +323,7 @@ class FunctionHandler():
             The tool output status code.
             The result.
         """
-        logger.typewriter_log(
+        self.logger.typewriter_log(
             "ASK For Human Help",
             Fore.RED,
             "You must give some suggestions, please type in your feedback and then press 'Enter' to send and continue the loop"

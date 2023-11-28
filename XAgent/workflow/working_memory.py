@@ -1,7 +1,6 @@
 from colorama import Fore, Style
 from typing import List, Dict
 
-from XAgent.logs import logger, print_task_save_items
 from XAgent.ai_functions import function_manager
 
 class WorkingMemoryAgent():
@@ -13,11 +12,14 @@ class WorkingMemoryAgent():
         execute_process (list): A list to store the processes to be executed.
 
     """
-    def __init__(self):
+    def __init__(self, logger=None):
         """
         The constructor for the WorkingMemoryAgent class.
 
+        Args:
+            logger (object): The logger object.
         """
+        self.logger = logger
         self.subtask_handle_mapping = {}
         self.execute_process: List[Dict] = []
 
@@ -39,7 +41,7 @@ class WorkingMemoryAgent():
         and to map the subtask id with the terminal plan in subtask_handle_mapping
 
         Args:
-            terminal_plan (object): The terminal plan of the task. 
+            terminal_plan (object): The terminal plan of the task.
 
         """
         subtask_id = terminal_plan.get_subtask_id(to_str=True)
@@ -52,14 +54,13 @@ class WorkingMemoryAgent():
         }
 
         self.execute_process.append(datapoint)
-        self.subtask_handle_mapping[subtask_id] = datapoint 
+        self.subtask_handle_mapping[subtask_id] = datapoint
 
-        logger.typewriter_log(
+        self.logger.typewriter_log(
             "Working Memory: ",
             Fore.YELLOW,
             f"{Fore.YELLOW}Register a new subtask={Style.RESET_ALL}{subtask_id} {Fore.YELLOW}Process length={Style.RESET_ALL}{finish_node.get_depth()}."
         )
-        print_task_save_items(terminal_plan.data)
 
     def handle(self, tool_name, tool_input):
         """
@@ -74,6 +75,4 @@ class WorkingMemoryAgent():
 
         """
         assert tool_name == "chat_with_other_subtask"
-        logger.log("handle chat with other subtask")
-
-working_memory_agent = WorkingMemoryAgent()
+        self.logger.log("handle chat with other subtask")

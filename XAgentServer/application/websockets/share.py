@@ -180,7 +180,7 @@ class ReplayServer(WebSocketEndpoint):
                 self.logger.typewriter_log(
                     title=f"Send data to {self.client_id}: ",
                     title_color=Fore.RED,
-                    content=f"已发送{row.node_id}节点的数据, 长度：{len(json.dumps(row.data))}"
+                    content=f"Send {row.node_id}data to client, length: {len(json.dumps(row.data))}."
                 )
                 root_dir = os.path.join(XAgentServerEnv.base_dir, "localstorage", "interact_records", row.create_time[:10], row.interaction_id)
                 await self.websocket.send_text(

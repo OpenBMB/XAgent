@@ -63,7 +63,7 @@ class XTransformers(Transformers):
         past_key_values: Optional[Tuple] = None,
     ) -> Tuple[torch.FloatTensor, Optional[KVCacheType]]:
         
-        next_token_logits, output_past_key_values = super.forward(input_ids,attention_mask,past_key_values)
+        next_token_logits, output_past_key_values = super().forward(input_ids,attention_mask,past_key_values)
         
         if self.logits_processor:
             next_token_logits = self.logits_processor(input_ids,next_token_logits)

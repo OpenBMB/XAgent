@@ -2,13 +2,11 @@
   <section class="container-box flex-column">
     <div ref="listRef" class="history-list flex-column">
       <template
-        v-for="({ content, msgID, role, isLatest}, index) in chatMsgInfo"
-        :key="index"
-      >
+        v-for="({ content, msgID, role, isLatest}, index) in currentHistoryTalk"
+        :key="index">
         <TransitionGroup
           name="message"
-          tag="div"
-          >
+          tag="div">
           <div v-if="role === 'USER'" class="flex-row input">
             <img src="@/assets/images/playground/userAvatar.svg" alt="message" />
             <div class="user-content-border">
@@ -16,22 +14,22 @@
             </div>
           </div>
 
-          <div  v-else-if="role === 'AI'" class="flex-row result typed-box">
+          <div v-else-if="role === 'AI'" class="flex-row result typed-box">
             <img class="avatar round-corner-logo"  alt="logo"
               width="52" height="52" 
               src="@/assets/images/playground/main-logo-avatar.png"/>
             <div class="content">
-              <Tab 
+              <Tab
                 :ref="tabchildList"
                 :conversationId="conversationId"
                 :key="msgID"
-                :mode="remSetting?.mode || 'auto'"
+                :mode="isAutoMode ? 'auto' : 'manual'"
                 @disconnect="disConnectWebsocket"
                 @runSubtask="RunNextSubtask"
                 @runInner="RunNextinnerNode"
                 :isLatest = "isLatest"
                 :pageMode = "pageMode"
-                :isLoading = "isLoading"
+                :isLoading = "isSkeletonLoading"
               />
             </div>
             <div class="flex-row feedback-wrapper">
@@ -40,13 +38,12 @@
               </span>
               <el-button 
                 :icon="Share"
-                v-if="canShare && isTaskCompleted"
+                v-if="canBeShared && isTaskCompleted"
                 text
                 type="primary"
-                @click="onShare">
+                @click="handleTalkShare">
                 share
               </el-button>
-              <!-- <Feedback :data="{ content, msgID, role, conversationId, feedbackMsg, rating }" @evaluate-success="evaluateSuccess" /> -->
             </div>
           </div>
         </TransitionGroup>
@@ -75,25 +72,6 @@
               </span>
             </el-badge>
         </span>
-      <!-- <div class="input-box" v-show="chatMsgInfo.length <= 0">
-        <TalkInput :is-progress="isShowTyped" @send-message="sendMessage" />
-        <canvas class="watermark" style="opacity: 0;"></canvas>
-      </div> -->
-      <!-- <div
-          class="input-box refresh-btn-border"
-          v-show="chatMsgInfo.length > 0"
-        >
-        <el-button
-          class="flex-row refresh-btn flex-center"
-          @click="regenerate"
-          disabled
-          >
-              <img class="refresh-icon"
-                src ="@/assets/images/playground/refreshNew.svg"
-                alt="refresh" />
-              Regenerate
-        </el-button>
-      </div> -->
       
       <div class="flex-row warning" v-if="isFooterPanelCollapsed">
         <a href="javascript:void(0);">
@@ -107,45 +85,97 @@
       </div>
     </div>
   </section>
-
 </template>
 
 <script setup lang="ts">
 
-import hljs from 'highlight.js'
-import MarkdownIt from 'markdown-it'
 import { Share, WarnTriangleFilled } from '@element-plus/icons-vue'
-import { nextTick, ref, watch } from 'vue'
-import { onBeforeMount, onMounted, onBeforeUpdate, onUpdated, onUnmounted, onBeforeUnmount } from 'vue'
-import { ChatMsgInfoInf, IChatRequest } from '/#/talk-type'
-import { ElMessage, ElMessageBox } from 'element-plus'
+import { nextTick, ref, computed,  
+  watch, onBeforeUnmount, onMounted } from 'vue'
+import { ElMessageBox } from 'element-plus'
 import { nanoid } from 'nanoid';
 import generateRandomId from "/@/utils/uuid"
-import throttle from '/@/utils/throttle'
+import debounce from '/@/utils/debounce';
 import Tab from './components/Tab.vue'
 import WorkSpace from './components/WorkSpace.vue'
 
 const route = useRoute()
 const router = useRouter()
 const taskStore = useTaskStore()
-const workspaceFilesNum = computed(() => taskStore.workspaceFiles.length)
+const configStore = useConfigStore()
+const chatMsgInfoStore = useHistoryTalkStore()
+const userStore = useUserStore()
+
+// setup user info
+
+const { userInfo } = storeToRefs(userStore)
+userInfo.value = userStore.getUserInfo;
+const user_id = userInfo?.value?.user_id as string;
+const token = userInfo?.value?.token as string;
+
+// page init setup
+const pageMode = computed(() => {
+  const _mode = route.params.mode;
+  if(_mode) {
+    return _mode as string;
+  } else {
+    return '';
+  }
+});
 
 const currentNewTalkId = computed(() => taskStore.getCurrentNewTalkId);
 
-const {
-    workspaceFiles: workspaceFiles
-} = toRefs(taskStore);
-// 根据conversionId查询历史对话
+const conversationId = computed(() => {
+  if(pageMode.value === 'playback' || pageMode.value === 'runshared') {
+        const _id = route.params.id as string;
+        if(!_id) { router.push('/playground') }
+        else { return _id; }
+  } else if(pageMode.value === 'recorder') {
+        return route.params.id as string;
+  } else if(pageMode.value === 'new') {
+        return currentNewTalkId.value;
+  } else {
+        return '';
+  }
+});
 
-const chatMsgInfo = ref<ChatMsgInfoInf[]>([])
+// set the User Question input
+
+if(pageMode.value === "recorder") {
+  configStore.setInput('Record Playing');
+}
+conversationId.value && taskStore.setCurrentTaskId(conversationId.value);
+
+// setup the talk sharing setting
+const canBeShared = computed(() => (pageMode.value === "new" || pageMode.value === "playback"));
+
+const handleTalkShare = () => {
+  const id = conversationId.value;
+  shareRequest(
+    {
+      interaction_id: id,
+      user_id: userInfo.value?.user_id,
+      token: userInfo.value?.token
+    }
+  ).then((res: any) => {
+      console.log(res)
+    }).catch((err: any) => {
+      console.log(err)
+    })
+}
+
+// setup the workspace files and workspace panel
+const workspaceFilesNum = computed(() => taskStore.workspaceFiles.length)
 
 const isFooterPanelCollapsed = ref(true)
-const inputBoxRef = ref<any>(null)
-const isLoading = ref(true)
 
-const BACKEND_URL = (
-  import.meta.env.VITE_BACKEND_URL as string
-  ).replace(/\/api/, '');
+const { workspaceFiles: workspaceFiles } = toRefs(taskStore);
+
+const { filelist: fileListConfig} = storeToRefs(configStore);
+const { newtalkSettings: newtalkSettings } = storeToRefs(configStore);
+const { input: newTalkInputText } = storeToRefs(configStore);
+
+const inputBoxRef = ref<any>(null)
 
 const handleCollapse = () => {
   isFooterPanelCollapsed.value = !isFooterPanelCollapsed.value
@@ -159,133 +189,72 @@ const handleCollapse = () => {
     inputBoxRef.value.style.setProperty('padding-top', '2px')
   }
 }
+// set up the tab ref and setting
+const listRef = ref<Nullable<HTMLElement>>(null)
+const refList = ref<Nullable<any>[]>([]);
+const isSkeletonLoading = ref(true)
 
-const configStore = useConfigStore()
-const {
-  filelist: fileListConfig,
-} = storeToRefs(configStore)
-const chatMsgInfoStore = useHistoryTalkStore()
-const { currentInput, isRequestingAi } = storeToRefs(chatMsgInfoStore)
-
-let ws: WebSocket | null = null;
-
-let pageMode = computed(() => {
-  if(!route.query || !route.query.mode) {
-    if(route.params && route.params.mode)
-    {
-      return route.params.mode as string;
-    }
-  }
-  return route.query.mode as string || '';
-}); // 从其他页面跳转进来，是回放模式 还是浏览模式 还是开启一个新对话
-
-
-if(pageMode.value === "recorder") {
-  chatMsgInfoStore.setCurrentInput('Record Playing');
+const tabchildList = (el: any) => {
+  el && refList.value.push(el)
+}
+const scrollToBottom = () => {
+  nextTick(() => {
+    if (listRef.value) listRef.value!.scrollTop = listRef.value?.scrollHeight || 0
+  })
 }
 
-console.log("route.params = ", route.params)
-
-let conversationId = computed(() => {
-  switch(pageMode.value) {
-      case 'playback':
-        return route.params.id as string || '';
-        break;
-
-      case 'runshared':
-        return route.params.id as string || '';
-        break;
-
-      case 'review':
-        return route.query.id as string || '';
-        break;
-
-      case 'new':
-        return currentNewTalkId.value as string || generateRandomId();
-        break;
-
-      case 'recorder':
-        return route.params.id as string || generateRandomId();
-        break;
-
-      default:
-        // router.push('/playground')
-        return '';
-        break;
-    }
-})
-
-
-const canShare = computed(() => {
-    return pageMode.value === "new" || pageMode.value === "playback";
-})
-
-
-const refList = ref<Nullable<any>[]>([]);
-const tabchildList = (el: any) => {
-  if(el) {
-    refList.value.push(el);
-  }
+const handleStopLoading = () => {
+  isSkeletonLoading.value = false;
 };
 
-// if(!route.params.mode && !route.query?.mode) {
-//   router.push('/playground')
-// }
+// setup auto mode
+const isAutoModeMap = new Map([
+  ['playback', true],
+  ['recorder', true],
+  ['runshared', true]
+]) as Map<string, boolean>;
 
-const taskInfo = storeToRefs(taskStore);
-
-const userStore = useUserStore()
-const { userInfo } = storeToRefs(userStore)
-userInfo.value = userStore.getUserInfo;
-
-conversationId.value && taskStore.setCurrentTaskId(conversationId.value);
-
-const {
-  historyArr : ChatHistoryArr
-}= storeToRefs(chatMsgInfoStore);
-
-const sharedTalksArr = computed(()  => chatMsgInfoStore.getSharedArr);
-
-const currentItem = computed(() => {
-  const _chat_history_arr = ChatHistoryArr?.value || [];
-  const _shared_talks_arr = sharedTalksArr?.value || []
-  const arr = pageMode.value === 'runshared' ? _shared_talks_arr : _chat_history_arr;
-  return arr?.find(
-    (item: any) => item.interaction_id === conversationId.value);
+const isAutoMode = computed(() => {
+  if(pageMode.value === 'new') {
+      return newtalkSettings.value?.mode === 'auto';
+  } else {
+      return isAutoModeMap.get(pageMode.value) as boolean;
+  }
 });
 
-chatMsgInfo.value = [
-  {
-    content: currentItem.value?.parameters[0]?.goal || chatMsgInfoStore.getCurrentInput,
-    msgID: nanoid(),
-    parentMsgID: '',
-    role: 'USER',
-    isLatest: true
-  },
-  {
-    content: '',
-    msgID: currentItem.value?.interaction_id || '',
-    parentMsgID: '',
-    role: 'AI',
-    isLatest: true
-  }
-]
+// taskStore.setAutoMode(isAutoModeMap.get(pageMode.value) as boolean);
+// const { isAutoMode: isAutoMode } = storeToRefs(taskStore);
+const {isCompleted: isTaskCompleted } = storeToRefs(taskStore);
 
-// 判断当前会话是不是历史会话 如果不是的话，则设置获取没有设置conversationId的记忆设置
-const setting = chatMsgInfoStore.getSetting(conversationId.value)
-const remSetting = chatMsgInfoStore.getSetting('config')
+// setup the websocket connection
+let ws: WebSocket | null = null;
 
+const BACKEND_URL = ( import.meta.env.VITE_BACKEND_URL as string ).replace(/\/api/, '');
+const ws_protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+const ws_host = BACKEND_URL.replace('https://', '').replace('http://', '');
+const ws_origin = `${ ws_protocol }//${ ws_host }`;
+const authStr = `${conversationId.value}?user_id=${user_id}&token=${token}`;
 
-taskStore.setAutoMode(remSetting?.mode === 'auto');
+const pathMap = new Map([
+  ['new', '/ws/base/'],
+  ['playback', '/ws/replay/'],
+  ['recorder', '/ws/recorder/'],
+  ['runshared', '/ws/share/']
+]) as Map<string, string>;
 
-const {
-    isCompleted: isTaskCompleted
-  } = storeToRefs(taskStore);
+const recorder_dir = sessionStorage.getItem('rec');
 
-const {
-    subtasks: subTasks
-  } = storeToRefs(taskStore);
-  
+if(recorder_dir) {
+  sessionStorage.removeItem('rec');
+} // for record mode
+
+const newTalkUrl = `${ ws_origin }${pathMap.get('new')}${ authStr }&description=${ newTalkInputText.value.substring(0, 26) }`;
+
+const playbackUrl = `${ ws_origin }${pathMap.get('playback') }${ authStr }`;
+
+const recordUrl = `${ ws_origin }${ pathMap.get('recorder') }${ authStr }&recorder_dir=${ recorder_dir }`;
+
+const shareUrl = `${ ws_origin }${ pathMap.get('runshared') }${ authStr }`;
 
 const stateMap = new Map([
   [WebSocket.CONNECTING, 'CONNECTING'],
@@ -294,184 +263,100 @@ const stateMap = new Map([
   [WebSocket.CLOSED, 'CLOSED'],
 ]) as Map<number, string>;
 
-// TODo: when ws closed , stop loading;
+const sendMsgViaWebsocket = (data: any) => {
+  if(ws && ws.readyState === WebSocket.OPEN) {
+    const _data = typeof data === 'string' ? data : JSON.stringify(data);
+    ws?.send(_data);
+  }
+}
+
+const closeWebsocketInstance = () => {
+  if(ws && ws.readyState === 1) { ws.close() }
+}
 
 const handleConnectFailNotification = (msg: string) => {
-  taskStore.reset();
-  ElMessageBox.confirm(
-    msg || 'Connection failed, please try again later.',
-    'Error',
+  // taskStore.reset();
+  ElMessageBox.confirm( msg || 'Connection failed, please try again later.', 'Error',
     {
       type: 'error',
       icon: markRaw(WarnTriangleFilled),
     }
-  )
-};
-
-const handleFinish = () => {
-    taskStore.completeSubtask();
-    if(ws && ws.readyState === 1) {
-        ws.close();
-    }
-    ElMessageBox({
-      type: 'success',
-      message: 'Your task is completed.'
-    })
-};
-const handleFailed = () => {
-  taskStore.completeSubtask();
-}
-const RunNextSubtask = (data: string) => {
-  const query_params = JSON.stringify({
-    type: "data",
-    args: {
-      goal: data,
-    },
-    agent: remSetting?.agent,
-    mode: remSetting?.mode,
-    node_id: taskStore.last_step_id || null,
-  });
-  if(ws && ws.readyState === WebSocket.OPEN) {
-    ws?.send(query_params);
-  }
-};
-
-
-const user_id = userInfo?.value?.user_id as string;
-const token = userInfo?.value?.token as string;
-const chatIdFromRoute = computed(() => {
-  return (route.params.id);
-});
-
-const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-
-const recorder_dir = sessionStorage.getItem('rec');
-
-if(recorder_dir) {
-  sessionStorage.removeItem('rec');
-}
-
-const plainUrl = `${ protocol }//${ 
-    BACKEND_URL.replace('https://', '')
-    .replace('http://', '')
-  }/ws/base/${
-    conversationId.value
-  }?user_id=${
-    user_id
-  }&token=${
-    token
-  }&description=${
-currentInput.value.substring(0, 26)}`;
-
-const playbackUrl = `${ protocol }//${
-  BACKEND_URL.replace('https://', '').replace('http://', '')
-}/ws/replay/${
-  conversationId.value
-}?user_id=${user_id}&token=${token}`;
-
-const recordUrl = `${ protocol }//${ BACKEND_URL.replace('https://', '').replace('http://', '')
-}/ws/recorder/${
-  conversationId.value
-}?user_id=${user_id}&token=${token}&recorder_dir=${recorder_dir}`;
-
-const runShareUrl = `${ protocol }//${
-  BACKEND_URL.replace('https://', '').replace('http://', '')
-}/ws/share/${
-  conversationId.value
-}?user_id=${user_id}&token=${token}`;
-
-const RunNextinnerNode = (data: any) => {
-  const query_params = JSON.stringify({
-    type: "data",
-    args: {
-      ...data,
-    },
-    agent: remSetting?.agent,
-    mode: remSetting?.mode,
-    node_id: taskStore.last_step_id || null,
-  });
-
-  if(ws && ws.readyState === WebSocket.OPEN) {
-    ws?.send(query_params);
-  }
-};
-
-const pingKeepAlive = () => {
-  const ping = JSON.stringify({
-    type: 'ping'
-  });
-  if(ws && ws.readyState === WebSocket.OPEN) {
-    ws?.send(ping);
-  }
-};
-
-const handleStopLoading = () => {
-  isLoading.value = false;
+  ).then(() => {
+    router.push('/playground')
+  }).catch(() => {
+    router.push('/playground')
+  })
 };
 
 const disConnectWebsocket = () => {
-  const data = {
-    type: "disconnect"
-  }
-  if(ws && ws.readyState === WebSocket.OPEN) {
-    ws?.send(JSON.stringify(data));
-  }
-  if(ws && ws.readyState === 1) {
-    ws.close();
-  }
+  const data = { type: "disconnect" }
+  sendMsgViaWebsocket(data);
+  closeWebsocketInstance();
   ws = null;
+};
+
+const handleTaskCompletelyFinished = () => {
+    taskStore.completeSubtask();
+    closeWebsocketInstance();
+    handleStopLoading();
+    ElMessageBox({
+      type: 'success',
+      message: 'Your task is completed.'
+    });
+};
+
+const pingKeepAlive = () => {
+  sendMsgViaWebsocket({ type: 'ping' });
+};
+
+const handleAlertError = (msg: string) => {
+  handleStopLoading();
+  return ElMessageBox.alert(msg, 'Error', {
+      type: 'error',
+      icon: markRaw(WarnTriangleFilled),
+    },
+  )
 }
 
-const scrollToBottom = () => {
-  nextTick(() => {
-    if (listRef.value) listRef.value!.scrollTop = listRef.value?.scrollHeight || 0
-  })
+const default_WS_Establish_Error_Handler = (e: any) => {
+  console.log("ws.onerror", e);
+  handleStopLoading();
 }
 
-const sendConnectType = () => {
-  const data = {
-    type: 'connect',
-  }
-  if(ws && ws.readyState === WebSocket.OPEN) {
-    ws?.send(JSON.stringify(data));
-  }
+const sendConnectResponse = () => {
+  const data = { type: 'connect'}
+  sendMsgViaWebsocket(data);
 }
 
 const wsMessageHandler = (data: any) => {
       const { status } = data;
 
-      // if(isCompleted.value) {
-      //   return;
-      // }
       const tabRefArr = refList.value;
-      const tabchild = tabRefArr[tabRefArr.length - 1];
+      let tabchild: any = null;
+      if(tabRefArr && tabRefArr.length > 0) {
+        tabchild = tabRefArr[tabRefArr.length - 1];
+      }
+
+      if(isTaskCompleted.value) return;
 
       if(data.success === false) {
-        ElMessageBox.alert(
-          data.message,
-          'Error',
-          {
-            type: 'error',
-            icon: markRaw(WarnTriangleFilled),
-          },
-        )
-        // Stop the skeleton loading
-        // taskStore.completeSubtask();
-
         disConnectWebsocket();
-        // router.push('/playground')
+        handleStopLoading();
+        // taskStore.completeSubtask();
+        handleAlertError(data.message).then(() => {
+          // router.push('/playground')
+        });
         return;
       }
-
-      if(data.type = 'pong') {
+      if(data.type === 'pong') {
         pingKeepAlive();
       }
-
       if(data.workspace_file_list && Array.isArray(data.workspace_file_list)) {
         taskStore.setWorkspaceFiles(data.workspace_file_list);
       }
-
-      data.node_id && taskStore.setLastStepId(data.node_id);
+      if(data.node_id) {
+        taskStore.setLastStepId(data.node_id);
+      }
 
       switch (status) {
           case 'start':
@@ -499,20 +384,20 @@ const wsMessageHandler = (data: any) => {
               break;
 
           case 'finished':
-              handleFinish();
               disConnectWebsocket();
-              resetRunConnectionOnce()
+              handleTaskCompletelyFinished();
+              // resetRunConnectionOnce()
               break;
 
           case 'failed':
               handleStopLoading();
               handleConnectFailNotification(data?.message);
               disConnectWebsocket();
-              resetRunConnectionOnce()
+              // resetRunConnectionOnce()
               break;
 
           case 'connect':
-              sendConnectType();
+              sendConnectResponse();
               break;
 
           default:
@@ -521,184 +406,61 @@ const wsMessageHandler = (data: any) => {
 };
 
 const newTalkConnection = () => {
-  taskStore.reset();
   const query_params = {
     type: "data",
-    args: {
-      goal: currentInput.value,
+    args: 
+    { 
+      goal: newTalkInputText.value,
       // fileList 
     },
-    agent: remSetting?.agent,
-    mode: remSetting?.mode,
+    agent: newtalkSettings.value?.agent,
+    mode: newtalkSettings.value?.mode,
     file_list: fileListConfig.value
   };
-  ws = new WebSocket(plainUrl );
-  ws.onmessage = (e) => {
-    const data = JSON.parse(e.data);
-    wsMessageHandler(data);
-  }
-  ws.onerror = (e) => {
-    console.log("ws.onerror");
-  }
-  ws.onopen = () => {
-    if(ws && ws.readyState === WebSocket.OPEN) {
-      ws.send(JSON.stringify(query_params));
-    }
-  }
-}
-
-// 输入回答
-const sendMessage = async (val: string) => {
-  if (!val) return
-  chatMsgInfoStore.setCurrentInput(val)
-  chatMsgInfo.value = [
-      {
-        content: val,
-        msgID: nanoid(),
-        parentMsgID: '',
-        role: 'USER',
-        isLatest: true
-      },
-      {
-        content: '',
-        msgID: nanoid(),
-        parentMsgID: '',
-        role: 'AI',
-        isLatest: true
-      }
-  ]
-  // const inputMsg: ChatMsgInfoInf = {
-  //   role: 'USER',
-  //   content: currentInput.value,
-  //   msgID: nanoid(),
-  //   parentMsgID: chatMsgInfo.value.at(-1)?.msgID || '',
-  //   childrenIds: [],
-  // }
-  // const lastChat = chatMsgInfo.value.at(-1)
-  // if (lastChat) {
-  //   lastChat.childrenIds = [...(lastChat.childrenIds as string[] || []), inputMsg.msgID]
-  // }
-  // chatMsgInfo.value.push(inputMsg);
-
-  // if (chatMsgInfo.value.length === 1) {
-  //   chatMsgInfoStore.setHistoryChat(conversationId.value, inputMsg)
-  // } else {
-  //   chatMsgInfoStore.pushHistoryChat(conversationId.value, inputMsg)
-  // }
-
-  nextTick(() => (listRef.value!.scrollTop = listRef.value?.scrollHeight || 0))
-  // currentInput.value = ''
-
-  // await queryAnswer().finally(() => chatMsgInfoStore.setisShouldRefreshHistory(true))
-  return Promise.resolve()
-}
-
-
-const onShare = () => {
-  const id = conversationId.value;
-
-  shareRequest(
-    {
-      interaction_id: id,
-      user_id: userInfo.value?.user_id,
-      token: userInfo.value?.token
-    }
-  ).then((res: any) => {
-      console.log(res)
-    }).catch((err: any) => {
-      console.log(err)
-    })
-
+  ws = new WebSocket( newTalkUrl );
+  ws.onmessage = (e) => { wsMessageHandler(JSON.parse(e.data)); }
+  ws.onerror = (e) => { default_WS_Establish_Error_Handler(e); }
+  ws.onopen = () => { sendMsgViaWebsocket(query_params);}
 }
 
 const runSharedConnection = () => {
-  if(!conversationId.value) {
-    console.log("conversationId.value is null");
-    return;
-  }
-  const query_params = {
-      type: "shared"
-  }
   taskStore.setAutoMode(true);
-  ws = new WebSocket(runShareUrl);
-  ws.onmessage = (e) => {
-    const data = JSON.parse(e.data);
-    wsMessageHandler(data);
-  }
-  ws.onerror = (e) => {
-    console.log("ws.onerror");
-  }
-  ws.onopen = () => {
-    if(chatIdFromRoute.value  && ws && ws.readyState === WebSocket.OPEN) {
-      ws?.send(JSON.stringify(query_params));
-    }
-  }
+  const query_params = { type: "shared"}
+  ws = new WebSocket(shareUrl);
+  ws.onmessage = (e) => { wsMessageHandler(JSON.parse(e.data)); }
+  ws.onerror = (e) => { default_WS_Establish_Error_Handler(e); }
+  ws.onopen = () => { sendMsgViaWebsocket(query_params);} 
 }
 
 const playbackConnection = () => {
-  if(!conversationId.value) {
-    console.log("conversationId.value is null");
-    return;
-  }
-  const query_params = {
-      type: "replay"
-  }
+  const query_params = { type: "replay" }
   taskStore.setAutoMode(true);
   ws = new WebSocket(playbackUrl);
-  ws.onmessage = (e) => {
-    const data = JSON.parse(e.data);
-    wsMessageHandler(data);
-  }
-  ws.onerror = (e) => {
-    console.log("ws.onerror");
-  }
-  ws.onopen = () => {
-    if(chatIdFromRoute.value  && ws && ws.readyState === WebSocket.OPEN) {
-      ws?.send(JSON.stringify(query_params));
-    }
-  }
+  ws.onmessage = (e) => { wsMessageHandler(JSON.parse(e.data)); }
+  ws.onerror = (e) => { default_WS_Establish_Error_Handler(e); }
+  ws.onopen = () => { sendMsgViaWebsocket(query_params);}
 }
 
 const recordConnection = () => {
   taskStore.setAutoMode(true);
-  const query_params = {
-      type: "recorder"
-  }
+  const query_params = { type: "recorder"}
   ws = new WebSocket(recordUrl);
-  ws.onmessage = (e) => {
-    const data = JSON.parse(e.data);
-    wsMessageHandler(data);
-  }
-  ws.onerror = (e) => {
-    console.log("ws.onerror");
-  }
-  ws.onopen = () => {
-    if(ws && ws.readyState === WebSocket.OPEN) {
-      ws?.send(JSON.stringify(query_params));
-    }
-  }
+  ws.onmessage = (e) => { wsMessageHandler(JSON.parse(e.data)); }
+  ws.onerror = (e) => { default_WS_Establish_Error_Handler(e); }
+  ws.onopen = () => { sendMsgViaWebsocket(query_params);}
 }
-
 
 const RunConnection = () => {
   disConnectWebsocket();
+  taskStore.reset();
+
   switch(pageMode.value) {
     case 'playback':
       playbackConnection();
       break;
 
-    case 'review':
-      // newTalkConnection();
-      break;
-
     case 'new':
-      const input = currentInput.value;
-      if (input) {
-        newTalkConnection();
-        sendMessage(input)
-      } else {
-        router.push('/playground')
-      }
+      newTalkConnection();
       break;
 
     case 'recorder':
@@ -713,384 +475,124 @@ const RunConnection = () => {
       break;
   }
 }
-const isShowRunConnectionOnce = ref(false)
-let RunConnectionOnce = function() {
-  RunConnection();
-  if (pageMode.value == 'new' || pageMode.value == 'recorder') {
-    
-    RunConnectionOnce = function () {
-      if (!isShowRunConnectionOnce.value) {
-        isShowRunConnectionOnce.value = true
-        ElMessageBox.alert(
-          'The task is running, please wait!',
-          'Error',
-          {
-            type: 'error',
-            icon: markRaw(WarnTriangleFilled),
-            
-          },
-          
-        ).then(() => {
-          isShowRunConnectionOnce.value = false
-        })
-        .catch(() => {
-          isShowRunConnectionOnce.value = false
-        })
-      }
-      
-    }
-    
-  }
-}
-// task Complete And Reset RunConnectionOnce
-const resetRunConnectionOnce = () => {
-  RunConnectionOnce = () => {
-    RunConnection();
-  }
-}
-watch(() => currentItem.value,
-  (newVal, oldVal) => {
 
-    console.log("currentItem.value = ", currentItem.value);
-    if(!currentItem.value) {
-      return;
+// task and subtask running
+const RunNextSubtask = (data: string) => {
+  const query_params = {
+    type: "data",
+    args: {
+      goal: data,
+    },
+    agent: newtalkSettings.value?.agent,
+    mode: newtalkSettings.value?.mode,
+    node_id: taskStore.last_step_id || null,
+  };
+  sendMsgViaWebsocket(query_params);
+};
+
+const RunNextinnerNode = (data: any) => {
+  const query_params = {
+    type: "data",
+    args: {
+      ... data,
+    },
+    agent: newtalkSettings.value?.agent,
+    mode: newtalkSettings.value?.mode,
+    node_id: taskStore.last_step_id || null,
+  };
+  sendMsgViaWebsocket(query_params);
+};
+
+// talks and history setup
+const sharedTalksArr = computed(()  => chatMsgInfoStore.getSharedArr);
+const historyTalksArr = computed(() => chatMsgInfoStore.getArrHistory);
+
+const currentItem = computed(() => {
+  const _temp1 = historyTalksArr.value?.find(
+      (item: any) => item.interaction_id === conversationId.value);
+  const _temp2 = sharedTalksArr.value?.find(
+      (item: any) => item.interaction_id === conversationId.value);
+  
+  switch(pageMode.value) {
+      case 'playback':
+        return {
+          id: conversationId.value,
+          text: _temp1 ? _temp1.parameters[0]?.goal : 'PlayBack'
+        }
+      case 'new':
+        return {
+          id: conversationId.value,
+          text: newTalkInputText.value || 'New Talk'
+        }
+      case 'recorder':
+        return {
+          id: conversationId.value,
+          text: 'Run Record ' + recorder_dir
+        }
+      case 'runshared':
+        return {
+          id: conversationId.value,
+          text: _temp2 ? _temp2.parameters[0]?.goal : ('Run Shared Talk ' + conversationId.value)
+        }
+      default:
+        return {
+          id: conversationId.value,
+          text: ''
+        }
     }
-    RunConnectionOnce();
-    chatMsgInfo.value = [
-      {
-        content: currentItem.value?.parameters[0]?.goal || chatMsgInfoStore.getCurrentInput,
+});
+
+const currentHistoryTalk = ref<any>([]);
+
+watch(() => currentItem.value, (newVal, oldVal) => {
+  if(!newVal) {
+    return;
+  }
+  currentHistoryTalk.value = [
+    {
+        content: newVal.text,
         msgID: nanoid(),
         parentMsgID: '',
         role: 'USER',
         isLatest: true
-      },
-      {
+    },
+    {
         content: '',
-        msgID: currentItem.value?.interaction_id || '',
+        msgID: newVal.id,
         parentMsgID: '',
         role: 'AI',
         isLatest: true
-      }
-    ]
-  },
-  {
-    immediate: true
-  }
-);
+    }
+]
+}, { immediate: true });
 
-onUnmounted(() => {
-  disConnectWebsocket();
-  chatMsgInfo.value = [];
-  taskStore.reset();
+
+
+watch(() => [pageMode.value, conversationId.value],
+  (newVal, oldVal) => {
+    if(!pageMode.value || !conversationId.value) {
+      router.push('/playground')
+      return;
+    }
+    taskStore.setAutoMode(isAutoMode.value);
+    disConnectWebsocket();
+    taskStore?.reset();
+    debounce(function() {
+      RunConnection();
+    }, 1000)();
+  }
+,{ immediate: true });
+
+onMounted(() => {
+  refList.value = [];
 });
 
-const md = new MarkdownIt({
-  html: true,
-  // breaks: true,
-  linkify: true,
-  highlight: function (str, lang) {
-    const div = document.createElement('div')
-    div.id = conversationId.value
-    div.classList.add('copy-btn')
-    div.dataset.clipboardAction = 'copy'
-    div.dataset.clipboardTarget = `#copy${nanoid()}`
-    div.innerText = 'Copy'
+onBeforeUnmount(() => {
+  refList.value = [];
+  disConnectWebsocket();
+  taskStore?.reset();
+});
 
-    let html = ''
-    const language = hljs.getLanguage(lang) ? lang : 'python'
-    const code = hljs.highlight(str, { language }).value
-
-    div.addEventListener('click', (e: any) => {
-      console.log(e)
-    })
-
-    try {
-      html = html + code
-    } catch {}
-    return `<pre><code class="hljs language-${lang}">${html}</code></pre>`
-  },
-  langPrefix: 'hljs language-',
-})
-
-
-const isShowTyped = ref(false)
-const isTypedStop = ref(true)
-
-
-watch(() =>[ route.params.id , route.query.id, route.query.mode],
-  (newVal, oldVal) => {
-
-    taskStore.reset();
-    console.log("changed route,  route = ", newVal);
-
-    // if(!pageMode.value) {
-    //   router.push('/playground')
-    //   return;
-    // }
-
-    if(pageMode.value === 'playback' || pageMode.value === 'review' || pageMode.value === 'record') {
-        taskStore.reset();
-
-        if(pageMode.value === 'playback') {
-          taskStore.setAutoMode(true);
-        } else {
-          taskStore.setAutoMode(false);
-          taskStore.completeSubtask();
-        }
-
-        // if(!conversationId.value) {
-        //   router.push('/playground')
-        //   return;
-        // }
-        // if(!currentItem.value) {
-        //   router.push('/playground')
-        //   return;
-        // }
-
-        chatMsgInfo.value = [
-          {
-            content: currentItem.value?.parameters[0]?.goal || chatMsgInfoStore.getCurrentInput,
-            msgID: nanoid(),
-            parentMsgID: '',
-            role: 'USER',
-            isLatest: true
-          },
-          {
-            content: '',
-            msgID: currentItem.value?.interaction_id,
-            parentMsgID: '',
-            role: 'AI',
-            isLatest: true
-          }
-        ]
-    }
-    RunConnectionOnce();
-    nextTick(() => {
-      if (listRef.value) listRef.value!.scrollTop = listRef.value?.scrollHeight || 0
-    })
-    // conversationId.value = newVal.id  as string
-    // queryChatInfo(newVal.id  as string).finally(() => {
-    //   if (isNew) {
-    //     isShowTyped.value = false
-
-    //   } else {
-
-    //     if (isRequestingAi.value) {
-    //       isShowTyped.value = true
-    //     } else {
-    //       isShowTyped.value = !isTypedStop.value
-    //     }
-    //   }
-    //   nextTick(() => {
-    //     if (listRef.value) listRef.value!.scrollTop = listRef.value?.scrollHeight || 0
-    //   })
-    // })
-  },
-  {
-    immediate: true
-  }
-)
-
-// const queryChatInfo = async (id: string) => {
-//   if (!id) return
-//   const {data: res} = await getDataApi({ convId: id })
-
-//   // 此APi在正式环境不可用
-//   // return  RequestData
-
-
-//   const useMessage = res.data.msgInfos.find((cmp: any) => {
-//     return cmp.role === 'USER'
-//   })
-//   // currentInput.value = useMessage.content
-//   // const res = {...RequestData}
-//   // console.log(RequestData)
-//   // to
-//   const newRes = {...res, ...{dataNew: {
-//     setting: {
-//       mode: 'manual',
-//       agent: 'Data agent',
-//       plugins: ['1'],
-//       temperature: new Date().getTime(),
-//     }
-//   }}}
-
-//   // if (!res?.data?.msgInfos[0]) {
-//   //   router.push('/playground')
-//   //   return
-//   // }
-//   const msgArr: any[] = res?.data?.msgInfos
-
-//   chatMsgInfoStore.setHistoryChat(id, msgArr)
-//   chatMsgInfoStore.setSetting(id, newRes.dataNew.setting)
-//   const arr = msgArr.reduce((prev, current, index) => {
-//     prev[current.msgID] = msgArr.filter((msgItem) => msgItem.parentMsgID === current.msgID)?.map((item) => item.msgID)
-//     return prev
-//   }, {})
-
-//   const newArr: any[] = []
-//   msgArr.forEach((item, index) => {
-//     item.content_html = md.render(item.content)
-//     item.childrenIds = arr[item.msgID]
-//     if (index === 0) {
-//       newArr.push(item)
-//     }
-//     const parentMsg = msgArr.find((msgItem) => msgItem.msgID === newArr.at(-1).parentMsgID)
-//     if (!parentMsg) return
-//     newArr.push(parentMsg)
-//   })
-
-//   chatMsgInfo.value = newArr.reverse().slice(0, 2)
-
-//   nextTick(() => (listRef.value!.scrollTop = listRef.value?.scrollHeight || 0))
-// }
-
-// 增加水印
-// const userInfoStore = useUserStore()
-// const { userInfo } = storeToRefs(userInfoStore)
-// onMounted(() => useInitWaterMark('.watermark', userInfo.value?.user_id + ''))
-
-const listRef = ref<Nullable<HTMLElement>>(null)
-const wormText = (params: IChatRequest, {tasks, costTime, msgId }: {tasks: any; costTime: number; msgId: string }, refresh: boolean) => {
-  const run = async () => {
-    isShowTyped.value = false
-    isTypedStop.value = true
-    // TODO: 赋值ID
-    const newChat: ChatMsgInfoInf = {
-      msgID: msgId,
-      content: '',
-      parentMsgID: params.chatMessage.at(-1)!.id || '',
-      role: 'AI',
-      costTimeMilli: costTime,
-      subTasks: [],
-      isLatest: true
-      // 当前的inenr是不是最新的那条信息
-    }
-    chatMsgInfo.value.forEach((item) => {
-      item.isLatest = false
-    })
-    chatMsgInfo.value.at(-1)?.childrenIds?.push(msgId)
-    chatMsgInfo.value.push(newChat)
-
-    chatMsgInfoStore.pushHistoryChat(params.conversationId, newChat)
-
-    nextTick(() => {
-      if (listRef.value) listRef.value!.scrollTop = listRef.value?.scrollHeight || 0
-    })
-  }
-
-  isTypedStop.value = false
-  run()
-}
-
-
-// 执行重新生成操作
-const regenerate = () => {
-  const input = currentInput.value
-  sendMessage(input)
-}
-
-// 初次加载逻辑
-// if (route.query.id) {
-//   chatMsgInfoStore.setisShouldRefreshHistory(false)
-//   queryChatInfo(route.query.id as string)
-// } 
-// const strFragment = reactive<Array<{ text: string; isEnd: boolean; isProgress: boolean; id: string }>>([])
-// 请求AI结果
-// async function queryAnswer(refresh?: string): Promise<void> {  
-//   if (isShowTyped.value) return
-//   isShowTyped.value = true
-//   isRequestingAi.value = true
-
-//   const chatMessage: Array<HistoryListInf> = chatMsgInfo.value?.map(
-//     ({ role, content, msgID, parentMsgID, costTimeMilli }: ChatMsgInfoInf, index) => {
-//       return {
-//         content: { pairs: content, type: 'TEXT', costTime: costTimeMilli || 0 },
-//         id: msgID,
-//         role,
-//         parentMsgID: parentMsgID || '',
-//       }
-//     }
-//   )
-
-//   const params: IChatRequest = {
-//     chatMessage: chatMessage.slice(-10),
-//     conversationId: conversationId.value,
-//     parentMessageId: '',
-//     generateType: !!refresh ? 'REGENERATE' : 'NORMAL',
-//     setting: route.query.id ? setting : remSetting,
-//   }
-
-//   lastConversionId.value = unref(conversationId)
-//   const {data: res} = await refreshDataApi(params)
-//   // 此APi在正式环境不可用
-//     //  return refreshAIData
-//   isRequestingAi.value = false
-//   lastConversionId.value = ''
-//   if (res?.code === 0) {
-//     // const tasks = res?.data?.subTasks || []
-//     const tasks = res?.data?.subTasks || []
-//     const costTime = res?.data?.costTimeMillis
-//     // const msgId = res?.data?.msgId
-//     const msgId = new Date().getTime() + '' // todo id不同  用来辨别
-//     if (params.conversationId !== conversationId.value) {
-//       isShowTyped.value = !isTypedStop.value
-//     } else {
-//       isShowTyped.value = true
-//       wormText(params, {tasks, costTime, msgId}, !!refresh)
-//     }
-//   } else {
-//     ElMessage({ type: 'error', message: res?.message })
-//   }
-// }
-
-// 重新生成
-// const refreshAnswer = ({ msgID }: { msgID: string }) => {
-//   // 存储操作
-//   useFeedbackRequest({ messageId: msgID, conversationId: conversationId.value, rating: 'THUMBS_NO', feedbackAction: 'REGENERATE' })
-//   // 删除最后一个回答
-//   chatMsgInfo.value.pop()
-//   queryAnswer('refresh')
-// }
-
-// 反馈成功
-// const evaluateSuccess = ({ feedbackMsg, messageId, rating }: { feedbackMsg: string; messageId: string; rating: feedbackRating }) => {
-//   const currentMessage = chatMsgInfo.value.find((item) => item.msgID === messageId)
-//   if (currentMessage) {
-//     currentMessage.rating = rating
-//     currentMessage.feedbackMsg = feedbackMsg
-//   }
-// }
-
-// const switchMsg = (val: { index: number; lastId: string; currentId: string; conversationId: string }) => {
-//   const historyChat = chatMsgInfoStore.getHistoryChat(val.conversationId)
-
-//   const lastChatIndex = chatMsgInfo.value.findIndex((item) => item.msgID === val.lastId)
-//   const lastChat = chatMsgInfo.value.slice(0, lastChatIndex)
-//   const currentChat = historyChat.find((item: ChatMsgInfoInf) => item.msgID === val.currentId)
-
-//   let followChat: ChatMsgInfoInf[] = []
-
-//   const findChat = (msgID: string) => {
-//     const chat = historyChat.find((item: ChatMsgInfoInf) => item.parentMsgID === msgID)
-//     if (chat) {
-//       followChat.push(chat)
-//       findChat(chat.msgID)
-//     }
-//   }
-//   findChat(val.currentId)
-//   if (followChat[0]) {
-//     chatMsgInfo.value = [...lastChat, currentChat, ...followChat]
-//   } else {
-//     chatMsgInfo.value = [...lastChat, currentChat]
-//   }
-
-//   nextTick(() => {
-//     if (followChat.length === 0) {
-//       if (listRef.value) listRef.value!.scrollTop = listRef.value?.scrollHeight || 0
-//     }
-//   })
-// }
 </script>
 
 <style scoped lang="scss">

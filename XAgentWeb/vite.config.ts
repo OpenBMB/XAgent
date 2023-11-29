@@ -27,7 +27,7 @@ export default defineConfig(({ command, mode }) => {
   console.log('command', command, 'mode', mode)
   console.log()
   return {
-    base: './',
+    base: '/',
     resolve: {
       alias: [
         { find: /\/@\//, replacement: pathResolve('src') + '/' },

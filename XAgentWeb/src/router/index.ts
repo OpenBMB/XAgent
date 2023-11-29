@@ -2,6 +2,7 @@ import type { App } from 'vue'
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
 import Login from '../views/login/login.vue'
 import Layout from '/@/layouts/default.vue'
+import Chat from '../views/playground/chat.vue';
 
 const moduleRoute: any[] = []
 const modules = import.meta.glob('./modules/**/*.ts', { eager: true })
@@ -47,21 +48,17 @@ const routes: Readonly<RouteRecordRaw[]> = [
     meta: {
       requireAuth: true,
       isBetaOnly: false,
-      title: 'Our Shared Talks ｜ X-Agent',
     },
     children: [
       {
         name: 'SharedTalks',
         path: '/share',
-        meta: {
-          isBetaOnly: false,
-          title: 'Our Shared Talks ｜ X-Agent',
-        },
         component: () => import('/@/views/playground/layout.vue'),
         children: [
           {
             name: 'SharedTalks',
             path: '/share',
+            title: 'Our Shared Talks ｜ X-Agent',
             component: () => import('/@/views/playground/share.vue'),
           },
         ]
@@ -70,15 +67,15 @@ const routes: Readonly<RouteRecordRaw[]> = [
   },
   {
     name: 'Playground',
-    path: '/playground',
     component: Layout,
+    path: '/playground',
     meta: { 
       title: 'Demo Playground ｜ X-Agent',
     },
     children: [
       {
-        path: '/playground',
         name: 'Playground',
+        path: '/playground',
         component: () => import('/@/views/playground/layout.vue'),
         children: [
           {
@@ -90,15 +87,23 @@ const routes: Readonly<RouteRecordRaw[]> = [
               isBetaOnly: true,
             },
           },
-          { 
-            path: '/playground/chat',
-            name: 'Talk',
-            component: () => import('../views/playground/chat.vue')
+          {
+            name: 'viewTalk',
+            path: '/playground/chat/:mode?/:id?',
+            component: Chat,
+            meta: {
+              title: 'View Talk ｜ X-Agent',
+              isBetaOnly: false,
+            },
           },
-          { 
-            name: 'NewTalk',
-            path: '/playground/chat/:mode/:id?',
-            component: () => import('../views/playground/chat.vue')
+          {
+            name: 'newtalk',
+            path: '/playground/chat/:mode',
+            component: Chat,
+            meta: {
+              title: 'New Talk ｜ X-Agent',
+              isBetaOnly: true,
+            },
           },
         ],
       },

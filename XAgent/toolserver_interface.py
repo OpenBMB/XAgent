@@ -6,7 +6,6 @@ import json5 as json
 import requests
 
 from colorama import Fore
-from XAgent.logs import logger
 from XAgent.utils import ToolCallStatusCode
 from XAgent.ai_functions import function_manager
 from XAgent.recorder import RunningRecoder
@@ -27,12 +26,13 @@ def is_wrapped_response(obj: dict) -> bool:
     return False
 
 
-def unwrap_tool_response(obj):
+def unwrap_tool_response(obj, logger=None):
     """
     Unwrap the tool response object.
 
     Args:
         obj: The tool response object.
+        logger: The logger.
 
     Returns:
         The unwrapped tool response object.
@@ -53,7 +53,7 @@ def unwrap_tool_response(obj):
                         'file_name': name
                     }
                 case 'composite':
-                    return [unwrap_tool_response(o) for o in obj['data']]
+                    return [unwrap_tool_response(o, logger) for o in obj['data']]
         else:
             return obj
     elif isinstance(obj, (str, int, float, bool, list)):
@@ -71,8 +71,9 @@ class ToolServerInterface():
     The interface to communicate with the ToolServer.
     """
 
-    def __init__(self, recorder: RunningRecoder):
+    def __init__(self, recorder: RunningRecoder, logger=None):
         self.recorder = recorder
+        self.logger = logger
 
     def lazy_init(self, config):
         """
@@ -89,10 +90,8 @@ class ToolServerInterface():
             self.url = config.selfhost_toolserver_url
         else:
             raise NotImplementedError('Please use selfhost toolserver')
-        logger.typewriter_log("Trying to connect to ToolServer at", Fore.RED, self.url)
+        self.logger.typewriter_log("ToolServer connected in", Fore.RED, self.url)
         response = requests.post(f'{self.url}/get_cookie',)
-        response.raise_for_status()
-        logger.typewriter_log("ToolServer connected in", Fore.RED, self.url)
         self.cookies = response.cookies
 
     def close(self):
@@ -243,7 +242,7 @@ class ToolServerInterface():
             for tool_json in tools_json:
                 function_manager.register_function(tool_json)
         except Exception as e:
-            logger.typewriter_log(
+            self.logger.typewriter_log(
                 "Tool Retrieval Failed, nothing will be retrieved, please fix here.",
                 Fore.RED,
             )
@@ -327,12 +326,12 @@ class ToolServerInterface():
 
         cache_output = self.recorder.query_tool_server_cache(url, payload)
 
-        if ("redo_action" in self.config["experiment"] and self.config['experiment']['redo_action']) or cache_output is None:
+        if self.config['experiment']['redo_action'] or cache_output is None:
             response = requests.post(url, json=payload, cookies=self.cookies)
             response_status_code = response.status_code
             if response.status_code == 200 or response.status_code == 450:
                 command_result = response.json()
-                command_result = unwrap_tool_response(command_result)
+                command_result = unwrap_tool_response(command_result, self.logger)
             else:
                 command_result = response.text
 

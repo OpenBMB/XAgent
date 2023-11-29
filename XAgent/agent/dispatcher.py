@@ -5,7 +5,6 @@ from XAgent.config import CONFIG
 
 from XAgent.agent.base_agent import BaseAgent
 from XAgent.utils import RequiredAbilities, TaskSaveItem, AgentRole
-from XAgent.logs import logger
 from XAgent.agent.dispatcher_agent import DispatcherAgent
 from XAgent.message_history import Message
 
@@ -14,15 +13,16 @@ class AgentDispatcher(metaclass=abc.ABCMeta):
     """
     Base abstract class for Agent Dispatcher.
     """
-    def __init__(self):
+    def __init__(self, logger=None):
         """
         Initialize AgentDispatcher. Assign agent markets for each requirement in RequiredAbilities.
         Agent markets are initially empty.
         """
         self.agent_markets = {}
+        self.logger = logger
         for requirement in RequiredAbilities:
             self.agent_markets[requirement] = []
-        logger.typewriter_log(
+        self.logger.typewriter_log(
             f"Constructing an AgentDispatcher:",
             Fore.YELLOW,
             self.__class__.__name__,
@@ -95,7 +95,7 @@ class AutomaticAgentDispatcher(AgentDispatcher):
 class XAgentDispatcher(AgentDispatcher):
     """Generate the prompt and the agent for the given task."""
 
-    def __init__(self, config, enable=True):
+    def __init__(self, config, enable=True, logger=None):
         """
         Initialize XAgentDispatcher.
 
@@ -103,7 +103,8 @@ class XAgentDispatcher(AgentDispatcher):
             config: Dispatcher configuration.
             enable (bool, optional): Whether the dispatcher is active. Defaults to True.
         """
-        super().__init__()
+        self.logger = logger
+        super().__init__(logger)
         self.config = config
         self.dispatcher = DispatcherAgent(config)
         self.enable = enable
@@ -153,7 +154,7 @@ class XAgentDispatcher(AgentDispatcher):
             )
         except:
             # TODO: remove when all the agents can be created with dispatcher.
-            logger.info("build agent error, use default agent")
+            self.logger.info("build agent error, use default agent")
             agent = self.agent_markets[ability_type][0](config, *args, **kwargs)
         return agent
 
@@ -179,19 +180,19 @@ class XAgentDispatcher(AgentDispatcher):
             ability_type
         )
         if self.enable:
-            logger.typewriter_log(self.__class__.__name__, Fore.GREEN, f"Refine the prompt of a specific agent for {Fore.GREEN}RequiredAbilities.{ability_type.name}{Style.RESET_ALL}")
+            self.logger.typewriter_log(self.__class__.__name__, Fore.GREEN, f"Refine the prompt of a specific agent for {Fore.GREEN}RequiredAbilities.{ability_type.name}{Style.RESET_ALL}")
             _, prompt_messages, tokens = self.dispatcher.parse(
                 target_task, example_input, example_system_prompt, example_user_prompt
             )
             print(prompt_messages)
             if prompt_messages[0].content == "" and prompt_messages[1].content == "":
-                logger.info("Dispatcher fail to follow the output format, we fallback to use the default prompt.")
+                self.logger.info("Dispatcher fail to follow the output format, we fallback to use the default prompt.")
                 prompt_messages = [
                     Message(role="system", content=example_system_prompt),
                     Message(role="user", content=example_user_prompt),
                 ]
             else:
-                logger.typewriter_log(self.__class__.__name__, Fore.GREEN, f"The prompt has been refined!")
+                self.logger.typewriter_log(self.__class__.__name__, Fore.GREEN, f"The prompt has been refined!")
         else:
             prompt_messages = [
                 Message(role="system", content=example_system_prompt),

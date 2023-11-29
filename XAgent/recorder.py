@@ -8,6 +8,7 @@ from colorama import Fore
 from XAgent.workflow.base_query import AutoGPTQuery
 from XAgent.config import XAgentConfig
 from XAgentServer.database.connect import SessionLocal
+from XAgentServer.loggers.logs import Logger
 from XAgentServer.models.recorder import XAgentRunningRecord
 from XAgentServer.application.cruds.recorder import RunningRecordCRUD
 from XAgentServer.enums.recorder_type import RecorderTypeEnum
@@ -43,18 +44,17 @@ def get_db():
 
 
 class RunningRecoder():
-    """和task对应，负责维护目前的状态，并将经历过的所有事情记录到数据库中.
-    1.记录所有agent的交互记录，即输入输出
-    2.
+    """A class used to record the running sequences of the program, also including program query status and config data.
     """
 
-    def __init__(self, record_id: str, newly_start=True, root_dir=None):
+    def __init__(self, record_id: str, newly_start=True, root_dir=None, logger: Logger=None):
         self.record_id = record_id
         self.record_root_dir = root_dir
         if not os.path.exists(self.record_root_dir):
             os.makedirs(self.record_root_dir, exist_ok=True)
 
         self.newly_start = newly_start  # 是全新启动的
+        self.logger = logger
         self.query = {}
         self.config = {}
 
@@ -79,6 +79,16 @@ class RunningRecoder():
 
     def generate_record(self, current, node_id, node_type, data):
         """generate a recorder"""
+        self.logger.typewriter_log(title="-=-=-=-=-=-=-=Recorder Start-=-=-=-=-=-=-=\n",
+                                   title_color=Fore.GREEN,
+                                   content=f"Current: {current} Node: {node_type} {node_id}")
+        self.logger.typewriter_log(title="-=-=-=-=-=-=-=Data -=-=-=-=-=-=-=\n",
+                                   title_color=Fore.GREEN,
+                                   content=json.dumps(data, ensure_ascii=False, indent=4))
+        self.logger.typewriter_log(title="-=-=-=-=-=-=-=Recorder End-=-=-=-=-=-=-=",
+                                   title_color=Fore.GREEN,
+                                   content="")
+
         return XAgentRunningRecord(
             record_id=self.record_id,
             current=current,
@@ -89,6 +99,7 @@ class RunningRecoder():
             update_time=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
             is_deleted=False,
         )
+
 
     def regist_plan_modify(self,
                            refine_function_name,
@@ -108,6 +119,8 @@ class RunningRecoder():
             node_type=RecorderTypeEnum.PLAN_REFINE,
             data=plan_refine_record,
         )
+
+
         with get_db() as db:
             RunningRecordCRUD.insert_record(db=db, record=record)
         self.plan_refine_id += 1

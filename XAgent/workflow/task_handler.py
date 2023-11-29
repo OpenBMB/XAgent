@@ -4,7 +4,6 @@ import uuid
 from colorama import Fore
 
 from XAgent.inner_loop_search_algorithms.ReACT import ReACTChainSearch
-from XAgent.logs import logger, print_task_save_items
 from XAgent.agent.summarize import summarize_plan
 from XAgent.utils import (RequiredAbilities, SearchMethodStatusCode,
                           TaskSaveItem, TaskStatusCode)
@@ -13,7 +12,6 @@ from XAgent.core import XAgentCoreComponents, XAgentParam
 from XAgentServer.enums.status import StatusEnum
 from .plan_exec import Plan, PlanAgent
 from .reflection import get_posterior_knowledge
-from .working_memory import working_memory_agent
 
 
 class TaskHandler():
@@ -52,6 +50,7 @@ class TaskHandler():
             query=self.query,
             avaliable_tools_description_list=self.tool_functions_description_list,
         )
+        self.logger = self.xagent_core.logger
         # self.avaliable_tools_description_list = tool_functions_description_list
 
         self.interaction = self.xagent_core.interaction
@@ -60,6 +59,7 @@ class TaskHandler():
         self.function_list = self.xagent_core.function_list
         self.function_handler = self.xagent_core.function_handler
         self.toolserver_interface = self.xagent_core.toolserver_interface
+        self.working_memory_agent = self.xagent_core.working_memory_agent
         self.now_dealing_task = None
 
     def outer_loop(self):
@@ -72,7 +72,7 @@ class TaskHandler():
         Returns:
             None
         """
-        logger.typewriter_log(
+        self.logger.typewriter_log(
             f"-=-=-=-=-=-=-= BEGIN QUERY SOVLING -=-=-=-=-=-=-=",
             Fore.YELLOW,
             "",
@@ -118,18 +118,18 @@ class TaskHandler():
                     self.now_dealing_task, receive_data)
 
                 if flag:
-                    logger.typewriter_log(
+                    self.logger.typewriter_log(
                         "-=-=-=-=-=-=-= USER INPUT -=-=-=-=-=-=-=",
                         Fore.GREEN,
                         "",
                     )
-                    logger.typewriter_log(
+                    self.logger.typewriter_log(
                         "goal: ",
                         Fore.YELLOW,
                         f"{new_intput}",
                     )
                     self.now_dealing_task.data.goal = new_intput
-                    logger.typewriter_log(
+                    self.logger.typewriter_log(
                         "-=-=-=-=-=-=-= USER INPUT -=-=-=-=-=-=-=",
                         Fore.GREEN,
                         "",
@@ -141,7 +141,9 @@ class TaskHandler():
 
             self.posterior_process(self.now_dealing_task)
 
-            working_memory_agent.register_task(self.now_dealing_task)
+            self.working_memory_agent.register_task(self.now_dealing_task)
+
+            self.xagent_core.print_task_save_items(self.now_dealing_task.data)
 
             refinement_result = {
                 "name": self.now_dealing_task.data.name,
@@ -161,7 +163,7 @@ class TaskHandler():
                 self.plan_agent.plan_refine_mode(
                     self.now_dealing_task, self.toolserver_interface, self.agent_dispatcher)
             else:
-                logger.typewriter_log(
+                self.logger.typewriter_log(
                     "subtask submitted as no need to refine the plan, continue",
                     Fore.BLUE,
                 )
@@ -188,7 +190,7 @@ class TaskHandler():
                 self.interaction.insert_data(
                     data=subtask_list, status=StatusEnum.SUBTASK, current=current_task_id)
 
-        logger.typewriter_log("ALL Tasks Done", Fore.GREEN)
+        self.logger.typewriter_log("ALL Tasks Done", Fore.GREEN)
         return
 
     def inner_loop(self, plan: Plan, ):
@@ -205,12 +207,12 @@ class TaskHandler():
             ReACTChainSearch: Instance of the search plan.
         """
         task_ids_str = plan.get_subtask_id(to_str=True)
-        logger.typewriter_log(
+        self.logger.typewriter_log(
             f"-=-=-=-=-=-=-= Performing Task {task_ids_str} ({plan.data.name}): Begin -=-=-=-=-=-=-=",
             Fore.GREEN,
             "",
         )
-        print_task_save_items(plan.data)
+        self.xagent_core.print_task_save_items(plan.data)
 
         agent = self.agent_dispatcher.dispatch(
             RequiredAbilities.tool_tree_search,
@@ -247,14 +249,14 @@ class TaskHandler():
 
         if search_method.status == SearchMethodStatusCode.SUCCESS:
             plan.data.status = TaskStatusCode.SUCCESS
-            logger.typewriter_log(
+            self.logger.typewriter_log(
                 f"-=-=-=-=-=-=-= Task {task_ids_str} ({plan.data.name}): Solved -=-=-=-=-=-=-=",
                 Fore.GREEN,
                 "",
             )
         elif search_method.status == SearchMethodStatusCode.FAIL:
             plan.data.status = TaskStatusCode.FAIL
-            logger.typewriter_log(
+            self.logger.typewriter_log(
                 f"-=-=-=-=-=-=-= Task {task_ids_str} ({plan.data.name}): Failed -=-=-=-=-=-=-=",
                 Fore.RED,
                 "",
@@ -275,7 +277,7 @@ class TaskHandler():
             None
         """
 
-        logger.typewriter_log(
+        self.logger.typewriter_log(
             "-=-=-=-=-=-=-= POSTERIOR_PROCESS, working memory, summary, and reflection -=-=-=-=-=-=-=",
             Fore.BLUE,
         )

@@ -12,6 +12,7 @@ yag: yagmail.SMTP = None
 
 redis = RedisClient()
 
+# 初始化删除所有的key
 redis.delete_all_keys()
 
 

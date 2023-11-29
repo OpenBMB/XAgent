@@ -8,7 +8,6 @@ from XAgent.core import XAgentCoreComponents
 from XAgent.data_structure.node import ToolNode
 from XAgent.data_structure.tree import TaskSearchTree
 from XAgent.inner_loop_search_algorithms.base_search import BaseSearchMethod
-from XAgent.logs import logger, print_assistant_thoughts
 from XAgent.message_history import Message
 from XAgent.utils import SearchMethodStatusCode, ToolCallStatusCode
 NOW_SUBTASK_PROMPT = '''
@@ -219,7 +218,7 @@ class ReACTChainSearch(BaseSearchMethod):
         now_node = now_attempt_tree.root
 
         while now_node.get_depth() < config.max_subtask_chain_length:
-            logger.typewriter_log(
+            self.xagent_core_components.logger.typewriter_log(
                 "-=-=-=-=-=-=-= THOUGHTS, REASONING, PLAN AND CRITICISM WILL NOW BE VERIFIED BY AGENT -=-=-=-=-=-=-=",
                 Fore.GREEN,
                 "",
@@ -233,13 +232,13 @@ class ReACTChainSearch(BaseSearchMethod):
                         now_node.data, receive_data)
                     now_node.data = data
                     if rewrite_flag:
-                        logger.typewriter_log(
+                        self.xagent_core_components.logger.typewriter_log(
                             "-=-=-=-=-=-=-= USER INPUT -=-=-=-=-=-=-=",
                             Fore.GREEN,
                             "",
                         )
-                        print_assistant_thoughts(now_node.data, False)
-                        logger.typewriter_log(
+                        self.xagent_core_components.print_assistant_thoughts(now_node.data, False)
+                        self.xagent_core_components.logger.typewriter_log(
                             "-=-=-=-=-=-=-= USER INPUT -=-=-=-=-=-=-=",
                             Fore.GREEN,
                             "",
@@ -292,7 +291,7 @@ class ReACTChainSearch(BaseSearchMethod):
 
             new_tree_node = agent.message_to_tool_node(new_message)
 
-            print_data = print_assistant_thoughts(
+            print_data = self.xagent_core_components.print_assistant_thoughts(
                 new_tree_node.data, False
             )
 

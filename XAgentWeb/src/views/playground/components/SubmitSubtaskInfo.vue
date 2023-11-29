@@ -112,6 +112,7 @@
                     :value="viewedCodeStr" 
                     :isShowLineNum="showLineNum"
                 />
+
                 <template v-slot:footer>
                     <el-button 
                         type="primary"

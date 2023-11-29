@@ -26,27 +26,35 @@ useAsset('/path')
 const input = ref('')
 const router = useRouter()
 
-const historyTalkStore = useHistoryTalkStore()
 const taskStore = useTaskStore()
+const configStore = useConfigStore()
 
 const agent = ref('');
 const mode = ref('')
 
 const settingChange = (val: any) => {
-  agent.value = val.agent
-  mode.value = val.mode
-  historyTalkStore.setSetting('config', val)
+  agent.value = val.agent;
+  mode.value = val.mode;
+  configStore.setNewtalkSettings({
+    agent: val.agent,
+    mode: val.mode
+  });
 }
 
-useInitChatPreparation().then((res: any) => {
-  const { data : { id } } = res;
-  taskStore.setCurrentNewTalkId(id);
-}).catch((err: any) => {
-  console.log(err);
-});
+onMounted(() => {
+  useInitChatPreparation().then((res: any) => {
+      if(!res || !res.data) {
+        return;
+      }
+      const { data : { id } } = res;
+      taskStore.setCurrentNewTalkId(id);
+  }).catch((err: any) => {
+      console.log(err);
+  });
+})
+
 
 const sendMessage = (val: string) => {
-  const uuid = generateRandomId();
   if(agent.value === "" || mode.value === "") {
     ElMessage({
       message: 'Please select agent and mode first',
@@ -64,9 +72,15 @@ const sendMessage = (val: string) => {
       input.value = val;
     })
   } else {
-    historyTalkStore.setCurrentInput(val)
+    
+    configStore.setNewtalkSettings({
+      agent: agent.value,
+      mode: mode.value
+    });
+    configStore.setInput(val);
+
     router.push({
-      name: 'NewTalk',
+      name: 'newtalk',
       params: {
         mode: "new"
       }});

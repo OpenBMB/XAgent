@@ -61,7 +61,8 @@
           tabSize: 2,
           indentWithTabs: true,
           autofocus: true,
-          placeholder: 'Code is here...'
+          placeholder: 'Code is here...',
+          lineSeparator:'\n'
       })
   
       const print = (type: any, event: any) => {

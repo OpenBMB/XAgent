@@ -1,13 +1,25 @@
+interface newtalkSettings {
+    mode: string
+    agent: string
+}
+
 interface ConfigState {
     filelist: any[]
     recorder_dir: string | null
+    newtalkSettings: newtalkSettings
+    input: string
 }
 
 export const useConfigStore = defineStore('config', {
     state: (): ConfigState => {
       return {
         filelist: [],
-        recorder_dir: null
+        recorder_dir: null,
+        newtalkSettings: {
+            mode: "",
+            agent: "",
+        },
+        input: ""
       }
     },
     getters: {
@@ -16,6 +28,12 @@ export const useConfigStore = defineStore('config', {
         },
         getRecorderDir(): string | null {
             return this.recorder_dir
+        },
+        getNewtalkSettings(): object {
+            return this.newtalkSettings
+        },
+        getInput(): string {
+            return this.input
         }
     },
     actions: {
@@ -34,6 +52,12 @@ export const useConfigStore = defineStore('config', {
         resetConfig() {
             this.filelist = []
             this.recorder_dir = null
+        },
+        setNewtalkSettings(val: newtalkSettings) {
+            this.newtalkSettings = val
+        },
+        setInput(val: string) {
+            this.input = val
         }
     }
 })

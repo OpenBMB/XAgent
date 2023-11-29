@@ -97,9 +97,8 @@ const chatMsgInfoStore = useHistoryTalkStore();
 const sharedTalksArr = computed(() => chatMsgInfoStore.getSharedArr);
 
 const runSharedItem = (item: any, index: number) => {
-  console.log(item)
   router.push({
-    name: "NewTalk",
+    name: "viewTalk",
     params: {
       id: item.interaction_id,
       mode: "runshared",

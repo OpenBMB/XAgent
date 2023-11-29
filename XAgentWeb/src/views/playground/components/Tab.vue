@@ -147,7 +147,7 @@
               </div>
             </TransitionGroup>
             <div
-              v-if="currentSubtaskIndex === index"
+              v-if="currentSubtaskIndex === index && isLoading"
               v-show="isInnerNodeGenerating && !isTaskCompleted && !subTasks[index].isShowRefinement"
             >
               <el-skeleton :rows="3" animated />

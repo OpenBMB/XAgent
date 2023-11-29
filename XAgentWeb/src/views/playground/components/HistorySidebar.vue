@@ -163,10 +163,7 @@ const userStore = useUserStore()
 const authStore = useAuthStore()
 const chatMsgInfoStore = useHistoryTalkStore()
 const historyTalkArr = computed(()  => chatMsgInfoStore.getArrHistory);
-
-const {
-  userInfo: userInfo
-} = storeToRefs(userStore)
+const { userInfo: userInfo } = storeToRefs(userStore)
 
 const isBetaUser = true;
 
@@ -245,8 +242,8 @@ const deleteHistory = async (item: any , index: number) => {
 }
 
 const playbackItem = (item: any, index: number) => {
-  router.push({
-    name: 'NewTalk',
+  router.replace({
+    name: 'viewTalk',
     params: { 
       id: item.interaction_id,
       mode: 'playback'

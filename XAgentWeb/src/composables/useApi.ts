@@ -44,13 +44,19 @@ httpService.interceptors.response.use(
       // res?.data?.code === 1017 || 
       // res?.data?.code === 1018
     ) {
-      authStore.clearLoginState();
-      userStore.clearUserInfo();
+      authStore.clearLoginState()
+      userStore.clearUserInfo()
     }
     return res?.data
   },
   (err: any) => {
     console.log(err)
+    const authStore = useAuthStore()
+    const userStore = useUserStore()
+    if ( err.response.status === 401) {
+      authStore.clearLoginState()
+      userStore.clearUserInfo()
+    }
     return
   }
 )

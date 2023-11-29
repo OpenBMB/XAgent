@@ -96,8 +96,6 @@ export const useTaskStore = defineStore('task', {
             } 
 
             let index_2 = this.subtasks.findIndex((item) => item.task_id === data.current);
-            
-            console.log("index_2", index_2);
 
             if(index_2 < 0 || index_2 === this.subtasks.length - 1) {
                 // last element or not found
@@ -202,6 +200,10 @@ export const useTaskStore = defineStore('task', {
 
         getWorkspaceFiles(): any[] {
             return this.workspaceFiles || []
+        },
+
+        getIsAutoMode(): boolean {  
+            return this.isAutoMode
         }
     }
 })

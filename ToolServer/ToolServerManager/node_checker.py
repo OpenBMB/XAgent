@@ -58,6 +58,7 @@ async def check_nodes_status_loop():
     """
     An infinite loop that checks the status of the nodes and waits 1 second before each iteration.
     """
+    logger.info("Nodes status checker started.")
     while True:
         try:
             await check_nodes_status()

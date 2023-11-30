@@ -44,7 +44,7 @@ docker run -it -p 13520:13520  -v /host/model/path:/model:rw --gpus all --ipc=ho
 You should change the config file to use the customized model. The sample config file is in `assets/xagentllama.yml`.
 Run XAgent with customized model by: 
 ```shell
-python run.py --task "find all the prime numbers <=100" --model "xagentllm" --config-file "assets/xagentllama.yml"
+python run.py --task "find all the prime numbers <=100" --config-file "assets/xagentllama.yml"
 ```
 
 

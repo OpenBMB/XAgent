@@ -31,21 +31,18 @@ async def startup():
     if CONFIG['builtin_monitor']:
         from node_checker import check_nodes_status_loop
         
-        checker = None
         async for checker in NodeChecker.find_all():
             if not psutil.pid_exists(checker.pid):
                 checker.delete()
-        
-        if checker is None:
-            checker = NodeChecker(
-                manager_id=MANAGER_ID,
-                interval=float(CONFIG['node'].get('health_check_interval',1)),
-                pid=os.getpid()
-                )
-            await checker.save()
 
-            loop = asyncio.get_running_loop()
-            loop.create_task(check_nodes_status_loop())
+        checker = NodeChecker(
+            manager_id=MANAGER_ID,
+            interval=float(CONFIG['node'].get('health_check_interval',1)),
+            pid=os.getpid()
+            )
+        await checker.save()
+
+        asyncio.create_task(check_nodes_status_loop())
             
 
     # register path to node

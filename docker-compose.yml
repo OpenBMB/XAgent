@@ -7,7 +7,7 @@ services:
       context: ./
       dockerfile: dockerfiles/ToolServerManager/Dockerfile
     ports:
-      - 8080:8080
+      - "8080:8080"
     volumes:
       - toolserverconfig:/app/assets/config
       - /var/run/docker.sock:/var/run/docker.sock
@@ -19,6 +19,8 @@ services:
      DB_COLLECTION: ${DB_COLLECTION}
     depends_on:
       - db
+    networks:
+      - default
     command: ["--workers","2","-t","600"]
 
   # This will create a test node that will never be used by XAgent
@@ -29,6 +31,8 @@ services:
       dockerfile: dockerfiles/ToolServerNode/Dockerfile
     volumes:
       - "toolserverconfig:/app/assets/config"
+    networks:
+      - default
 
   db:
     image: mongo
@@ -39,6 +43,8 @@ services:
      MONGO_INITDB_ROOT_PASSWORD: ${DB_PASSWORD}
     logging:
       driver: "none"
+    networks:
+      - default
 
   XAgentServer:
     image: xagentteam/xagent-server:latest
@@ -62,6 +68,8 @@ services:
         condition: service_healthy
       xagent-redis:
         condition: service_healthy
+    networks:
+      - default
 
   xagent-mysql:
     image: mysql
@@ -80,6 +88,8 @@ services:
       interval: 5s
       timeout: 3s
       retries: 20
+    networks:
+      - default
 
   xagent-redis:
     image: redis
@@ -91,7 +101,8 @@ services:
       interval: 5s
       timeout: 3s
       retries: 20
-
+    networks:
+      - default
 
 
 volumes:

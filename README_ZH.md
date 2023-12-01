@@ -123,9 +123,9 @@ pip install -r requirements.txt
 
 - 运行XAgent
 ```bash
-python run.py --task "put your task here" --model "gpt-4"
+python run.py --task "put your task here" --config-file "assets/config.yml"
 ```
-您可以使用参数`--upload_files`来指定提交给XAgent的文件。
+您可以使用参数`--upload-files`来指定提交给XAgent的文件。
 您的XAgent的本地工作空间在`local_workspace`中，您可以在运行过程中找到XAgent生成的所有文件。
 此外，在`running_records`中，您可以找到所有的中间步骤信息，例如任务状态、LLM的输入输出对、使用的工具等。
 在运行结束后，`ToolServerNode`中的完整`worksapce`也将被打包下载到其中。

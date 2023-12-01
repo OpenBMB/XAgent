@@ -121,9 +121,9 @@ XAgent を実行するには、`gpt-4-32k` を使用することを強く推奨�
 
 - XAgent の実行
 ```bash
-python run.py --task "put your task here" --model "gpt-4" --config_file "assets/config.yml"
+python run.py --task "put your task here" --config-file "assets/config.yml"
 ```
-1. 引数 `--upload_files` を使って、XAgent に送信したい初期ファイルを選択することができます。
+1. 引数 `--upload-files` を使って、XAgent に送信したい初期ファイルを選択することができます。
 
 2. XAgent のローカルワークスペースは `local_workspace` にあり、実行中のプロセスを通じて XAgent が生成するすべてのファイルを見つけることができます。
 

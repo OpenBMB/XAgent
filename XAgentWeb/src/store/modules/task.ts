@@ -92,23 +92,29 @@ export const useTaskStore = defineStore('task', {
 
         nextsubtask(data: any) {
             if(this.isCompleted) {
-                return 
+                return;
             } 
 
-            let index_2 = this.subtasks.findIndex((item) => item.task_id === data.current);
-
-            if(index_2 < 0 || index_2 === this.subtasks.length - 1) {
-                // last element or not found
+            let index_2 = this.subtasks.findIndex((item) => data.current === item.task_id);
+            if(index_2 === this.subtasks.length - 1) {
                 this.subtasks.concat(data.data);
-                
             } else {
-                // not last element and index + 1 is available
-                const tail_num = this.subtasks.length - index_2;
-                this.subtasks.splice(index_2, tail_num, ...data.data);     
+                if(index_2 < 0) {
+                    let index_3 = this.subtasks.findIndex((item) => data.current.startsWith(item.task_id));
+                    if(index_3 < 0) {
+                        this.subtasks.concat(data.data);
+                    } else {
+                        const tail_num = this.subtasks.length - index_3;
+                        this.subtasks.splice(index_3 + 1, tail_num, ...data.data);
+                    }
+                } else {
+                    const tail_num = this.subtasks.length - index_2;
+                    this.subtasks.splice(index_2, tail_num, ...data.data);
+                }                
             }
-
             this.current_subtask_index += 1
             this.current_inner_index = 0
+
         },  
 
         completeSubtask() {

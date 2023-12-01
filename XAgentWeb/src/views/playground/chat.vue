@@ -171,9 +171,11 @@ const isFooterPanelCollapsed = ref(true)
 
 const { workspaceFiles: workspaceFiles } = toRefs(taskStore);
 
-const { filelist: fileListConfig} = storeToRefs(configStore);
-const { newtalkSettings: newtalkSettings } = storeToRefs(configStore);
-const { input: newTalkInputText } = storeToRefs(configStore);
+const { 
+  input: newTalkInputText,
+  newtalkSettings: newtalkSettings,
+  filelist: fileListConfig
+} = storeToRefs(configStore);
 
 const inputBoxRef = ref<any>(null)
 
@@ -341,6 +343,7 @@ const wsMessageHandler = (data: any) => {
 
       if(data.success === false) {
         disConnectWebsocket();
+        console.log('disconnect due to success is false');
         handleStopLoading();
         // taskStore.completeSubtask();
         handleAlertError(data.message).then(() => {
@@ -385,6 +388,7 @@ const wsMessageHandler = (data: any) => {
 
           case 'finished':
               disConnectWebsocket();
+              console.log('disconnect due to task finished');
               handleTaskCompletelyFinished();
               // resetRunConnectionOnce()
               break;
@@ -393,6 +397,7 @@ const wsMessageHandler = (data: any) => {
               handleStopLoading();
               handleConnectFailNotification(data?.message);
               disConnectWebsocket();
+              console.log('disconnect due to task failed');
               // resetRunConnectionOnce()
               break;
 
@@ -451,6 +456,7 @@ const recordConnection = () => {
 }
 
 const RunConnection = () => {
+  console.log('run connection so we disconnect existing websocket');
   disConnectWebsocket();
   taskStore.reset();
 
@@ -576,6 +582,7 @@ watch(() => [pageMode.value, conversationId.value],
     }
     taskStore.setAutoMode(isAutoMode.value);
     disConnectWebsocket();
+    console.log('page mode or conversation id changed so we disconnect existing websocket');
     taskStore?.reset();
     debounce(function() {
       RunConnection();
@@ -590,6 +597,7 @@ onMounted(() => {
 onBeforeUnmount(() => {
   refList.value = [];
   disConnectWebsocket();
+  console.log('chat unmounted so we disconnect existing websocket');
   taskStore?.reset();
 });
 

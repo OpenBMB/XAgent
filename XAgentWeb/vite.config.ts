@@ -78,14 +78,16 @@ export default defineConfig(({ command, mode }) => {
       terserOptions: {
         compress: {
           keep_infinity: true,
-          drop_console: process.env.type === 'prod',
+          // drop_console: process.env.type === 'prod',
+          drop_console: false,
           drop_debugger: true,
         },
       },
       chunkSizeWarningLimit: 2000,
     },
     esbuild: {
-      drop: process.env.type === 'prod' ? ['console', 'debugger'] : [],
+      // drop: process.env.type === 'prod' ? ['console', 'debugger'] : [],
+      drop: process.env.type === 'prod' ? ['debugger'] : [],
     },
   }
 }) as UserConfigExport

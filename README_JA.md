@@ -121,7 +121,7 @@ XAgent を実行するには、`gpt-4-32k` を使用することを強く推奨�
 
 - XAgent の実行
 ```bash
-python run.py --task "put your task here" --config-file "assets/config.yml"
+python run.py --task "put your task here" --config_file "assets/config.yml"
 ```
 1. 引数 `--upload-files` を使って、XAgent に送信したい初期ファイルを選択することができます。
 

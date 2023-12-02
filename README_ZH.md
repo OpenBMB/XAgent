@@ -123,7 +123,7 @@ pip install -r requirements.txt
 
 - 运行XAgent
 ```bash
-python run.py --task "put your task here" --config-file "assets/config.yml"
+python run.py --task "put your task here" --config_file "assets/config.yml"
 ```
 您可以使用参数`--upload-files`来指定提交给XAgent的文件。
 您的XAgent的本地工作空间在`local_workspace`中，您可以在运行过程中找到XAgent生成的所有文件。

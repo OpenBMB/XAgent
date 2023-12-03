@@ -67,10 +67,15 @@ if metadata.version("openai") < "1.0":
                 if model_name == "gpt-4":
                     if "gpt-4-32k" in CONFIG.api_keys:
                         model_name = "gpt-4-32k"
+                    elif "gpt-4-1106-preview" in CONFIG.api_keys:
+                        model_name = "gpt-4-1106-preview"
                     else:
                         model_name = "gpt-3.5-turbo-16k"
                 elif model_name == "gpt-3.5-turbo":
-                    model_name = "gpt-3.5-turbo-16k"
+                    if "gpt-3.5-turbo-1106" in CONFIG.api_keys:
+                        model_name = "gpt-3.5-turbo-1106"
+                    else:
+                        model_name = "gpt-3.5-turbo-16k"
                 else:
                     raise e
                 print("max context length reached, retrying with " + model_name)
@@ -169,8 +174,13 @@ else:
             if "maximum context length" in e.message:
                 if model_name == "gpt-4" and "gpt-4-32k" in CONFIG.api_keys:
                     model_name = "gpt-4-32k"
+                elif model_name == "gpt-4" and "gpt-4-1106-preview" in CONFIG.api_keys:
+                    model_name = "gpt-4-1106-preview"
                 else:
-                    model_name = "gpt-3.5-turbo-16k"
+                    if "gpt-3.5-turbo-1106" in CONFIG.api_keys:
+                        model_name = "gpt-3.5-turbo-1106"
+                    else:
+                        model_name = "gpt-3.5-turbo-16k"
 
                 print(f"max context length reached, retrying with {model_name}")
                 chatcompletion_kwargs = get_apiconfig_by_model(model_name)

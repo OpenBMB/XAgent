@@ -1,0 +1,43 @@
+api_keys:
+  gpt-3.5-turbo-1106:
+    - api_key: sk-xxxxx
+      organization: org-xxxxxx
+      model: gpt-3.5-turbo-1106
+  gpt-4-1106-preview:
+    - api_key: sk-xxxxx
+      organization: org-xxxxxx
+      model: gpt-4-1106-preview
+
+
+default_request_type: openai # or xagent
+default_completion_kwargs:
+  model: gpt-4-1106-preview
+  temperature: 0.2
+  request_timeout: 60
+
+enable_summary: true
+summary:
+  single_action_max_length: 2048
+  max_return_length: 12384
+
+use_selfhost_toolserver: true
+selfhost_toolserver_url: http://localhost:8080
+
+max_retry_times: 5
+max_subtask_chain_length: 15
+max_plan_refine_chain_length: 3
+max_plan_tree_depth: 3
+max_plan_tree_width: 5
+max_plan_length: 4096
+
+rapidapi_retrieve_tool_count: 0
+
+enable_ask_human_for_help: False
+
+tool_blacklist:
+  - FileSystemEnv_print_filesys_struture
+
+record_dir:
+
+experiment:
+  redo_action: false

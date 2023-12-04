@@ -66,7 +66,7 @@ class Logger(metaclass=abc.ABCMeta):
         )
         self.file_handler.setLevel(logging.DEBUG)
         info_formatter = RecordFormatter(
-            "%(asctime)s [%(threadName)s] %(levelname)s: %(title)s %(message)s"
+            "%(asctime)s [%(threadName)s] %(levelname)s: %(title_color)s %(title)s %(message)s"
         )
         self.file_handler.setFormatter(info_formatter)
 
@@ -76,7 +76,7 @@ class Logger(metaclass=abc.ABCMeta):
         )
         error_handler.setLevel(logging.ERROR)
         error_formatter = RecordFormatter(
-            "%(asctime)s [%(threadName)s] %(levelname)s %(module)s:%(funcName)s:%(lineno)d %(title)s"
+            "%(asctime)s [%(threadName)s] %(levelname)s %(module)s:%(funcName)s:%(lineno)d %(title_color)s %(title)s"
             " %(message_no_color)s"
         )
         error_handler.setFormatter(error_formatter)

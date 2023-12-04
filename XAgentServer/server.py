@@ -74,13 +74,16 @@ class XAgentServer:
                 if not os.path.exists(upload_dir):
                     os.makedirs(upload_dir)
                 # 拷贝到workspace
-                if os.path.exists(file_path):
-                    if os.path.samefile(file_path, os.path.join(upload_dir, file_name)):
-                        # 文件路径相同,跳过复制
-                        pass
-                    else:
-                        shutil.copy(file_path, os.path.join(upload_dir, file_name))
-                    # shutil.copy(file_path, os.path.join(upload_dir, file_name))
+                if interaction.call_method == "web":
+                    shutil.copy(file_path, os.path.join(upload_dir, file_name))
+                else:
+                    if os.path.exists(file_path):
+                        if os.path.samefile(file_path, os.path.join(upload_dir, file_name)):
+                            # 文件路径相同,跳过复制
+                            pass
+                        else:
+                            shutil.copy(file_path, os.path.join(upload_dir, file_name))
+                        # shutil.copy(file_path, os.path.join(upload_dir, file_name))
 
                 new_file = os.path.join(upload_dir, file_name)
                 try:

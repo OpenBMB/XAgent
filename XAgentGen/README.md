@@ -34,7 +34,7 @@ You can low down the memory requirement by changing the `MAX_JOBS` in the docker
 ## Run the docker image
 Start the docker image by:
 ```shell
-docker run -it -p 13520:13520  -v /host/model/path:/model:rw --gpus all --ipc=host xagentteam/xagentgen:latest python app.py --model-path /model --port 13520
+docker run -it -p 13520:13520 --network tool-server-network -v /host/model/path:/model:rw --gpus all --ipc=host xagentteam/xagentgen:latest python app.py --model-path /model --port 13520
 ```
 **Note:** Change the `/host/model/path` to the path of your model directory. The service should be listening on port `13520`.
 
@@ -46,6 +46,4 @@ Run XAgent with customized model by:
 ```shell
 python run.py --task "find all the prime numbers <=100" --config-file "assets/xagentllama.yml"
 ```
-
-
 

@@ -7,7 +7,7 @@ services:
       context: ./
       dockerfile: dockerfiles/ToolServerManager/Dockerfile
     ports:
-      - "8080:8080"
+      - 8080:8080
     volumes:
       - toolserverconfig:/app/assets/config
       - /var/run/docker.sock:/var/run/docker.sock
@@ -40,35 +40,6 @@ services:
     logging:
       driver: "none"
 
-  xagent-mysql:
-    image: mysql
-    command:
-      - --default-authentication-plugin=caching_sha2_password
-      - --character-set-server=utf8mb4
-      - --collation-server=utf8mb4_unicode_ci
-    environment:
-      MYSQL_ROOT_PASSWORD: xagent
-    ports:
-      - "3306:3306"
-    volumes:
-      - ./XAgentServer/database/sql:/docker-entrypoint-initdb.d
-    healthcheck:
-      test: ["CMD", "mysql -h localhost -u root -pxagent -e 'SELECT 1'"]
-      interval: 5s
-      timeout: 3s
-      retries: 20
-
-  xagent-redis:
-    image: redis
-    ports:
-      - "6379:6379"
-    command: redis-server --requirepass xagent
-    healthcheck:
-      test: [ "CMD", "redis-cli", "ping" ]
-      interval: 5s
-      timeout: 3s
-      retries: 20
-      
   XAgentServer:
     image: xagentteam/xagent-server:latest
     build:
@@ -92,8 +63,39 @@ services:
       xagent-redis:
         condition: service_healthy
 
+  xagent-mysql:
+    image: mysql
+    command:
+      - --default-authentication-plugin=caching_sha2_password
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+    environment:
+      MYSQL_ROOT_PASSWORD: xagent
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./XAgentServer/database/sql:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: [ "CMD", "mysqladmin","ping", "-h", "localhost" ]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  xagent-redis:
+    image: redis
+    ports:
+      - "6379:6379"
+    command: redis-server --requirepass xagent
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+
+
 volumes:
-  xagentmongodb:  
+  xagentmongodb:
   toolserverconfig:
     name: toolserverconfig
     driver: local

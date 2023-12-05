@@ -55,6 +55,9 @@ if metadata.version("openai") < "1.0":
         )
         logger.debug("chatcompletion: using " + model_name)
         chatcompletion_kwargs = get_apiconfig_by_model(model_name)
+        if "azure_endpoint" in chatcompletion_kwargs:
+            api_base = chatcompletion_kwargs.pop("azure_endpoint", None)
+            chatcompletion_kwargs.update({"api_base": api_base})
         chatcompletion_kwargs.update(kwargs)
 
         try:
@@ -142,10 +145,10 @@ else:
             organization = chatcompletion_kwargs.pop("organization", None)
             chatcompletion_kwargs.update(kwargs)
             client = openai.AzureOpenAI(
-                api_key=api_key, 
+                api_key=api_key,
                 organization=organization,
-                azure_endpoint=azure_endpoint, 
-                api_version=api_version, 
+                azure_endpoint=azure_endpoint,
+                api_version=api_version,
                 timeout=request_timeout
             )
         else:
@@ -157,9 +160,9 @@ else:
             organization = chatcompletion_kwargs.pop("organization", None)
             chatcompletion_kwargs.update(kwargs)
             client = openai.OpenAI(
-                api_key=api_key, 
+                api_key=api_key,
                 organization=organization,
-                base_url=base_url, 
+                base_url=base_url,
                 timeout=request_timeout
             )
         try:

@@ -18,7 +18,7 @@ default_completion_kwargs:
 enable_summary: true
 summary:
   single_action_max_length: 2048
-  max_return_length: 126464 # https://github.com/OpenBMB/XAgent/pull/297#discussion_r1413349570
+  max_return_length: 122392 # https://github.com/OpenBMB/XAgent/pull/297#discussion_r1413349570
 
 use_selfhost_toolserver: true
 selfhost_toolserver_url: http://localhost:8080

@@ -61,6 +61,13 @@ export const useTaskStore = defineStore('task', {
                 return 
             }
             let index_1 = this.subtasks.findIndex((item) => item.task_id === data.current);
+            if(index_1 < 0) {
+                console.log('task.ts: index_1 < 0')
+                console.log('task.ts: data.', data)
+                console.log('task.ts: this.subtasks', this.subtasks);
+                return;
+            }
+            
             this.subtasks[index_1].inner.push(data.data);
             this.current_inner_index += 1
         },
@@ -92,20 +99,22 @@ export const useTaskStore = defineStore('task', {
 
         nextsubtask(data: any) {
             if(this.isCompleted) {
+                console.log('task.ts: task is completed')
                 return;
             } 
-
             let index_2 = this.subtasks.findIndex((item) => data.current === item.task_id);
+
             if(index_2 === this.subtasks.length - 1) {
                 this.subtasks.concat(data.data);
             } else {
                 if(index_2 < 0) {
-                    let index_3 = this.subtasks.findIndex((item) => data.current.startsWith(item.task_id));
-                    if(index_3 < 0) {
-                        this.subtasks.concat(data.data);
+                    let index_3 = this.subtasks.findIndex((item) => data.current < item.task_id);
+                    // keep the ascending order of subtasks
+                    if(index_3 <= 0 || index_3 === this.subtasks.length - 1) {
+                        this.subtasks = [...this.subtasks, ...data.data]
                     } else {
                         const tail_num = this.subtasks.length - index_3;
-                        this.subtasks.splice(index_3 + 1, tail_num, ...data.data);
+                        this.subtasks.splice(index_3, tail_num, ...data.data);
                     }
                 } else {
                     const tail_num = this.subtasks.length - index_2;
@@ -154,6 +163,7 @@ export const useTaskStore = defineStore('task', {
             this.current_subtask_index = 0
             this.current_inner_index = 0
             this.isCompleted = false
+            this.workspaceFiles = []
         },
 
         addWorkspaceFiles(data: any) {

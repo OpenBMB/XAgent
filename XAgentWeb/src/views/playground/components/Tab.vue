@@ -73,7 +73,7 @@
             v-model="currentGoalStr"
           />
           <span v-else class="input-text">
-            {{ subTasks[index].goal }}
+            {{ subTasks[index] ? subTasks[index].goal : "" }}
           </span>
 
           <div class="bottom-shadow">
@@ -227,11 +227,11 @@ const {
   current_inner_index: currentInnerIndex,
 } = storeToRefs(taskStore);
 
-
-
 const currentGoalStr = computed({
   get: () => {
-    return taskInfo.subtasks.value[parseInt(tabIndex.value)].goal;
+    return (
+        taskInfo.subtasks.value[parseInt(tabIndex.value)] ? taskInfo.subtasks.value[parseInt(tabIndex.value)].goal : ""
+    );
   },
   set: (val) => {
     taskStore.setStepGoal(parseInt(tabIndex.value), val);
@@ -243,11 +243,13 @@ const showTaskDetail = ref(true);
 
 
 watch(currentInnerIndex, (val) => {
+  if(taskInfo.subtasks.value.length === 0) {
+    return;
+  }
   const _sub_task = taskInfo.subtasks.value[parseInt(tabIndex.value)];
   if(!_sub_task) {
-    router.push("/playground");
     return;
-  } 
+  }
   const inners = _sub_task.inner;
   const len = inners.length;
   if (isOnlyExpandLastInner.value) {
@@ -792,6 +794,12 @@ defineExpose({
   padding: 20px;
   border-radius: 8px;
   border: none;
+}
+
+:deep(.el-tabs__item.is-active) {
+  background-color: #f5f6f9 !important;
+  border-color: #f5f6f9 !important;
+  box-shadow: none !important;
 }
 </style>
 <!-- <style lang="scss">

@@ -55,6 +55,9 @@ if metadata.version("openai") < "1.0":
         )
         logger.debug("chatcompletion: using " + model_name)
         chatcompletion_kwargs = get_apiconfig_by_model(model_name)
+        if "azure_endpoint" in chatcompletion_kwargs:
+            api_base = chatcompletion_kwargs.pop("azure_endpoint", None)
+            chatcompletion_kwargs.update({"api_base": api_base})
         chatcompletion_kwargs.update(kwargs)
 
         try:
@@ -67,10 +70,15 @@ if metadata.version("openai") < "1.0":
                 if model_name == "gpt-4":
                     if "gpt-4-32k" in CONFIG.api_keys:
                         model_name = "gpt-4-32k"
+                    elif "gpt-4-1106-preview" in CONFIG.api_keys:
+                        model_name = "gpt-4-1106-preview"
                     else:
                         model_name = "gpt-3.5-turbo-16k"
                 elif model_name == "gpt-3.5-turbo":
-                    model_name = "gpt-3.5-turbo-16k"
+                    if "gpt-3.5-turbo-1106" in CONFIG.api_keys:
+                        model_name = "gpt-3.5-turbo-1106"
+                    else:
+                        model_name = "gpt-3.5-turbo-16k"
                 else:
                     raise e
                 print("max context length reached, retrying with " + model_name)
@@ -130,18 +138,26 @@ else:
         chatcompletion_kwargs = get_apiconfig_by_model(model_name)
 
         request_timeout = kwargs.pop("request_timeout", 60)
-        if "azure_endpoint" in chatcompletion_kwargs:
-            azure_endpoint = chatcompletion_kwargs.pop("azure_endpoint", None)
+        if "api_version" in chatcompletion_kwargs:
+            if "base_url" in chatcompletion_kwargs:
+                base_url = chatcompletion_kwargs.pop("base_url", None)
+            else:
+                base_url = chatcompletion_kwargs.pop("api_base", None)
+            azure_endpoint = chatcompletion_kwargs.pop("azure_endpoint", base_url)
             api_version = chatcompletion_kwargs.pop("api_version", None)
             api_key = chatcompletion_kwargs.pop("api_key", None)
-            organization = chatcompletion_kwargs.pop("organization", None)
+            chatcompletion_kwargs.pop("api_type", None)
+            if "engine" in chatcompletion_kwargs:
+                model = chatcompletion_kwargs.pop("engine", None)
+            else:
+                model = chatcompletion_kwargs.pop("model", None)
+            chatcompletion_kwargs.update({"model": model})
             chatcompletion_kwargs.update(kwargs)
             client = openai.AzureOpenAI(
-                api_key=api_key, 
-                organization=organization,
-                azure_endpoint=azure_endpoint, 
-                api_version=api_version, 
-                timeout=request_timeout
+                api_key=api_key,
+                azure_endpoint=azure_endpoint,
+                api_version=api_version,
+                timeout=request_timeout,
             )
         else:
             if "base_url" in chatcompletion_kwargs:
@@ -152,9 +168,9 @@ else:
             organization = chatcompletion_kwargs.pop("organization", None)
             chatcompletion_kwargs.update(kwargs)
             client = openai.OpenAI(
-                api_key=api_key, 
+                api_key=api_key,
                 organization=organization,
-                base_url=base_url, 
+                base_url=base_url,
                 timeout=request_timeout
             )
         try:
@@ -169,8 +185,13 @@ else:
             if "maximum context length" in e.message:
                 if model_name == "gpt-4" and "gpt-4-32k" in CONFIG.api_keys:
                     model_name = "gpt-4-32k"
+                elif model_name == "gpt-4" and "gpt-4-1106-preview" in CONFIG.api_keys:
+                    model_name = "gpt-4-1106-preview"
                 else:
-                    model_name = "gpt-3.5-turbo-16k"
+                    if "gpt-3.5-turbo-1106" in CONFIG.api_keys:
+                        model_name = "gpt-3.5-turbo-1106"
+                    else:
+                        model_name = "gpt-3.5-turbo-16k"
 
                 print(f"max context length reached, retrying with {model_name}")
                 chatcompletion_kwargs = get_apiconfig_by_model(model_name)

@@ -36,7 +36,7 @@
       },
       isLineWrapping: {
         type: Boolean,
-        default: false
+        default: true
       },
     },
     setup(props, { emit }) {

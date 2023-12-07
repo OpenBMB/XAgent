@@ -76,9 +76,10 @@ services:
     volumes:
       - ./XAgentServer/database/sql:/docker-entrypoint-initdb.d
     healthcheck:
-      test: [ "CMD", "mysqladmin","ping", "-h", "localhost" ]
-      interval: 5s
-      timeout: 3s
+      # test: [ "CMD", "mysqladmin","ping", "-h", "localhost" ]
+      test: ["CMD-SHELL", "mysql -h localhost -u root -pxagent -e 'SELECT 1'"]
+      #interval: 10s
+      timeout: 20s
       retries: 20
 
   xagent-redis:

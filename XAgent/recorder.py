@@ -4,6 +4,7 @@ import datetime
 import os
 import time
 import json
+import re
 from colorama import Fore
 from XAgent.workflow.base_query import AutoGPTQuery
 from XAgent.config import XAgentConfig
@@ -12,6 +13,7 @@ from XAgentServer.loggers.logs import Logger
 from XAgentServer.models.recorder import XAgentRunningRecord
 from XAgentServer.application.cruds.recorder import RunningRecordCRUD
 from XAgentServer.enums.recorder_type import RecorderTypeEnum
+
 
 
 def dump_common_things(object):
@@ -82,9 +84,11 @@ class RunningRecoder():
         self.logger.typewriter_log(title="-=-=-=-=-=-=-=Recorder Start-=-=-=-=-=-=-=\n",
                                    title_color=Fore.GREEN,
                                    content=f"Current: {current} Node: {node_type} {node_id}")
+        json_str = json.dumps(data, ensure_ascii=False, indent=4)
+        json_str=re.sub(r'"api_key": "(.+?)"', r'"api_key": "**"', json_str)
         self.logger.typewriter_log(title="-=-=-=-=-=-=-=Data -=-=-=-=-=-=-=\n",
                                    title_color=Fore.GREEN,
-                                   content=json.dumps(data, ensure_ascii=False, indent=4))
+                                   content=json_str)
         self.logger.typewriter_log(title="-=-=-=-=-=-=-=Recorder End-=-=-=-=-=-=-=",
                                    title_color=Fore.GREEN,
                                    content="")

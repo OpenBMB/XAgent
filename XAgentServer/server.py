@@ -2,6 +2,7 @@
 """
 import json
 import os
+import re
 import shutil
 
 from colorama import Fore
@@ -50,9 +51,10 @@ class XAgentServer:
             xagent_core = XAgentCoreComponents()
             # build XAgent Core Components
             xagent_core.build(xagent_param, interaction=interaction)
-
-            self.logger.info(json.dumps(
-                xagent_param.config.to_dict(), indent=2))
+            json_str = json.dumps(
+                xagent_param.config.to_dict(), indent=2)
+            json_str=re.sub(r'"api_key": "(.+?)"', r'"api_key": "**"', json_str)
+            self.logger.info(json_str)
             self.logger.typewriter_log(
                 "Human-In-The-Loop",
                 Fore.RED,

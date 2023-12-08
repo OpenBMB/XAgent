@@ -8,6 +8,9 @@ from copy import deepcopy
 from colorama import Fore, Style
 from XAgent.logs import logger
 from XAgent.workflow.base_query import AutoGPTQuery
+import sys
+sys.path.append("..")
+
 from XAgent.config import XAgentConfig, CONFIG
 
 def dump_common_things(object):

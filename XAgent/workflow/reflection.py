@@ -39,7 +39,7 @@ def get_posterior_knowledge(all_plan: Plan, terminal_plan: Plan, finish_node: To
         arguments=function_manager.get_function_schema('generate_posterior_knowledge')['parameters']
     )
 
-    data = json5.loads(new_message["arguments"])
+    data = json5.loads(new_message["global_arguments"])
     # print(data)
 
     return data

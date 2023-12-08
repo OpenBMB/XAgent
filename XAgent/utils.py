@@ -10,7 +10,11 @@ import tiktoken
 from XAgent.config import CONFIG
 
 
-encoding = tiktoken.encoding_for_model(CONFIG.default_completion_kwargs['model'])
+#encoding = tiktoken.encoding_for_model(CONFIG.default_completion_kwargs['model'])
+if CONFIG.default_completion_kwargs['model'] == "xagentllm":
+    encoding = tiktoken.encoding_for_model("gpt-4")  # TODO: this is not good
+else:
+    encoding = tiktoken.encoding_for_model(CONFIG.default_completion_kwargs['model'])
 
 def get_token_nums(text:str)->int:
     return len(encoding.encode(text))

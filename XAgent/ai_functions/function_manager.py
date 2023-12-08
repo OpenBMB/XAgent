@@ -67,7 +67,7 @@ class FunctionManager:
                     arguments=arguments,
                     **completions_kwargs
                 )
-                returns = json5.loads(response['choices'][0]['message']['content'])['arguments']
+                returns = json5.loads(response['choices'][0]['message']['content'])['global_arguments']
         
         if return_generation_usage:
             return returns, response['usage']

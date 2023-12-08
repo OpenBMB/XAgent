@@ -68,12 +68,12 @@ class ToolAgent(BaseAgent):
             *args,**kwargs
         )
 
-        function_call_args:dict = message['function_call']['arguments']
+        function_call_args:dict = message['tool_call']['arguments']
 
         # for tool_call, we need to validate the tool_call arguments if exising
         if self.config.default_request_type == 'openai' and 'tool_call' in function_call_args:
             tool_schema = function_manager.get_function_schema(function_call_args['tool_call']["tool_name"])
-            assert tool_schema is not None, f"Function {function_call_args['tool_call']['tool_name']} not found! Poential Schema Validation Error!"
+            assert tool_schema is not None, f"Tool {function_call_args['tool_call']['tool_name']} not found! Poential Schema Validation Error!"
             
             tool_call_args = function_call_args['tool_call']['tool_input'] if 'tool_input' in function_call_args['tool_call'] else ''
             
@@ -91,14 +91,14 @@ class ToolAgent(BaseAgent):
                     broken_json=tool_call_args,
                     function_schema=tool_schema,
                     messages=messages,
-                    error_message=str(e))["choices"][0]["message"]["function_call"]["arguments"]
+                    error_message=str(e))["choices"][0]["message"]["tool_call"]["arguments"]
                 validate()
             
             function_call_args['tool_call']['tool_input'] = tool_call_args
             
-            message['function_call'] = function_call_args.pop('tool_call')
-            message['function_call']['name'] = message['function_call'].pop('tool_name')
-            message['function_call']['arguments'] = message['function_call'].pop('tool_input')
+            message['tool_call'] = function_call_args.pop('tool_call')
+            message['tool_call']['name'] = message['tool_call'].pop('tool_name')
+            message['tool_call']['arguments'] = message['tool_call'].pop('tool_input')
             message['arguments'] = function_call_args
                 
         return message,tokens
@@ -123,10 +123,10 @@ class ToolAgent(BaseAgent):
             new_node.data["content"] = message["content"]
         if 'arguments' in message.keys():
             new_node.data['thoughts']['properties'] = message["arguments"]
-        if "function_call" in message.keys():
-            new_node.data["command"]["properties"]["name"] = message["function_call"]["name"]
-            new_node.data["command"]["properties"]["args"] = message["function_call"]["arguments"]
+        if "tool_call" in message.keys():
+            new_node.data["command"]["properties"]["name"] = message["tool_call"]["name"]
+            new_node.data["command"]["properties"]["args"] = message["tool_call"]["arguments"]
         else:
-            logger.typewriter_log("message_to_tool_node warning: no function_call in message",Fore.RED)
+            logger.typewriter_log("message_to_tool_node warning: no tool_call in message",Fore.RED)
 
         return new_node

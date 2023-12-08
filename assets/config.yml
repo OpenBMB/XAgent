@@ -1,35 +1,21 @@
 api_keys:
-  gpt-3.5-turbo-16k:
-    - api_key: sk-xxxxx
-      api_base: https://example.com
-      api_type: azure
-      api_version: 2023-07-01-preview
-      engine: GPT-35-Turbo-16k
-      # you can use any kwargs supported by openai.ChatCompletion here
-    - api_key: sk-xxxxx
-      organization: org-xxxxxx
-      model: gpt-3.5-turbo-16k
-  gpt-4:    
-    - api_key: sk-xxxxx
-      organization: org-xxxxx
-      model: gpt-4
-    - api_key: sk-xxxxx
-      organization: org-xxxxxx
-      model: gpt-4
+  pt-3.5-turbo-16k:
+  gpt-4:
   gpt-4-32k:
-    - api_key: sk-xxxxx
-      organization: org-xxxxx
-      model: gpt-4-32k
-    - api_key: sk-xxxxx
-      organization: org-xxxxxx
-      model: gpt-4-32k
+  xagentllm:
+    - temperature: 1.0
+      top_p: 1.0
+      repetition_penalty: 1.05
 
 
-default_request_type: openai # or xagent
+default_request_type: xagent # or xagent
 default_completion_kwargs:
-  model: gpt-4-32k
-  temperature: 0.2
-  request_timeout: 60
+  model: xagentllm
+  temperature: 1.0
+  top_p: 1.0
+  request_timeout: 200
+  repetition_penalty: 1.05
+  max_tokens: 2048
 
 enable_summary: true
 summary:
@@ -54,3 +40,6 @@ tool_blacklist:
   - FileSystemEnv_print_filesys_struture
 
 record_dir:
+
+experiment:
+  redo_action: false

@@ -58,17 +58,20 @@ else:
     connection = None
 
 
-# 中间件
+# Middleware
 @app.middleware("http")
 async def db_session_middleware(request: Request, call_next):
-    # 默认响应
+    """
+    This middleware function is used to create a database session object and attach it to the request state.
+    The database session is closed after the request is processed.
+    """
     response = Response("Internal server error", status_code=500)
     if XAgentServerEnv.DB.db_type in ["sqlite", "mysql", "postgresql"]:
         try:
             request.state.db = connection.db_session
             response = await call_next(request)
         finally:
-            # 关闭数据库会话
+# 关闭数据库会话
             request.state.db.close()
     else:
         response = await call_next(request)
@@ -77,6 +80,9 @@ async def db_session_middleware(request: Request, call_next):
 
 # 依赖项,获取数据库会话对象
 def get_db(request: Request):
+    """
+    Dependency function to get the database session object.
+    """
     if XAgentServerEnv.DB.db_type in ["sqlite", "mysql", "postgresql"]:
         return request.state.db
     else:
@@ -93,6 +99,10 @@ yag: yagmail.SMTP = None
 
 
 async def startup_event():
+    """
+    Event function that is called on server startup.
+    It initializes various global variables and services.
+    """
     logger.info("XAgent Service Startup Param:")
     for key, item in XAgentServerEnv.__dict__.items():
         if not key.startswith("__"):
@@ -152,17 +162,26 @@ async def startup_event():
 
 @app.on_event("startup")
 async def startup():
+    """
+    Event function that is called on server startup.
+    """
     await startup_event()
 
 
 @app.on_event("shutdown")
 async def shutdown():
+    """
+    Event function that is called on server shutdown.
+    """
     if websocket_queue:
         await websocket_queue.put(None)
 
 
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    """
+    Exception handler for RequestValidationError.
+    """
     return JSONResponse(
         status_code=400,
         content={"status": "failed", "message": exc.errors()}
@@ -180,7 +199,7 @@ app.add_middleware(
 def check_user_auth(user_id: str = Form(...),
                     token: str = Form(...)):
     """
-
+    Function to check user authentication.
     """
     if userInterface.user_is_exist(user_id=user_id) == False:
         return False
@@ -197,7 +216,7 @@ async def register(email: str = Form(...),
                    industry: str = Form(...),
                    db: Session = Depends(get_db)) -> ResponseBody:
     """
-
+    API endpoint to register a new user.
     """
     userInterface.register_db(db)
     if userInterface.user_is_exist(email=email):
@@ -234,7 +253,7 @@ async def auth(user_id: str = Query(...),
                db: Session = Depends(get_db)
                ) -> ResponseBody:
     """
-
+    API endpoint to authenticate a user.
     """
     userInterface.register_db(db)
     user = userInterface.get_user(user_id=user_id)
@@ -266,7 +285,7 @@ async def login(email: str = Form(...),
                 token: str = Form(...),
                 db: Session = Depends(get_db)) -> ResponseBody:
     """
-
+    API endpoint to login a user.
     """
     userInterface.register_db(db)
     user = userInterface.get_user(email=email)
@@ -286,7 +305,7 @@ async def login(email: str = Form(...),
 @app.post("/check")
 async def check(token: str = Form(...), db: Session = Depends(get_db)) -> ResponseBody:
     """
-
+    API endpoint to check the validity of a token.
     """
     userInterface.register_db(db)
     if token is None:
@@ -305,6 +324,9 @@ async def create_upload_files(files: List[UploadFile] = File(...),
                               user_id: str = Form(...),
                               token: str = Form(...),
                               db: Session = Depends(get_db)) -> ResponseBody:
+    """
+    API endpoint to upload files.
+    """
     userInterface.register_db(db)
     if user_id == "":
         return ResponseBody(success=False, message="user_id is empty!")
@@ -348,7 +370,7 @@ async def get_all_interactions(user_id: str = Form(...),
                                page_num: int = Form(...),
                                db: Session = Depends(get_db)) -> ResponseBody:
     """
-
+    API endpoint to get all interactions for a user.
     """
     userInterface.register_db(db)
     interactionInterface.register_db(db)
@@ -372,6 +394,9 @@ async def get_all_interactions(user_id: str = Form(...),
                                page_size: int = Form(...),
                                page_num: int = Form(...),
                                db: Session = Depends(get_db)) -> ResponseBody:
+    """
+    API endpoint to get all shared interactions.
+    """
     userInterface.register_db(db)
     interactionInterface.register_db(db)
     if user_id == "":
@@ -389,7 +414,9 @@ async def share_interaction(user_id: str = Form(...),
                             token: str = Form(...),
                             interaction_id: str = Form(...),
                             db: Session = Depends(get_db)) -> ResponseBody:
-
+    """
+    API endpoint to share an interaction.
+    """
     userInterface.register_db(db)
     interactionInterface.register_db(db)
     if user_id == "":
@@ -416,7 +443,7 @@ async def get_all_interactions(user_id: str = Form(...),
                                interaction_id: str = Form(...),
                                db: Session = Depends(get_db)) -> ResponseBody:
     """
-
+    API endpoint to delete an interaction.
     """
     userInterface.register_db(db)
     interactionInterface.register_db(db)
@@ -445,7 +472,9 @@ async def update_interaction_parameter(user_id: str = Form(...),
                                        interaction_id: str = Form(...),
                                        db: Session = Depends(get_db)
                                        ) -> ResponseBody:
-    
+    """
+    API endpoint to update the configuration of an interaction.
+    """
     userInterface.register_db(db)
     interactionInterface.register_db(db)
     if user_id == "":
@@ -479,6 +508,9 @@ async def update_interaction_description(user_id: str = Form(...),
                                          interaction_id: str = Form(...),
                                          db: Session = Depends(get_db)
                                          ) -> ResponseBody:
+    """
+    API endpoint to update the description of an interaction.
+    """
     userInterface.register_db(db)
     interactionInterface.register_db(db)
     if user_id == "":
@@ -510,7 +542,7 @@ class MainServer(WebSocketEndpoint):
     count: int = 0
     client_id: str = ""
     websocket: WebSocket = None
-    
+
     """
     In this websocket, we will receive the args from user,
     and you can use it to run the interaction.
@@ -518,7 +550,7 @@ class MainServer(WebSocketEndpoint):
     and you can add other keys to the args to tell XAgent what do you want to do.
 
     """
-
+    
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.db: Session = None
@@ -535,7 +567,9 @@ class MainServer(WebSocketEndpoint):
         self.interactionInterface.register_db(self.db)
 
     async def on_connect(self, websocket: WebSocket):
-
+        """
+        Event listener that is called when a websocket connection is established.
+        """
         self.client_id = self.scope.get(
             "path_params", {}).get("client_id", None)
         self.date_str = datetime.now().strftime("%Y-%m-%d")
@@ -591,6 +625,9 @@ class MainServer(WebSocketEndpoint):
 
     
     async def on_disconnect(self, websocket, close_code):
+        """
+        Event listener that is called when a websocket connection is closed.
+        """
         try:
             self.interactionInterface.update_interaction_status(
                 interaction_id=self.client_id, status="failed", message=f"failed, code: {close_code}", current_step=uuid.uuid4().hex)
@@ -603,14 +640,17 @@ class MainServer(WebSocketEndpoint):
         finally:
             if self.db:
                 self.db.close()
-    
+
     async def on_receive(self, websocket, data):
+        """
+        Event listener that is called when data is received from the client over the websocket connection.
+        """
         self.logger.typewriter_log(
             title=f"Receive data from {self.client_id}: ",
             title_color=Fore.RED,
             content=data)
         args, agent, mode, file_list = await self.check_receive_data(data)
-        # in this step, we need to update interaction to register agent, mode, file_list
+# in this step, we need to update interaction to register agent, mode, file_list
         self.interactionInterface.update_interaction({
             "interaction_id": self.client_id,
             "agent": agent,
@@ -629,12 +669,18 @@ class MainServer(WebSocketEndpoint):
 
     
     async def on_send(self, websocket: WebSocket):
+        """
+        Event listener that is called periodically to send messages to the client over the websocket connection.
+        """
         while True:
             await asyncio.sleep(10)
             await websocket.send_text(WebsocketResponseBody(status="pong", success=True, message="pong", data={"type": "pong"}).to_text())
 
     
     async def check_receive_data(self, data):
+        """
+        Function to validate and process the data received from the client.
+        """
         data = json.loads(data)
         args = data.get("args", {})
         agent = data.get("agent", "")
@@ -645,7 +691,7 @@ class MainServer(WebSocketEndpoint):
             await self.websocket.send_text(WebsocketResponseBody(status="failed", message="args is empty!", data=None).to_text())
             raise XAgentIOWebSocketReceiveError("args is empty!")
 
-        # mode with auto or manual and required
+# mode with auto or manual and required
         if mode not in ["auto", "manual"]:
             await self.websocket.send_text(WebsocketResponseBody(status="failed", message="mode is not exist! Only auto and manual are allowed!", data=None).to_text())
             raise XAgentIOWebSocketReceiveError(
@@ -654,6 +700,9 @@ class MainServer(WebSocketEndpoint):
 
     
     async def do_running_long_task(self, parameter):
+        """
+        Function to run a long task asynchronously.
+        """
         current_step = uuid.uuid4().hex
         base = self.interactionInterface.get_interaction(
             interaction_id=self.client_id)
@@ -684,6 +733,7 @@ class MainServer(WebSocketEndpoint):
             f"Register logger into XAgentServer of {base.interaction_id}, done!")
         self.logger.info(
             f"Start a new thread to run interaction of {base.interaction_id}, done!")
+        
         task = asyncio.create_task(server.interact(interaction))
         await task
         with broadcast_lock:
@@ -703,7 +753,7 @@ class RecorderServer(WebSocketEndpoint):
     In this websocket, we will receive the recorder_dir from user,
     and you can use it to record the interaction.
     """
-
+    
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.db: Session = None
@@ -720,6 +770,9 @@ class RecorderServer(WebSocketEndpoint):
         self.interactionInterface.register_db(self.db)
 
     async def on_connect(self, websocket: WebSocket):
+        """
+        Event listener that is called when a websocket connection is established.
+        """
         self.client_id = uuid.uuid4().hex
         query_string = self.scope.get("query_string", b"").decode()
         parameters = parse_qs(query_string)
@@ -742,7 +795,7 @@ class RecorderServer(WebSocketEndpoint):
         if not self.userInterface.user_is_valid(user_id=user_id, token=token):
             raise XAgentIOWebSocketConnectError("user is not available!")
         
-        # check running, you can edit it by yourself in envs.py to skip this check
+# check running, you can edit it by yourself in envs.py to skip this check
         if XAgentServerEnv.check_running:
             if self.interactionInterface.is_running(user_id=user_id):
                 raise XAgentIOWebSocketConnectError(
@@ -766,6 +819,9 @@ class RecorderServer(WebSocketEndpoint):
         await websocket.send_text(WebsocketResponseBody(status="connect", success=True, message="connect success", data=base.to_dict()).to_text())
 
     async def on_disconnect(self, websocket, close_code):
+        """
+        Event listener that is called when a websocket connection is closed.
+        """
         try:
             self.interactionInterface.update_interaction_status(
                 interaction_id=self.client_id, status="failed", message=f"failed, code: {close_code}", current_step=uuid.uuid4().hex)
@@ -780,6 +836,9 @@ class RecorderServer(WebSocketEndpoint):
                 self.db.close()
 
     async def on_receive(self, websocket, data):
+        """
+        Event listener that is called when data is received from the client over the websocket connection.
+        """
         logger.typewriter_log(
             title=f"Receive data from {self.client_id}: ",
             title_color=Fore.RED,
@@ -789,11 +848,17 @@ class RecorderServer(WebSocketEndpoint):
         
 
     async def on_send(self, websocket: WebSocket):
+        """
+        Event listener that is called periodically to send messages to the client over the websocket connection.
+        """
         while True:
             await asyncio.sleep(10)
             await websocket.send_text(WebsocketResponseBody(status="pong", success=True, message="pong", data={"type": "pong"}).to_text())
 
     async def do_running_long_task(self, parameter):
+        """
+        Function to run a long task asynchronously.
+        """
         current_step = uuid.uuid4().hex
         base = self.interactionInterface.get_interaction(
             interaction_id=self.client_id)
@@ -831,7 +896,7 @@ class RecorderServer(WebSocketEndpoint):
             if manager.is_connected(self.client_id):
                 await manager.disconnect(self.client_id, self.websocket)
         logger.info("done!")
-
+    
     def run(self, server: XAgentServer, interaction: XAgentInteraction):
         asyncio.run(server.interact(interaction))
 
@@ -848,7 +913,7 @@ class ReplayServer(WebSocketEndpoint):
     In this websocket, we will receive an interaction_id,
     and you can use it to replay the interaction.
     """
-
+    
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.db: Session = None
@@ -865,6 +930,9 @@ class ReplayServer(WebSocketEndpoint):
         self.interactionInterface.register_db(self.db)
 
     async def on_connect(self, websocket: WebSocket):
+        """
+        Event listener that is called when a websocket connection is established.
+        """
         self.client_id = uuid.uuid4().hex
         self.interaction_id = self.scope.get(
             "path_params", {}).get("client_id", None)

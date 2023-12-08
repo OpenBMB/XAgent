@@ -18,7 +18,26 @@ from XAgentServer.server import XAgentServer
 
 
 class CommandLine():
+    """
+    A command-line interface for interacting with XAgentServer.
+
+    Attributes:
+        env: An instance of the XAgentServer environment.
+        client_id: A unique identifier for the client, generated as a hexadecimal UUID.
+        date_str: The current date as a string in YYYY-MM-DD format.
+        log_dir: The directory where the logs are stored.
+        logger: An instance of the Logger used for logging interactions.
+        interactionDB: A database interface for interacting with either a persistent
+            database (SQLite, MySQL, PostgreSQL) or a local storage file, depending
+            on the configuration of `env`.
+    """
     def __init__(self, env: XAgentServerEnv):
+        """
+        Initialize the CommandLine instance.
+
+        Args:
+            env: An instance of the XAgentServer environment.
+        """
         self.env = env
         self.client_id = uuid.uuid4().hex
         self.date_str = datetime.now().strftime("%Y-%m-%d")
@@ -26,7 +45,7 @@ class CommandLine():
                                     "interact_records"), self.date_str, self.client_id)
         if not os.path.exists(self.log_dir):
             os.makedirs(self.log_dir)
-        
+
         self.logger = Logger(log_dir=self.log_dir, log_file=f"interact.log")
 
         self.logger.typewriter_log(
@@ -53,6 +72,16 @@ class CommandLine():
             self.interactionDB = InteractionLocalStorageInterface(env)
 
     def run(self, args: dict):
+        """
+        Runs the interaction with the XAgentServer with the provided arguments.
+
+        Args:
+            args: A dictionary of arguments for the interaction.
+
+        Raises:
+            ValueError: If `args` is not a dictionary.
+            Exception: If there is already a running interaction for the user.
+        """
         if args is None or not isinstance(args, dict):
             raise ValueError("args must be a dict")
 
@@ -147,15 +176,18 @@ class CommandLine():
               max_wait_seconds: int = 600,
               description: str = "XAgent-Test",):
         """
-        :param task: task description
-        :param role: role name
-        :param plan: plan
-        :param upload_files: upload files
-        :param download_files: download files
-        :param record_dir: record dir
-        :param mode: mode, only support auto and manual, if you choose manual, you need to press enter to continue in each step
-        :param max_wait_seconds: max wait seconds
-        :param description: description
+        Start an interaction with the XAgentServer.
+
+        Args:
+            task: Task description.
+            role: Role name (default is "Assistant").
+            plan: List of steps to perform (default is empty list).
+            upload_files: List of files to upload (default is empty list).
+            download_files: List of files to download (default is empty list).
+            record_dir: Directory to store records (default is `None`).
+            mode: Run mode. Can be "auto" or "manual" (default is "auto").
+            max_wait_seconds: Maximum wait time in seconds (default is 600).
+            description: Description of the interaction (default is "XAgent-Test").
         """
         print("-=-=--=-=-=-=-=-=-= Current Instruction =-=-=-=-=-=-=-=-=-=-=-=-=-=-")
         print(task)

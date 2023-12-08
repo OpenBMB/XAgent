@@ -6,7 +6,7 @@
     </div>
     <span>API Open Platform</span>
 
-    <!-- 请在PC端进行访问试用 -->
+    <!-- Try out on desktop -->
     <p class="tip">Please visit and try out on PC</p>
   </div>
 </template>

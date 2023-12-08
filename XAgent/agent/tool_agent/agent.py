@@ -14,9 +14,16 @@ from XAgent.ai_functions import function_manager,objgenerator
 from XAgent.config import CONFIG
 
 class ToolAgent(BaseAgent):
+    """
+    This class is used to represent the ToolAgent object, which is inherited from the BaseAgent. It mainly focuses
+    on actions around the tool tree and its functions.
+
+    Attributes:
+        abilities (set): Set to store the abilities of the current ToolAgent. By default, it is set to 
+        `RequiredAbilities.tool_tree_search`.
+    """
     abilities = set([RequiredAbilities.tool_tree_search])
-    
-    
+
     @retry(stop=stop_after_attempt(CONFIG.max_retry_times),reraise=True)
     def parse(
         self,
@@ -30,6 +37,29 @@ class ToolAgent(BaseAgent):
         *args,
         **kwargs
     ):
+        """
+        This function generates a message list and a token list based on the input parameters using the 
+        `generate()` function, modifies it as per specific conditions, and returns it.
+        
+        Args:
+            placeholders (dict, optional): Dictionary object to store the placeholders and their mappings.
+            arguments (dict, optional): Dictionary object to store argument's details.
+            functions: List of permissible functions that can be inserted in the function fields for the `openai` type.
+            function_call: A dictionary representing the current function call being processed.
+            stop: The termination condition for the loop.
+            additional_messages (list, optional): List of additional messages to be appended to the existing message list.
+            additional_insert_index (int, optional): The index position to insert the additional messages.
+            *args: Variable length argument list for the parent class's `generate()` function.
+            **kwargs: Arbitrary keyword arguments for the parent class's `generate()` function.
+            
+        Returns:
+            tuple: A tuple containing a dictionary of the parsed message and a list of tokens.
+            
+        Raises:
+            AssertionError: If the specified function schema is not found in the list of possible functions.
+            Exception: If the validation of the tool's call arguments fails.
+        """
+        
         prompt_messages = self.fill_in_placeholders(placeholders)
         messages = prompt_messages[:additional_insert_index] + additional_messages + prompt_messages[additional_insert_index:]
         messages = [message.raw() for message in messages]
@@ -87,7 +117,7 @@ class ToolAgent(BaseAgent):
                 validate()
             except Exception as e:  
                 messages[0] = change_tool_call_description(messages[0],reverse=True)
-                tool_call_args = objgenerator.dynamic_json_fixs(
+                tool_call_args = objgenerator.dynamic_json_fixes(
                     broken_json=tool_call_args,
                     function_schema=tool_schema,
                     messages=messages,
@@ -104,6 +134,19 @@ class ToolAgent(BaseAgent):
         return message,tokens
     
     def message_to_tool_node(self,message) -> ToolNode:
+        """
+        This method converts a given message dictionary to a ToolNode object.
+        
+        Args:
+            message (dict): Dictionary of message data containing content, function call and arguments.
+
+        Returns:
+            ToolNode: A ToolNode object generated from the provided message.
+            
+        Warning:
+            If the `function_call` field is missing in the input message, a warning message will be logged. 
+        """
+        
         # assume message format
         # {
         #   "content": "The content is useless",

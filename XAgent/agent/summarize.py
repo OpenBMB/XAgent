@@ -9,10 +9,30 @@ MAX_RETURN_LENGTH = CONFIG.summary['max_return_length']
 MAX_PLAN_LENGTH = CONFIG.max_plan_length
 
 def summarize_action(action_process:list[dict], task:str,)->(list[str],str):
+    """
+    Generate a summarized series of actions.
+
+    Args:
+        action_process (list[dict]): The list of actions to process.
+        task (str): The task name.
+
+    Returns:
+        str: The string contains a summary of the actions.
+    """
     if len(action_process) < 1:
         return "No steps found"
     
     def generate_func_args(args:dict,black_list=[])->str:
+        """
+        Generate function arguments in the form of strings.
+
+        Args:
+            args (dict): A dictionary of arguments.
+            black_list (list): A list of forbidden or restricted words or keys in the args dictionary.
+
+        Returns:
+            str: A string that summarizes the function arguments.
+        """
         ret = ''
         args_len = 0
         for k,v in args.items():
@@ -143,11 +163,29 @@ def summarize_action(action_process:list[dict], task:str,)->(list[str],str):
     return '\n'.join(ordered_rets)
 
 def summarize_plan(plans:dict)->str:
+    """
+    Generate a summarized plan based on provided plans.
+
+    Args:
+        plans (dict): The plans to provide.
+
+    Returns:
+        str: The string contains a summary of the plan.
+    """
     summary:list[list] = []
     task_ids = []
     detailed_info:dict[str,list] = {}
     current_task_id = None
     def recursive_summary(plan:dict,):
+        """
+        Generate a summarized plan in a recursive process.
+
+        Args:
+            plan (dict): A dictionary of plans.
+
+        Returns:
+            None
+        """
         nonlocal summary
         nonlocal current_task_id
         plan_des = [

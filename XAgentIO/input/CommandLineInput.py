@@ -9,6 +9,15 @@ import math
 
 
 def timer(func):
+    """
+    Decorator function to time the execution of a function.
+
+    Args:
+        func (Function): The function to be timed.
+
+    Returns:
+        wrapper (Function): The wrapped function with added timing functionality.
+    """
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
         try:
@@ -21,10 +30,28 @@ def timer(func):
 
 
 class CommandLineInput(BaseInput):
+    """
+    Class for handling command line input.
+
+    This child class extends from BaseInput and implements methods to handle and manage command line input data.
+
+    Attributes:
+        do_interrupt (bool): If True, input will be interrupted.
+        max_wait_seconds (int): Maximum wait time for input in seconds.
+    """
     def __init__(self, do_interrupt: bool = False, max_wait_seconds: int = 600):
         super().__init__(do_interrupt, max_wait_seconds)
 
     async def run(self, input_data):
+        """
+        Run the command line input method.
+
+        Args:
+            input_data (Any): The original input data to be processed.
+
+        Returns:
+            data (Any): The processed input data.
+        """
         if self.do_interrupt:
             data = await self.interrupt(input_data)
         else:
@@ -32,6 +59,18 @@ class CommandLineInput(BaseInput):
         return data
     
     async def get_each_input(self, key, value, res, timeout):
+        """
+        Returns the input from the command line for a single key-value pair.
+
+        Args:
+            key (str): The key for which to get input.
+            value (Any): The current value associated with the key.
+            res (dict): The result dictionary where inputs collected will be stored.
+            timeout (int): Timeout in seconds for the input.
+
+        Returns:
+            Any: The input data.
+        """
         self.logger.typewriter_log(
             f"Now, ASK For {key}, Origin Input: {value}",
             Fore.RED,
@@ -48,7 +87,15 @@ class CommandLineInput(BaseInput):
             return temp
         
     async def get_input(self, origin_data):
-        
+        """
+        Get input for all fields of the original data from the command line.
+
+        Args:
+            origin_data (dict): The original data for which to get input.
+
+        Returns:
+            dict: The dictionary with updated inputs.
+        """
         self.logger.typewriter_log(
                 "Next, you can start modifying the original input by typing 'Y/y/yes' or skip this step by typing 'N/n/no' and then press 'Enter' to continue the loop:",
                 Fore.RED
@@ -79,9 +126,19 @@ class CommandLineInput(BaseInput):
         res["done"] = True
         return res
     
-
     async def interrupt(self, input_data):
-        
+        """
+        Interrupts the current input process and returns the current data.
+
+        Args:
+            input_data (dict): The original input data.
+
+        Returns:
+            dict: The current data collected so far.
+
+        Raises:
+            XAgentIOTimeoutError: If the input times out.
+        """
         try:
             data = await self.get_input(input_data)
             return data
@@ -91,4 +148,10 @@ class CommandLineInput(BaseInput):
     
 
     def close(self):
+        """
+        Closes the active connection.
+
+        Raises:
+            XAgentIOCloseError: Always, indicating that the connection has been closed.
+        """
         raise XAgentIOCloseError("close connection!")

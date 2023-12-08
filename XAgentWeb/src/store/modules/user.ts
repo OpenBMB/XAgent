@@ -17,7 +17,7 @@ export const useUserStore = defineStore('user', {
   state: (): UserState => {
     return {
       // 用户信息
-      userInfo: null,
+      userInfo: useGetLocalCache<UserInfo>(USER_INFO) || null,
       roleList: [],
       lastUpdateTime: 0,
       showKey: false,

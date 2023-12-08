@@ -54,7 +54,7 @@
           <span>🔧 Using Tools:</span>
           <span>success quote for olato quotes</span>
         </div>
-        <img src="@/assets/images/playground/eyes.svg" alt="showDetail" class="showMoreIcon" @click="showModal" />
+        <img src="@/assets/images/playground/eyes.svg" alt="showDetail" class="showMoreIcon"/>
       </el-row>
 
       <el-row :gutter="0" justify="end" v-show="!isFreezed">
@@ -89,7 +89,6 @@
   import { ref } from 'vue'
   import ModalInfo from './ModalInfo.vue'
   import { ElMessage } from 'element-plus'
-  import { getModalData, getNewTaskData } from '/@/mockApi/index'
   import  SubmitSubtaskInfo  from "./SubmitSubtaskInfo.vue"
   const chatMsgInfoStore = useHistoryTalkStore()
   
@@ -103,6 +102,7 @@
       "isInnerNodeGenerating",
       "subTaskNumber", "innerNumber", "isFreezed"
   ]);
+
 
   const isEndNode = computed(() => props.isEndNode as boolean);
   const isFreezed =  computed(() => props.isFreezed as boolean);
@@ -177,12 +177,8 @@
     const param = toRaw(dataItem)
 
     emit('runToNext', {
-      ...param,
-      ...{
-        thought: thought.value,
-        apiName: apiName.value,
-        apiParameter: apiParameter.value,
-      }
+      subTaskNumber: subTaskNumber.value,
+      innerNumber: innerNumber.value,
     });
 
     runLoading.value = false
@@ -233,31 +229,6 @@
       // runActive(false)
     }
   })
-  const showModal = async () => {
-    const {data: res} = await getModalData({ id: '111' })
-    // 此API在正式环境不可用
-
-    // return 
-    
-    // "code": 0,
-    // "message": "Success",
-    // "data": {
-    //   "infos": []
-    // }
-
-    if(res.code === 0) {
-      dialogVisible.value = true
-      list.value = res.data.infos
-    } else {
-      ElMessage({
-        message: h('p', null, [
-          h('span', null, 'network error'),
-          h('i', { style: 'color: teal' }, 'VNode'),
-        ]),
-      })
-    }
-    
-  }
 
   const handleClose = (done: () => void) => {
     done()

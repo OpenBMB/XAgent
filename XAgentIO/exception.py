@@ -1,13 +1,14 @@
 class XAgentIOError(Exception):
-    """Base class for exceptions in this module."""
+    """The base class for exceptions in related to XAgent input/output (IO) operations."""
+    
     pass
 
 
 class XAgentIOInterruptError(XAgentIOError):
-    """Exception raised for errors in the input.
+    """A type of XAgentIOError that's raised when an IO operation is interrupted.
 
     Attributes:
-        message -- explanation of the error
+        message (str): An explanation of the error.
     """
 
     def __init__(self, message="XAgent IO Interrupt!"):
@@ -16,10 +17,10 @@ class XAgentIOInterruptError(XAgentIOError):
 
 
 class XAgentIOTimeoutError(XAgentIOError):
-    """Exception raised for errors in the input.
+    """A type of XAgentIOError that's raised when an IO operation times out.
 
     Attributes:
-        message -- explanation of the error
+        message (str): An explanation of the error.
     """
 
     def __init__(self, message="XAgent IO Timeout!"):
@@ -28,32 +29,34 @@ class XAgentIOTimeoutError(XAgentIOError):
 
 
 class XAgentIOCloseError(XAgentIOError):
-    """Exception raised for errors in the input.
+    """A type of XAgentIOError that's raised when an error occurs while closing an IO stream.
 
     Attributes:
-        message -- explanation of the error
+        message (str): An explanation of the error.
     """
 
     def __init__(self, message="XAgent IO Close!"):
         self.message = message
         super().__init__(self.message)
 
+
 class XAgentIOWebSocketError(XAgentIOError):
-    """Exception raised for errors in the input.
+    """A type of XAgentIOError that's raised for errors in websocket communications.
 
     Attributes:
-        message -- explanation of the error
+        message (str): An explanation of the error.
     """
 
     def __init__(self, message="XAgent IO WebSocket Error!"):
         self.message = message
         super().__init__(self.message)
 
+
 class XAgentIOWebSocketTimeoutError(XAgentIOWebSocketError):
-    """Exception raised for errors in the input.
+    """A type of XAgentIOWebSocketError that's raised when a websocket operation times out.
 
     Attributes:
-        message -- explanation of the error
+        message (str): An explanation of the error.
     """
 
     def __init__(self, message="XAgent IO WebSocket Timeout!"):
@@ -62,10 +65,10 @@ class XAgentIOWebSocketTimeoutError(XAgentIOWebSocketError):
 
 
 class XAgentIOWebSocketDisconnectError(XAgentIOWebSocketError):
-    """Exception raised for errors in the input.
+    """A type of XAgentIOWebSocketError that's raised when a websocket disconnects unexpectedly.
 
     Attributes:
-        message -- explanation of the error
+        message (str): An explanation of the error.
     """
 
     def __init__(self, message="XAgent IO WebSocket Disconnect!"):
@@ -74,10 +77,10 @@ class XAgentIOWebSocketDisconnectError(XAgentIOWebSocketError):
 
 
 class XAgentIOWebSocketConnectError(XAgentIOWebSocketError):
-    """Exception raised for errors in the input.
+    """A type of XAgentIOWebSocketError that's raised when a connection to a websocket cannot be established.
 
     Attributes:
-        message -- explanation of the error
+        message (str): An explanation of the error.
     """
 
     def __init__(self, message="XAgent IO WebSocket Connect Error!"):
@@ -86,10 +89,10 @@ class XAgentIOWebSocketConnectError(XAgentIOWebSocketError):
 
 
 class XAgentIOWebSocketCloseError(XAgentIOWebSocketError):
-    """Exception raised for errors in the input.
+    """A type of XAgentIOWebSocketError that's raised when a websocket cannot be closed properly.
 
     Attributes:
-        message -- explanation of the error
+        message (str): An explanation of the error.
     """
 
     def __init__(self, message="XAgent IO WebSocket Close!"):
@@ -98,10 +101,10 @@ class XAgentIOWebSocketCloseError(XAgentIOWebSocketError):
 
 
 class XAgentIOWebSocketSendError(XAgentIOWebSocketError):
-    """Exception raised for errors in the input.
+    """A type of XAgentIOWebSocketError that's raised when a message cannot be sent over a websocket.
 
     Attributes:
-        message -- explanation of the error
+        message (str): An explanation of the error.
     """
 
     def __init__(self, message="XAgent IO WebSocket Send Error!"):
@@ -110,13 +113,12 @@ class XAgentIOWebSocketSendError(XAgentIOWebSocketError):
 
 
 class XAgentIOWebSocketReceiveError(XAgentIOWebSocketError):
-    """Exception raised for errors in the input.
+    """A type of XAgentIOWebSocketError that's raised when a message cannot be received from a websocket.
 
     Attributes:
-        message -- explanation of the error
+        message (str): An explanation of the error.
     """
 
     def __init__(self, message="XAgent IO WebSocket Receive Error!"):
         self.message = message
         super().__init__(self.message)
-

@@ -4,21 +4,21 @@
             <span>Task Refinement</span>
         </div>
         <div class="task-refine-info-content">
-            <div class="task-refine-info-content-item">
+            <div class="task-refine-info-content-item" v-if="task_posterior_criticism">
                 <span class="task-refine-info-content-item-title">Task Posterior Criticism:</span>
                 <json-viewer 
                 :expand-depth="0"
                 :expanded="false"
                 :value="task_posterior_criticism"></json-viewer>
             </div>
-            <div class="task-refine-info-content-item">
+            <div class="task-refine-info-content-item" v-if="task_milestones">
                 <span class="task-refine-info-content-item-title">Task Milestones:</span>
                 <json-viewer
                 :expand-depth="0"
                 :expanded="false"
                 :value="task_milestones"></json-viewer>
             </div>
-            <div class="task-refine-info-content-item">
+            <div class="task-refine-info-content-item" v-if="posterior_tool_reflection">
                 <span class="task-refine-info-content-item-title">Posterior Tool Reflection:</span>
                 <json-viewer
                 :expand-depth="0"

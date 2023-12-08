@@ -21,11 +21,13 @@ import FileUpload from "./components/FileUpload.vue";
 import { ElMessage } from "element-plus";
 import generateRandomId from "/@/utils/uuid";
 
-const chatMsgInfoStore = useHistoryTalkStore()
+
 useAsset('/path')
 const input = ref('')
 const router = useRouter()
+
 const historyTalkStore = useHistoryTalkStore()
+const taskStore = useTaskStore()
 
 const agent = ref('');
 const mode = ref('')
@@ -33,8 +35,15 @@ const mode = ref('')
 const settingChange = (val: any) => {
   agent.value = val.agent
   mode.value = val.mode
-  chatMsgInfoStore.setSetting('config', val)
+  historyTalkStore.setSetting('config', val)
 }
+
+useInitChatPreparation().then((res: any) => {
+  const { data : { id } } = res;
+  taskStore.setCurrentNewTalkId(id);
+}).catch((err: any) => {
+  console.log(err);
+});
 
 const sendMessage = (val: string) => {
   const uuid = generateRandomId();
@@ -59,8 +68,7 @@ const sendMessage = (val: string) => {
     router.push({
       name: 'NewTalk',
       params: {
-        mode: "new",
-        id: uuid,
+        mode: "new"
       }});
   }
 }

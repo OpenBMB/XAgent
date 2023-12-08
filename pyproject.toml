@@ -1,0 +1,21 @@
+# https://python-poetry.org/docs/pyproject/
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry]
+name = "xagent"
+# Semantic versioning: https://semver.org
+version = "1.0.0"
+description = "An Autonomous LLM Agent for Complex Task Solving"
+authors = ["XAgent Team <xagentteam@gmail.com>"]
+license = "Apache 2.0"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+# `XAgent/config.py` has `match` syntax, which is from 3.10
+python = "^3.10"
+
+[tool.poetry.group.dev.dependencies]
+# unittest
+pytest = "^7.4.3"

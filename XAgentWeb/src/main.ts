@@ -9,14 +9,16 @@ import { setupHighlightDirective } from './directives/highlight'
 // import { setupClickOutsideDirective } from './directives/click-outside'
 import JsonViewer from 'vue-json-viewer'
 import VueViewer from 'v-viewer';
+import useReactInsideVue from './react/index.jsx';
 import 'viewerjs/dist/viewer.css';
 
 // Import JsonViewer as a Vue.js plugin
 
 const start = async () => {
   const app = createApp(App)
-
-  app.config.globalProperties.$ws_instance = null
+  app.directive('react', (el, binding) => {
+    useReactInsideVue(binding.value, el)
+});
 
   setupStore(app)
   setupRouter(app)
@@ -31,7 +33,7 @@ const start = async () => {
   }
   // setupClickOutsideDirective(app)
 
-  // 当路由准备好时再执行挂载( https://next.router.vuejs.org/api/#isready)
+  // Load when the router is ready( https://next.router.vuejs.org/api/#isready)
   await router.isReady()
 
   app.mount('#app', true)

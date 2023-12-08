@@ -5,6 +5,34 @@ from XAgentServer.database.models import User
 
 
 class XAgentUser(metaclass=abc.ABCMeta):
+    """
+    A class to represent a XAgent User.
+
+    Attributes
+    ----------
+    user_id : str
+        The unique id of the user.
+    email : str
+        The email address of the user.
+    name : str
+        The name of the user.
+    token : str
+        The token of the user.
+    available : bool, optional (True by default)
+        The availability status of a user.
+    corporation : str, optional (None by default)
+        The corporation the user belongs to.
+    industry : str, optional (None by default)
+        The industry the user belongs to.
+    position : str, optional (None by default)
+        The position of the user in the corporation.
+    create_time : str, optional (None by default)
+        The creation time of the user profile.
+    update_time : str, optional (None by default)
+        The last update time of the user profile
+    deleted : bool, optional (False by default)
+        The deletion status of a user. 
+    """
 
     def __init__(self, 
                  user_id: str, 
@@ -30,7 +58,15 @@ class XAgentUser(metaclass=abc.ABCMeta):
         self.update_time = update_time
         self.deleted = deleted
 
-    def to_dict(self):
+    def to_dict(self) -> dict:
+        """
+        Converts the User object to a dictionary.
+
+        Returns
+        -------
+        dict
+            The User object as a dictionary.
+        """
         return {
             "user_id": self.user_id,
             "email": self.email,
@@ -45,11 +81,32 @@ class XAgentUser(metaclass=abc.ABCMeta):
             "deleted": self.deleted
         }
 
-    def to_json(self):
+    def to_json(self) -> str:
+        """
+        Converts the User object to a JSON string.
+
+        Returns
+        -------
+        str
+            The User object as a JSON string.
+        """
         return json.dumps(self.to_dict(), indent=2, ensure_ascii=False)
 
     @staticmethod
     def from_dict(user_dict: dict):
+        """
+        Converts a dictionary to a User object.
+
+        Args
+        ----
+        user_dict : dict
+            dictionary representing a User object.
+
+        Returns
+        -------
+        XAgentUser object.
+
+        """
         return XAgentUser(
             user_id=user_dict["user_id"],
             email=user_dict["email"],
@@ -66,13 +123,47 @@ class XAgentUser(metaclass=abc.ABCMeta):
 
     @staticmethod
     def from_json(user_json: str):
+        """
+        Converts a JSON string to a User object.
+
+        Args
+        ----
+        user_json : str
+            JSON string representing a User object.
+
+        Returns
+        -------
+        XAgentUser object.
+        """
         return XAgentUser.from_dict(json.loads(user_json))
 
-    def is_available(self):
+    def is_available(self) -> bool:
+        """
+        Checks the availability of the User.
+        
+        Returns
+        -------
+        bool
+            The availability status of the user.
+
+        """
         return self.available
     
     @staticmethod
     def from_db(user: User):
+        """
+        Creates XAgentUser instance from a User instance from database.
+
+        Args
+        ----
+        user : User
+            User instance from database.
+
+        Returns
+        -------
+        XAgentUser
+            An instance of XAgentUser.
+        """
         user_id = user.user_id
         email = user.email
         name = user.name
@@ -97,4 +188,3 @@ class XAgentUser(metaclass=abc.ABCMeta):
             update_time=update_time,
             deleted=deleted
         )
-        

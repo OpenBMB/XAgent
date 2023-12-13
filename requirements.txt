@@ -28,3 +28,4 @@ pinecone-client
 websockets
 cryptography
 inputimeout
+pytest

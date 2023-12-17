@@ -45,7 +45,7 @@ class XAgentServer:
             xagent_param.build_query({
                 "role_name": "Assistant",
                 "task": args.get("goal", ""),
-                "plan": args.get("plan", ["Pay attention to the language in inital goal, alway answer with the same language of the inital goal given."]),
+                "plan": args.get("plan", ["Pay attention to the language in initial goal, always answer with the same language of the initial goal given."]),
             })
             xagent_param.build_config(config)
             xagent_core = XAgentCoreComponents()

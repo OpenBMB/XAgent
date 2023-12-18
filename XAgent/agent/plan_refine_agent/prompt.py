@@ -22,7 +22,7 @@ A task-handling agent will handle all the subtasks as the inorder-traversal. For
 4. It is powered by a state-of-the-art LLM, so it can handle many subtasks without using external tools or execute codes.
 
 RESOURCES:
-1. Internet access for searches and information gathering, seach engine and web browsing.
+1. Internet access for searches and information gathering, search engine and web browsing.
 2. A FileSystemEnv to read and write files (txt, code, markdown, latex...)
 3. A python interpretor to execute python files together with a pdb debugger to test and refine the code.
 4. A ShellEnv to execute bash or zsh command to further achieve complex goals. 

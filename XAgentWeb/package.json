@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite --host --mode development",
-    "build": "vite build --mode production"
+    "build": "vite build --mode production",
+    "test":  "vite --host --mode test"
   },
   "dependencies": {
     "@codemirror/lang-python": "^6.1.3",

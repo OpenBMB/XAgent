@@ -17,7 +17,7 @@ RUN pip install playwright && playwright install chromium &&  playwright install
 COPY ToolServer/ToolServerNode/requirements.txt .
 
 RUN pip install --no-cache-dir -r requirements.txt
-
+ 
 RUN rm -rf /tmp/* /var/tmp/*
 
 COPY ToolServer/ToolServerNode .

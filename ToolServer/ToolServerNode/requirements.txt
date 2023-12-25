@@ -8,7 +8,7 @@ fastapi
 func_timeout
 GitPython
 google_api_python_client
-httpx
+httpx[http2]
 Markdown
 numpy
 orjson

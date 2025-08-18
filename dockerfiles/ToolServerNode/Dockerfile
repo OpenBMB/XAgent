@@ -8,11 +8,11 @@ WORKDIR /app
 
 RUN apt-get update
 
-RUN apt update && apt install -y build-essential make openjdk-17-jdk-headless curl docker.io docker-compose psmisc sudo
+RUN apt update && apt install -y build-essential make openjdk-21-jre-headless curl docker.io docker-compose psmisc sudo
 
-RUN pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple
+# RUN pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple
 
-RUN pip install playwright && playwright install chromium &&  playwright install-deps
+RUN pip install playwright && playwright install chromium &&  playwright install-deps || true
 
 COPY ToolServer/ToolServerNode/requirements.txt .
 

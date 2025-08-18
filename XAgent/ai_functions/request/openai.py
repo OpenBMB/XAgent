@@ -175,6 +175,7 @@ else:
             )
         try:
             completions = client.chat.completions.create(**chatcompletion_kwargs)
+            # response = json.loads(completions.model_dump_json())
             response = completions.model_dump()
             if response["choices"][0]["finish_reason"] == "length":
                 raise BadRequestError(
@@ -204,6 +205,7 @@ else:
                 chatcompletion_kwargs.update(kwargs)
                 chatcompletion_kwargs.pop("schema_error_retry", None)
                 completions = client.chat.completions.create(**chatcompletion_kwargs)
+                # response = json.loads(completions.model_dump_json())
                 response = completions.model_dump()
             else:
                 raise e

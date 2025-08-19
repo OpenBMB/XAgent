@@ -1,35 +1,25 @@
+# ====================================================================
+# THIS IS THE CORRECTED AND SIMPLIFIED CONFIG FILE
+# ====================================================================
+
 api_keys:
-  gpt-3.5-turbo-16k:
-    - api_key: sk-xxxxx
-      api_base: https://example.com
-      api_type: azure
-      api_version: 2023-07-01-preview
-      engine: GPT-35-Turbo-16k
-      # you can use any kwargs supported by openai.ChatCompletion here
-    - api_key: sk-xxxxx
-      organization: org-xxxxxx
-      model: gpt-3.5-turbo-16k
-  gpt-4:    
-    - api_key: sk-xxxxx
-      organization: org-xxxxx
-      model: gpt-4
-    - api_key: sk-xxxxx
-      organization: org-xxxxxx
-      model: gpt-4
-  gpt-4-32k:
-    - api_key: sk-xxxxx
-      organization: org-xxxxx
-      model: gpt-4-32k
-    - api_key: sk-xxxxx
-      organization: org-xxxxxx
-      model: gpt-4-32k
+  # We will only define the gpt-4 model, which your key should have access to.
+  gpt-4:
+    # PASTE YOUR FULL, VALID OPENAI API KEY IN THE LINE BELOW
+    - api_key: "sk-proj-8Hs"
+      model: "gpt-4"
 
+# Set the default request type to openai
+default_request_type: openai
 
-default_request_type: openai # or xagent
+# Set the default model to gpt-4, which we know you have access to.
+# THIS IS THE MOST IMPORTANT FIX.
 default_completion_kwargs:
-  model: gpt-4-32k
+  model: "gpt-4"
   temperature: 0.2
   request_timeout: 60
+
+# --- The rest of the settings are correct and can be left as is ---
 
 enable_summary: true
 summary:

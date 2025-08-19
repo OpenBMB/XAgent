@@ -63,24 +63,25 @@ services:
       xagent-redis:
         condition: service_healthy
 
+  # --- ADD THIS NEW, IMPROVED BLOCK ---
   xagent-mysql:
-    image: mysql
-    command:
-      - --default-authentication-plugin=caching_sha2_password
-      - --character-set-server=utf8mb4
-      - --collation-server=utf8mb4_unicode_ci
+    image: mysql/mysql-server:latest
+    container_name: xagent-mysql
+    platform: linux/amd64
     environment:
       MYSQL_ROOT_PASSWORD: xagent
+      MYSQL_DATABASE: xagent
+      MYSQL_ROOT_HOST: '%'
     ports:
       - "3306:3306"
     volumes:
       - ./XAgentServer/database/sql:/docker-entrypoint-initdb.d
     healthcheck:
-      # test: [ "CMD", "mysqladmin","ping", "-h", "localhost" ]
-      test: ["CMD-SHELL", "mysql -h localhost -u root -pxagent -e 'SELECT 1'"]
-      #interval: 10s
-      timeout: 20s
-      retries: 20
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost", "-u", "root", "-pxagent"]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+
 
   xagent-redis:
     image: redis

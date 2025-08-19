@@ -164,14 +164,17 @@ class FunctionHandler():
                 'parse_web_text', webpage=result[:8096], prompt=command['arguments']['goals_to_browse'])
             result['useful_hyperlinks'] = result['useful_hyperlinks'][:3]
         if command['name'] == 'WebEnv_search_and_browse':
-            with ThreadPoolExecutor(max_workers=len(result)) as pool:
-                f = []
-                for ret in result:
-                    f.append(pool.submit(function_manager, 'parse_web_text',
-                             webpage=ret['page'][:8096], prompt=command['arguments']['goals_to_browse']))
-                for ret, thd in zip(result, f):
-                    ret['page'] = thd.result()
-                    ret['page']['useful_hyperlinks'] = ret['page']['useful_hyperlinks'][:3]
+            # --- START MODIFICATION ---
+            # Add a check to handle cases where the search returns no results.
+            if len(result) > 0:
+                with ThreadPoolExecutor(max_workers=len(result)) as pool:
+                    f = []
+                    for ret in result:
+                        f.append(pool.submit(function_manager, 'parse_web_text',
+                                webpage=ret['page'][:8096], prompt=command['arguments']['goals_to_browse']))
+                    for ret, thd in zip(result, f):
+                        ret['page'] = thd.result()
+                        ret['page']['useful_hyperlinks'] = ret['page']['useful_hyperlinks'][:3]
 
         if isinstance(result, str) and len(result) > 2000:
             # need to summarize

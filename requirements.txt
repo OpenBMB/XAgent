@@ -15,7 +15,6 @@ tiktoken
 tqdm
 uvicorn
 json5
-openai
 python-dotenv
 sqlalchemy
 tenacity
@@ -29,3 +28,6 @@ websockets
 cryptography
 inputimeout
 pytest
+pinecone
+openai
+httpx

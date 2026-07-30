@@ -16,6 +16,7 @@ from core.exceptions import ToolNotFound,OutputNotReady
 
 from utils.retriever import ada_retriever,build_tool_embeddings
 from utils.response import wrap_tool_response
+from utils.path_security import safe_upload_path, safe_workspace_path
 
 app = FastAPI()
 
@@ -54,10 +55,14 @@ async def upload_file(file:UploadFile):
     Returns:
         dict: A message denoting successful upload of the file.
     """
-    upload_file =  file.file.read()
-    file_name = file.filename
     work_directory = CONFIG['filesystem']['work_directory']
-    with open(os.path.join(work_directory,file_name),'wb') as f:
+    try:
+        destination = safe_upload_path(work_directory, file.filename)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
+
+    upload_file = file.file.read()
+    with open(destination, 'wb') as f:
         f.write(upload_file)
     return {"message": "Upload Success!"}
 
@@ -76,8 +81,14 @@ async def download_file(file_path:str=Body(...),file_type:str=Body(default='text
     work_directory = CONFIG['filesystem']['work_directory']
     if file_path.startswith(os.path.basename(work_directory)):
         file_path = file_path[len(os.path.basename(work_directory))+1:]
+    try:
+        download_path = safe_workspace_path(work_directory, file_path)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
+    if not os.path.isfile(download_path):
+        raise HTTPException(status_code=404, detail="File not found.")
     response = FileResponse(
-        path=os.path.join(work_directory,file_path),
+        path=download_path,
         filename=os.path.basename(file_path),
         )
     return response
@@ -223,31 +234,6 @@ async def get_json_schema_for_env(env_names:List[str]=Body(...)):
         "missing_envs": error_names,
     }
     
-@app.post('/register_new_tool')
-async def register_new_tool(tool_name:str=Body(...), code:str=Body(...)):
-    """
-    This function allows the user to register a new tool by providing the tool name and code.
-
-    Args:
-        tool_name (str): The name of the new tool.
-        code (str): The code for the new tool.
-
-    Returns:
-        dict: A dictionary representing the registered tool.
-
-    Raises:
-        HTTPException: If an error occurs during registering the new tool.
-    """
-    tool_register:ToolRegister = app.tool_register
-    try:
-        tool_dict = tool_register.register_tool(tool_name,code)
-    except Exception as e:
-        error_report =  traceback.format_exc()
-        logger.error(error_report)
-        raise HTTPException(status_code=406, detail=f"Error happens when registering new tool:\n{e}\n\n" + error_report)
-    
-    return tool_dict
-
 @app.post('/execute_tool')
 async def execute_tool(tool_name:str=Body(...), arguments:dict=Body(...), env_name:str=Body(default=None)):
     """

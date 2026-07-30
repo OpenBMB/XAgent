@@ -17,6 +17,10 @@ from XAgentServer.application.cruds.interaction import InteractionCRUD
 from XAgentServer.application.cruds.user import UserCRUD
 from XAgentServer.application.dependence import get_db
 from XAgentServer.application.schemas.response_body import ResponseBody
+from XAgentServer.application.utils.path_security import (
+    safe_child_path,
+    validate_plain_filename,
+)
 from XAgentServer.enums.status import StatusEnum
 from XAgentServer.exts.exception_ext import XAgentAuthError, XAgentWebError
 from XAgentServer.models.interaction import InteractionBase
@@ -181,6 +185,10 @@ def community(user_id: str = Depends(user_is_available),
     interaction = json.loads(interaction)
     raws = json.loads(raws)
     interaction_id = interaction["interaction_id"]
+    try:
+        validate_plain_filename(interaction_id)
+    except ValueError as exc:
+        raise XAgentWebError(str(exc))
     old_share = InteractionCRUD.get_shared_interaction(
         db=db, interaction_id=interaction_id)
 
@@ -197,12 +205,18 @@ def community(user_id: str = Depends(user_is_available),
     if not contain_finish:
         raise XAgentWebError("interaction is not finish!")
 
-    interaction_dir = os.path.join(XAgentServerEnv.base_dir,
-                                   "localstorage",
-                                   "interact_records",
-                                   interaction["create_time"][:10],
-                                   interaction_id,
-                                   "workspace")
+    records_dir = os.path.join(
+        XAgentServerEnv.base_dir, "localstorage", "interact_records"
+    )
+    try:
+        interaction_dir = safe_child_path(
+            records_dir,
+            os.path.join(
+                interaction["create_time"][:10], interaction_id, "workspace"
+            ),
+        )
+    except ValueError as exc:
+        raise XAgentWebError(str(exc))
 
     if not os.path.exists(interaction_dir):
         os.makedirs(interaction_dir)
@@ -213,9 +227,12 @@ def community(user_id: str = Depends(user_is_available),
 
     # 解压文件
     with zipfile.ZipFile(file=os.path.join(interaction_dir, "workspace.zip"), mode="r") as zip_file:
-        zip_list = zip_file.namelist()  # 得到压缩包里所有文件
-        for f in zip_list:
-            zip_file.extract(f, interaction_dir)  # 循环解压文件到指定目录
+        for member in zip_file.infolist():
+            try:
+                safe_child_path(interaction_dir, member.filename)
+            except ValueError as exc:
+                raise XAgentWebError(f"Invalid workspace archive: {exc}")
+        zip_file.extractall(interaction_dir)
 
     # 删除压缩包
     os.remove(os.path.join(interaction_dir, "workspace.zip"))

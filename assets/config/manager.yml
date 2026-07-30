@@ -39,7 +39,6 @@ redirect_to_node_path:
     - /get_json_schema_for_tools
     - /get_json_schema_for_envs
     - /retrieving_tools
-    - /register_new_tool
     - /upload_file
     - /download_file
     - /download_workspace

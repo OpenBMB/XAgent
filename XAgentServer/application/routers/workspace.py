@@ -15,6 +15,10 @@ from XAgentServer.application.cruds.interaction import InteractionCRUD
 from XAgentServer.application.cruds.user import UserCRUD
 from XAgentServer.application.dependence import get_db
 from XAgentServer.application.schemas.response_body import ResponseBody
+from XAgentServer.application.utils.path_security import (
+    safe_child_path,
+    validate_plain_filename,
+)
 
 router = APIRouter(prefix="/workspace",
                    tags=["workspace"],
@@ -58,10 +62,14 @@ async def create_upload_files(files: List[UploadFile] = File(...),
 
     file_list = []
     for file in files:
+        try:
+            original_name = validate_plain_filename(file.filename)
+        except ValueError as exc:
+            raise HTTPException(status_code=400, detail=str(exc))
         file_name = uuid.uuid4().hex + os.path.splitext(file.filename)[-1]
         with open(os.path.join(XAgentServerEnv.Upload.upload_dir, user_id, file_name), "wb") as f:
             f.write(await file.read())
-            file_list.append({"uuid": file_name, "name": file.filename})
+            file_list.append({"uuid": file_name, "name": original_name})
     return ResponseBody(data={"user_id": user_id,
                               "file_list": file_list},
                         success=True, message="upload success")
@@ -77,7 +85,7 @@ async def file(user_id: str = Depends(user_is_available),
     """
     interaction = InteractionCRUD.get_interaction(db=db, interaction_id=interaction_id)
 
-    if interaction is None:
+    if interaction is None or interaction.user_id != user_id:
         return ResponseBody(success=False, message="interaction is not exist!")
 
     time_str = interaction.create_time[:10]
@@ -92,10 +100,17 @@ async def file(user_id: str = Depends(user_is_available),
         return ResponseBody(success=False,
                             message="file is not exist!")
 
+    try:
+        requested_file = safe_child_path(file_path, file_name)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
+    if not os.path.isfile(requested_file):
+        return ResponseBody(success=False, message="file is not exist!")
+
     file_suffix = file_name.split(".")[-1]
     if file_suffix in ["jpg", "png",
                        "jpeg", "gif", "bmp"]:
-        with open(os.path.join(file_path, file_name), "rb") as f:
+        with open(requested_file, "rb") as f:
             data = base64.b64encode(f.read()).decode("utf-8")
         return ResponseBody(
             data=f"data:image/{file_suffix};base64,{data}",
@@ -105,21 +120,21 @@ async def file(user_id: str = Depends(user_is_available),
 
     if file_suffix in ["mp4", "avi", "mkv",
                        "rmvb", "rm", "flv", "3gp", "wmv"]:
-        return FileResponse(os.path.join(file_path, file_name),
+        return FileResponse(requested_file,
                             media_type="video/" + file_suffix)
 
     if file_suffix in ["mp3", "wav", "wma",
                        "ogg", "aac", "flac", "ape"]:
-        return FileResponse(os.path.join(file_path, file_name),
+        return FileResponse(requested_file,
                             media_type="audio/" + file_suffix)
 
     if file_suffix in ["pdf", "doc", "docx",
                        "xls", "xlsx", "ppt", "pptx"]:
-        return FileResponse(os.path.join(file_path, file_name),
+        return FileResponse(requested_file,
                             media_type="application/" + file_suffix)
 
     if file_suffix in ["json"]:
-        with open(os.path.join(file_path, file_name), 'r', encoding="utf-8") as f:
+        with open(requested_file, 'r', encoding="utf-8") as f:
             data = json.load(f)
 
         return ResponseBody(data=json.dumps(data,
@@ -129,11 +144,11 @@ async def file(user_id: str = Depends(user_is_available),
                             message="get file success!")
 
     if file_suffix in ["ipynb"]:
-        return FileResponse(os.path.join(file_path, file_name),
+        return FileResponse(requested_file,
                             media_type="application/" + file_suffix)
     
     
-    with open(os.path.join(file_path, file_name), 'r', encoding="utf-8") as f:
+    with open(requested_file, 'r', encoding="utf-8") as f:
         data = f.read()
 
     return ResponseBody(data=data, success=True, message="get file success!")

@@ -10,6 +10,10 @@ from colorama import Fore
 from XAgent.workflow.task_handler import TaskHandler
 from XAgentServer.interaction import XAgentInteraction
 from XAgentServer.application.core.envs import XAgentServerEnv
+from XAgentServer.application.utils.path_security import (
+    safe_child_path,
+    validate_plain_filename,
+)
 from XAgentServer.loggers.logs import Logger
 from XAgentServer.exts.exception_ext import (
     XAgentRunningError,
@@ -75,19 +79,27 @@ class XAgentServer:
                     xagent_core.base_dir, "upload")
                 if not os.path.exists(upload_dir):
                     os.makedirs(upload_dir)
+                try:
+                    validate_plain_filename(file_name)
+                    upload_destination = safe_child_path(upload_dir, file_name)
+                except ValueError as exc:
+                    raise XAgentUploadFileError(str(exc)) from exc
                 # 拷贝到workspace
                 if interaction.call_method == "web":
-                    shutil.copy(file_path, os.path.join(upload_dir, file_name))
+                    shutil.copy(file_path, upload_destination)
                 else:
                     if os.path.exists(file_path):
-                        if os.path.samefile(file_path, os.path.join(upload_dir, file_name)):
+                        if (
+                            os.path.exists(upload_destination)
+                            and os.path.samefile(file_path, upload_destination)
+                        ):
                             # 文件路径相同,跳过复制
                             pass
                         else:
-                            shutil.copy(file_path, os.path.join(upload_dir, file_name))
+                            shutil.copy(file_path, upload_destination)
                         # shutil.copy(file_path, os.path.join(upload_dir, file_name))
 
-                new_file = os.path.join(upload_dir, file_name)
+                new_file = upload_destination
                 try:
                     xagent_core.toolserver_interface.upload_file(new_file)
                 except Exception as e:

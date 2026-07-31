@@ -189,8 +189,14 @@ class OBJGenerator:
         
         message = response['choices'][0]['message']
         if 'function_call' not in message:
-            logger.typewriter_log("FunctionCallSchemaError: No function call found in the response", Fore.RED)
-            raise FunctionCallSchemaError(f"No function call found in the response: {message} ")
+            message['function_call'] = recover_function_call_from_content(
+                message.get('content', ''), req_kwargs['functions']
+            )
+            if message['function_call'] is None:
+                logger.typewriter_log("FunctionCallSchemaError: No function call found in the response", Fore.RED)
+                raise FunctionCallSchemaError(
+                    f"No function call found in the response: {message} "
+                )
         if message['function_call'] is None:
             message['function_call'] = recover_function_call_from_content(
                 message.get('content', ''), req_kwargs['functions']

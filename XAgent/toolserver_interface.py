@@ -8,6 +8,7 @@ import requests
 from colorama import Fore
 from XAgent.utils import ToolCallStatusCode
 from XAgent.ai_functions import function_manager
+from XAgent.file_utils import write_binary_file
 from XAgent.recorder import RunningRecoder
 
 
@@ -46,8 +47,9 @@ def unwrap_tool_response(obj, logger=None):
                     name = obj.get('name', uuid.uuid4().hex)
                     if obj['media_type'] == 'image/png' and not str(name).endswith('.png'):
                         name += '.png'
-                    with open(os.path.join('local_workspace', name), 'wb') as f:
-                        f.write(base64.b64decode(obj['data']))
+                    write_binary_file(
+                        'local_workspace', name, base64.b64decode(obj['data'])
+                    )
                     return {
                         'media_type': obj['media_type'],
                         'file_name': name

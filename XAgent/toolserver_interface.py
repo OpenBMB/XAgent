@@ -9,6 +9,7 @@ from colorama import Fore
 from XAgent.utils import ToolCallStatusCode
 from XAgent.ai_functions import function_manager
 from XAgent.file_utils import write_binary_file
+from XAgent.http_utils import toolserver_request_timeout
 from XAgent.recorder import RunningRecoder
 
 
@@ -88,6 +89,7 @@ class ToolServerInterface():
             NotImplementedError: If trying to use a non-selfhost ToolServer.
         """
         self.config = config
+        self.request_timeout = toolserver_request_timeout(config)
         if config.use_selfhost_toolserver:
             self.url = config.selfhost_toolserver_url
         else:
@@ -192,7 +194,11 @@ class ToolServerInterface():
                 status_code = cache_output["response_status_code"]
             else:
                 response = requests.post(
-                    url, json=payload, timeout=10, cookies=self.cookies)
+                    url,
+                    json=payload,
+                    timeout=self.request_timeout,
+                    cookies=self.cookies,
+                )
                 status_code = response.status_code
                 response.raise_for_status()
                 response = response.json()

@@ -38,6 +38,7 @@ summary:
 
 use_selfhost_toolserver: true
 selfhost_toolserver_url: http://localhost:8080
+toolserver_request_timeout: 600
 
 max_retry_times: 5
 max_subtask_chain_length: 15

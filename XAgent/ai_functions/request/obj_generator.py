@@ -11,6 +11,7 @@ from colorama import Fore
 from tenacity import retry, stop_after_attempt, retry_if_exception_type
 
 from .error import FunctionCallSchemaError
+from .function_call_utils import recover_function_call_from_content
 
 from XAgent.logs import logger
 from XAgent.config import CONFIG
@@ -186,9 +187,18 @@ class OBJGenerator:
             FunctionCallSchemaError: Error occurred during the schema validation of the function call.
         """
         
-        if 'function_call' not in response['choices'][0]['message']:
+        message = response['choices'][0]['message']
+        if 'function_call' not in message:
             logger.typewriter_log("FunctionCallSchemaError: No function call found in the response", Fore.RED)
-            raise FunctionCallSchemaError(f"No function call found in the response: {response['choices'][0]['message']} ")
+            raise FunctionCallSchemaError(f"No function call found in the response: {message} ")
+        if message['function_call'] is None:
+            message['function_call'] = recover_function_call_from_content(
+                message.get('content', ''), req_kwargs['functions']
+            )
+            if message['function_call'] is None:
+                raise FunctionCallSchemaError(
+                    f"No function call found in the response: {message}"
+                )
 
         # verify the schema of the function call if exists
         function_schema = list(filter(lambda x: x['name'] == response['choices'][0]['message']['function_call']['name'],req_kwargs['functions']))

@@ -1,6 +1,8 @@
 from datetime import date, datetime
 
-from XAgent.serialization import to_json_compatible
+import json
+
+from XAgent.serialization import parse_serialized_value, to_json_compatible
 
 
 def test_to_json_compatible_serializes_dates_recursively():
@@ -14,4 +16,16 @@ def test_to_json_compatible_serializes_dates_recursively():
         "api_version": "2023-07-01",
         "created_at": "2023-07-01T12:30:00",
         "nested": ["2024-01-02"],
+    }
+
+
+def test_parse_serialized_value_preserves_predecoded_object():
+    value = {"subtasks": [{"name": "first"}]}
+
+    assert parse_serialized_value(value, json.loads) is value
+
+
+def test_parse_serialized_value_decodes_text():
+    assert parse_serialized_value('{"subtasks": []}', json.loads) == {
+        "subtasks": []
     }

@@ -14,6 +14,7 @@ from XAgent.ai_functions import  function_manager
 from XAgent.core import XAgentCoreComponents
 from XAgent.agent.summarize import summarize_plan,clip_text
 from XAgent.config import CONFIG
+from XAgent.serialization import parse_serialized_value
 
 def plan_function_output_parser(function_output_item: dict) -> Plan:
     """Parses the function output item into a Plan object.
@@ -175,7 +176,9 @@ class PlanAgent():
             functions=[split_functions], 
         )
         
-        subtasks = json5.loads(new_message["function_call"]["arguments"])
+        subtasks = parse_serialized_value(
+            new_message["function_call"]["arguments"], json5.loads
+        )
 
         for subtask_item in subtasks["subtasks"]:
             subplan = plan_function_output_parser(subtask_item)

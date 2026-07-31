@@ -19,3 +19,10 @@ def to_json_compatible(value):
     if callable(method):
         return to_json_compatible(method())
     return str(value)
+
+
+def parse_serialized_value(value, loads):
+    """Deserialize text while preserving values already decoded by a client."""
+    if isinstance(value, (str, bytes, bytearray)):
+        return loads(value)
+    return value

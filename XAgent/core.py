@@ -220,8 +220,9 @@ class XAgentCoreComponents(metaclass=abc.ABCMeta):
         """
         close all components
         """
-        self.toolserver_interface.download_all_files()
-        self.toolserver_interface.close()
+        if self.toolserver_interface is not None:
+            self.toolserver_interface.download_all_files()
+            self.toolserver_interface.close()
 
     def print_task_save_items(self,
                               item: TaskSaveItem,

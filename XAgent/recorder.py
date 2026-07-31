@@ -8,6 +8,7 @@ import re
 from colorama import Fore
 from XAgent.workflow.base_query import AutoGPTQuery
 from XAgent.config import XAgentConfig
+from XAgent.serialization import to_json_compatible
 from XAgentServer.database.connect import SessionLocal
 from XAgentServer.loggers.logs import Logger
 from XAgentServer.models.recorder import XAgentRunningRecord
@@ -81,6 +82,7 @@ class RunningRecoder():
 
     def generate_record(self, current, node_id, node_type, data):
         """generate a recorder"""
+        data = to_json_compatible(data)
         self.logger.typewriter_log(title="-=-=-=-=-=-=-=Recorder Start-=-=-=-=-=-=-=\n",
                                    title_color=Fore.GREEN,
                                    content=f"Current: {current} Node: {node_type} {node_id}")

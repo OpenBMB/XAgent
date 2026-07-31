@@ -5,6 +5,7 @@ from colorama import Fore
 from copy import deepcopy
 
 from XAgent.config import CONFIG
+from XAgent.serialization import parse_serialized_value
 from XAgent.utils import LLMStatusCode, RequiredAbilities
 from XAgent.message_history import Message
 from XAgent.logs import logger
@@ -126,7 +127,12 @@ class BaseAgent(metaclass=abc.ABCMeta):
                     *args,**kwargs)
                 
                 message = {}
-                function_call_args:dict = json5.loads(response["choices"][0]["message"]["function_call"]['arguments'])
+                function_call_args: dict = parse_serialized_value(
+                    response["choices"][0]["message"]["function_call"][
+                        "arguments"
+                    ],
+                    json5.loads,
+                )
                 
                 if arguments is not None:
                     message['arguments'] = {
@@ -147,7 +153,9 @@ class BaseAgent(metaclass=abc.ABCMeta):
                     function_call=function_call,
                     stop=stop,
                     *args,**kwargs)
-                message = json5.loads(response["choices"][0]["message"]['content'])
+                message = parse_serialized_value(
+                    response["choices"][0]["message"]["content"], json5.loads
+                )
             case _:
                 raise NotImplementedError(f"Request type {CONFIG.default_request_type} not implemented")
             

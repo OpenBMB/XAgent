@@ -36,7 +36,7 @@ docker compose up
 请注意，你需要提前安装`docker`和`docker-compose`。
 
 ## 🧩 API说明
-### /get_cookies
+### /get_cookie
 该路径将返回一个cookie，其中包含ToolServerNode实例的node_id。
 所有后续的请求都需要使用该cookie来识别ToolServerNode实例。
 

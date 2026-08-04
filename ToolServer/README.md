@@ -36,7 +36,7 @@ docker compose up
 Note that you should install `docker` and `docker-compose` first.
 
 ## 🧩 API Documentation
-### /get_cookies
+### /get_cookie
 This path will return a cookie that contains the node_id of the ToolServerNode instance.
 All the following requests should use this cookie to identify the ToolServerNode instance.
 

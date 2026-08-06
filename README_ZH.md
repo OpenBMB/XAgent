@@ -25,7 +25,7 @@
 
 ## 📖 介绍
 
-XAgent是一个开源的基于大型语言模型（LLM）的自主智能体，可以自动解决各种任务。
+XAgent是一个开源的基于大语言模型（LLM）的自主智能体，可以自动解决各种任务。
 它被设计为一个通用的智能体，可以应用于各种任务。目前，XAgent仍处于早期阶段，我们正在努力改进它。
 
 🏆 我们的目标是创建一个可以解决任何给定任务的超级智能智能体！
@@ -55,7 +55,7 @@ XAgent由三部分组成：
 <div align="center">
     <img src="assets/readme/workflow.png" alt="XAgent的工作流程" width="700"/>
     <br/>
-    <figcaption>XAgent的工作流程图。</figcaption>
+    <figcaption>XAgent的工作流程图</figcaption>
 </div>
 
 ### 🧰 工具服务器

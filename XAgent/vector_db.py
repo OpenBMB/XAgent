@@ -57,7 +57,7 @@ class VectorDBInterface():
         and store the total vector count in the vector_count attribute.
 
         Raises:
-        Exception: An error occured accessing the database.
+        Exception: An error occurred accessing the database.
 
         """
         
@@ -110,7 +110,7 @@ class VectorDBInterface():
         sentence (str): The sentence to be deleted.
 
         Raises:
-        Exception: An error occured deleting the sentence.
+        Exception: An error occurred deleting the sentence.
 
         """
         
@@ -130,7 +130,7 @@ class VectorDBInterface():
         namespace (str, optional): The namespace of the vector. Defaults to "".
 
         Raises:
-        Exception: An error occured inserting the sentence.
+        Exception: An error occurred inserting the sentence.
 
         """
         
@@ -163,7 +163,7 @@ class VectorDBInterface():
         object: The most similar sentences.
 
         Raises:
-        Exception: An error occured searching the database.
+        Exception: An error occurred searching the database.
 
         """
         

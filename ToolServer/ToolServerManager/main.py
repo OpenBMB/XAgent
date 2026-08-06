@@ -81,7 +81,7 @@ async def wait_for_node_startup(node_id:str):
         node_id (str): The unique identifier of the node whose startup is to be waited for.
 
     Returns:
-        bool: True if node has started successfully, False if time out occured before node startup.
+        bool: True if node has started successfully, False if time out occurred before node startup.
     
     Raises:
         HTTPException: If node is not found in the databse.

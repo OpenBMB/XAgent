@@ -35,7 +35,7 @@ We welcome diverse forms of collaborations, including full-time and part-time ro
 <div align="center">
     <img src="assets/readme/overview.png" alt="Overview of Xagent" width="700"/>
     <br/>
-    <figcaption>Overview of XAgent.</figcaption>
+    <figcaption>Overview of XAgent</figcaption>
 </div>
 
 ### <img src="assets/readme/xagent_logo.png" height=30 align="texttop"> XAgent
@@ -55,7 +55,7 @@ XAgent is composed of three parts:
 <div align="center">
     <img src="assets/readme/workflow.png" alt="Workflow of Xagent" width="700"/>
     <br/>
-    <figcaption>Workflow of XAgent.</figcaption>
+    <figcaption>Workflow of XAgent</figcaption>
 </div>
 
 ### 🧰 ToolServer

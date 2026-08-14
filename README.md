@@ -205,7 +205,7 @@ A heartfelt thank you to all our contributors. Your efforts make this project gr
 
 ## 🌟 Star History
 
-[![Star History Chart](https://api.star-history.com/svg?repos=openbmb/xagent&type=Date)](https://star-history.com/##openbmb/xagent&Date)
+[![Star History Chart](https://star-history.dera.page/svg?repos=openbmb/xagent&type=Date)](https://star-history.dera.page/##openbmb/xagent&Date)
 
 ## Citation
 

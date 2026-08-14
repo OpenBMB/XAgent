@@ -194,7 +194,7 @@ XAgent 不仅能处理琐碎任务，还可以在复杂任务中提供宝贵的�
 
 ## 🌟 星标历史
 
-[![Star History Chart](https://api.star-history.com/svg?repos=openbmb/xagent&type=Date)](https://star-history.com/##openbmb/xagent&Date)
+[![Star History Chart](https://star-history.dera.page/svg?repos=openbmb/xagent&type=Date)](https://star-history.dera.page/##openbmb/xagent&Date)
 
 ## 引用
 

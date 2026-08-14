@@ -202,7 +202,7 @@ XAgent と [AutoGPT](https://github.com/Significant-Gravitas/AutoGPT) の結果�
 
 ## 🌟 Star History
 
-[![Star History Chart](https://api.star-history.com/svg?repos=openbmb/xagent&type=Date)](https://star-history.com/##openbmb/xagent&Date)
+[![Star History Chart](https://star-history.dera.page/svg?repos=openbmb/xagent&type=Date)](https://star-history.dera.page/##openbmb/xagent&Date)
 
 ## 引用
 

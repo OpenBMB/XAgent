@@ -125,21 +125,42 @@ CONFIG = XAgentConfig.get_default_config()
 ARGS = {}
 
 
-def get_model_name(model_name: str = None):
+# Model-name prefixes used when the user wants to talk to a local Ollama
+# server. ``ollama:<tag>`` is forwarded as ``<tag>`` so a user can write
+# ``ollama:llama3.1`` either in code or in a config file.
+_OLLAMA_PREFIX = 'ollama:'
+
+
+def get_model_name(model_name: str = None, request_type: str = None):
     """
     Get the normalized model name for a given input model name.
 
     Args:
         model_name (str, optional): Input model name. Default is None.
+        request_type (str, optional): The current
+            ``CONFIG.default_request_type``. When ``"ollama"``, arbitrary
+            local model tags (e.g. ``llama3.1``, ``mistral:7b-instruct``,
+            ``qwen2:7b``) are accepted and returned unchanged so a freshly
+            pulled local model does not require a code change.
 
     Returns:
         str: Normalized model name.
 
     Raises:
-        Exception: If the model name is not recognized.
+        Exception: If the model name is not recognized for any configured
+            request type other than ``"ollama"``.
     """
     if model_name is None:
         model_name = CONFIG.default_completion_kwargs['model']
+
+    raw_model_name = model_name
+    # Strip the ``ollama:`` namespace prefix so users can prefix any model
+    # name with ``ollama:`` regardless of request_type and still hit the
+    # local server.
+    if isinstance(model_name, str) and model_name.lower().startswith(
+        _OLLAMA_PREFIX
+    ):
+        model_name = model_name[len(_OLLAMA_PREFIX):]
 
     normalized_model_name = ''
     match model_name.lower():
@@ -164,8 +185,35 @@ def get_model_name(model_name: str = None):
             normalized_model_name = 'gpt-3.5-turbo-16k'
         case 'xagentllm':
             normalized_model_name = 'xagentllm'
+
+        # Common local model families the user might ``ollama pull`` first.
+        # We accept these even when the active request type is not Ollama so
+        # pointing the ``openai`` request type at an Ollama /v1 endpoint
+        # works out of the box.
+        case (
+            'llama3' | 'llama3.1' | 'llama3.2' | 'llama2' | 'codellama'
+            | 'mistral' | 'mixtral' | 'qwen' | 'qwen2' | 'qwen2.5'
+            | 'phi' | 'phi3' | 'gemma' | 'gemma2' | 'gemma3'
+            | 'deepseek-coder' | 'deepseek-r1' | 'command-r' | 'command-r-plus'
+        ):
+            normalized_model_name = raw_model_name
+
         case _:
-            raise Exception(f"Unknown model name {model_name}")
+            # Local deployments (Ollama plus any OpenAI-compatible server
+            # pointed at a local model tag, e.g. ``vllm serve meta-llama/
+            # Llama-3-8B-Instruct``) pass through unchanged. We only relax
+            # the whitelist for the Ollama request type so we never
+            # accidentally accept an OpenAI typo.
+            if request_type == 'ollama':
+                normalized_model_name = raw_model_name
+            else:
+                raise Exception(
+                    f"Unknown model name {model_name}. If this is a "
+                    "locally-served model, set "
+                    "`default_request_type: ollama` in your config and "
+                    "either drop the `ollama:` prefix or set "
+                    "`api_base` to your local server URL."
+                )
 
     return normalized_model_name
 

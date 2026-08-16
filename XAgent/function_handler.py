@@ -95,6 +95,17 @@ class FunctionHandler():
                     "properties"]["tool_name"]["enum"] = function_name_list
             case 'xagent':
                 pass
+            case 'ollama':
+                # The native Ollama /api/chat endpoint does not accept
+                # schema tool/function calls. We still install the
+                # subtask_handle schema so downstream code paths that
+                # introspect ``subtask_handle_function`` do not crash;
+                # actual tool dispatch is not driven by the LLM in this
+                # mode.
+                self.subtask_handle_function = function_manager.get_function_schema(
+                    'subtask_handle')
+                self.subtask_handle_function["parameters"]["properties"]["tool_call"][
+                    "properties"]["tool_name"]["enum"] = function_name_list
             case _:
                 raise NotImplementedError(
                     f"Request type {self.config.default_request_type} not implemented")

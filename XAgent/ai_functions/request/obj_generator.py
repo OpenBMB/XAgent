@@ -69,9 +69,15 @@ class OBJGenerator:
         if schema_validation:
             # refine the response
             match request_type:
-                case 'openai':                
+                case 'openai':
                     response = self.function_call_refine(kwargs,response)
                 case 'xagent':
+                    pass
+                case 'ollama':
+                    # Ollama's native /api/chat is plain text (no schema'd
+                    # tool/function calls). Schema validation is a no-op
+                    # here; downstream agents should rely on tool calling
+                    # via the OpenAI-compatible /v1 endpoint instead.
                     pass
                 case _:
                     raise NotImplementedError(f"Request type {request_type} not implemented")

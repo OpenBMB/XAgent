@@ -108,7 +108,7 @@ class FunctionManager:
         messages = [{'role':'user','content':function_prompt}]
         
         match CONFIG.default_request_type:
-            case 'openai':                
+            case 'openai':
                 response = objgenerator.chatcompletion(
                     messages=messages,
                     functions=[function_cfg['function']],
@@ -124,6 +124,28 @@ class FunctionManager:
                     **completions_kwargs
                 )
                 returns = json5.loads(response['choices'][0]['message']['content'])['arguments']
+            case 'ollama':
+                # Ollama native /api/chat returns plain text; we ask the
+                # local model to emit JSON matching the function schema
+                # (set ``format: json`` in config) and pull ``arguments``
+                # from ``response['choices'][0]['message']['content']``.
+                response = objgenerator.chatcompletion(
+                    messages=messages,
+                    json_mode=True,
+                    **completions_kwargs
+                )
+                content = response['choices'][0]['message']['content']
+                try:
+                    returns = json5.loads(content)
+                except Exception:
+                    # Last-ditch salvage: try to extract the first JSON
+                    # object embedded in the model output.
+                    returns = json5.loads(
+                        content[content.find('{'):content.rfind('}') + 1]
+                    )
+                # ``arguments`` may be at the top level or nested -- normalise.
+                if isinstance(returns, dict) and 'arguments' in returns:
+                    returns = returns['arguments']        
         
         if return_generation_usage:
             return returns, response['usage']

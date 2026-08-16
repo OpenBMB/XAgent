@@ -8,36 +8,92 @@ from typing import List, Dict
 import tiktoken
 from XAgent.config import CONFIG
 
-if CONFIG.default_completion_kwargs['model'] == "xagentllm":
-    encoding = tiktoken.encoding_for_model("gpt-4") # TODO: this is not good
-else:
-    encoding = tiktoken.encoding_for_model(CONFIG.default_completion_kwargs['model'])
+_DEFAULT_ENCODING_NAME = "cl100k_base"
+
+
+def _resolve_encoding(model_name: str):
+    """Return a tiktoken encoding for ``model_name`` with a safe fallback.
+
+    ``tiktoken.encoding_for_model`` raises ``KeyError`` for models it does
+    not know -- which is the case for every locally-served model such as
+    Ollama's ``llama3.1`` or ``qwen2``. Callers in XAgent import this
+    ``encoding`` symbol at module-import time, so a hard failure halts the
+    whole process. We fall back to ``cl100k_base`` (the GPT-4 encoding),
+    matching what ``ai_functions/request/ollama.py`` uses for accounting.
+    """
+    if not model_name:
+        try:
+            return tiktoken.get_encoding(_DEFAULT_ENCODING_NAME)
+        except Exception:
+            return None
+    if model_name == "xagentllm":
+        # xagentllm does not speak OpenAI tokenization either.
+        try:
+            return tiktoken.encoding_for_model("gpt-4")
+        except KeyError:
+            try:
+                return tiktoken.get_encoding(_DEFAULT_ENCODING_NAME)
+            except Exception:
+                return None
+    try:
+        return tiktoken.encoding_for_model(model_name)
+    except KeyError:
+        try:
+            return tiktoken.get_encoding(_DEFAULT_ENCODING_NAME)
+        except Exception:
+            try:
+                return tiktoken.encoding_for_model("gpt-4")
+            except Exception:
+                return None
+
+
+encoding = _resolve_encoding(CONFIG.default_completion_kwargs.get('model'))
+
+
+def _count_tokens_with(text, enc):
+    """Token-count ``text`` safely, returning 0 if no encoding is available."""
+    if enc is None or not text:
+        return 0
+    try:
+        return len(enc.encode(text))
+    except Exception:
+        # Last-ditch character heuristic if encoding somehow fails.
+        return max(0, len(text) // 4)
 
 def get_token_nums(text:str)->int:
     """
     Calculate the number of tokens in the given text.
-    
+
     Args:
         text (str): The text whose tokens need to be counted.
-        
+
     Returns:
         int: The number of tokens in the text.
     """
-    return len(encoding.encode(text))
+    return _count_tokens_with(text, encoding)
 
 def clip_text(text:str,max_tokens:int=None,clip_end=False)->str|int:
     """
     Truncate the given text to the specified number of tokens.
     If the original text and the clipped text are not of the same length, '`wrapped`' is added to the beginning or the end of the clipped text.
-    
+
     Args:
         text (str): The text to be clipped.
         max_tokens (int, optional): Maximum number of tokens. The text will be clipped to contain not more than this number of tokens.
         clip_end (bool, optional): If True, text will be clipped from the end. If False, text will be clipped from the beginning.
-        
+
     Returns:
         str, int: The clipped text, and the total number of tokens in the original text.
     """
+    if encoding is None or max_tokens is None or max_tokens <= 0:
+        # No tokenizer available (tiktoken missing or model unknown);
+        # best-effort character-based clipping so callers don't crash.
+        approximation = max(0, max_tokens or 0)
+        char_limit = max(1, approximation * 4)
+        clipped = text[-char_limit:] if not clip_end else text[:char_limit]
+        if clipped != text:
+            clipped = (clipped + '`wrapped`') if clip_end else ('`wrapped`' + clipped)
+        return clipped, len(text)
     encoded = encoding.encode(text)
     decoded = encoding.decode(encoded[:max_tokens] if clip_end else encoded[-max_tokens:])
     if len(decoded) != len(text):

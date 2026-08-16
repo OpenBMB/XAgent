@@ -156,6 +156,26 @@ class BaseAgent(metaclass=abc.ABCMeta):
                 message = parse_serialized_value(
                     response["choices"][0]["message"]["content"], json5.loads
                 )
+            case 'ollama':
+                # Local Ollama server: same response shape as OpenAI but
+                # plain-text content. Schema-based function calling is not
+                # available through the native /api/chat endpoint, so we
+                # only support plain generation here. Agents that need
+                # tool calls should set ``default_request_type: openai``
+                # and point ``api_base`` at Ollama's
+                # ``/v1/chat/completions``.
+                response = objgenerator.chatcompletion(
+                    messages=messages,
+                    functions=None,
+                    function_call=None,
+                    stop=stop,
+                    *args,**kwargs)
+                content = response["choices"][0]["message"]["content"]
+                # Try to surface structured fields if the local model emits
+                # JSON; fall back to raw text otherwise.
+                message = parse_serialized_value(content, json5.loads) \
+                    if isinstance(content, str) and content.lstrip().startswith('{') \
+                    else {"content": content}
             case _:
                 raise NotImplementedError(f"Request type {CONFIG.default_request_type} not implemented")
             

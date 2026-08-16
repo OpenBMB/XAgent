@@ -1,0 +1,83 @@
+# Sample XAgent configuration for a locally-deployed Ollama server.
+#
+# Quick start:
+#   1. Install Ollama:        https://ollama.com
+#   2. Pull a model:          ollama pull llama3.1:8b
+#   3. Edit this file:        set `model:` to the tag you pulled.
+#   4. Run XAgent with it:    CONFIG_FILE=assets/ollama_config.yml python run.py --task "..."
+#
+# Two ways to talk to Ollama:
+#
+#   A) "ollama" request type (default here)  -> talks to Ollama's NATIVE
+#      /api/chat endpoint. Pros: no SDK dependency on the openai package,
+#      stable contract, works on every model in the Ollama library.
+#      Cons: no schema'd tool/function calling.
+#
+#   B) "openai" request type  -> point `api_base` at Ollama's OpenAI-
+#      compatible /v1/chat/completions (must be Ollama >= 0.1.14). Pros:
+#      OpenAI-style function calling works (when the model supports it).
+#      Cons: token-counts and finish_reason are approximate.
+#
+# Switch request types by changing `default_request_type` below. Both paths
+# accept the same `api_base` and `model` values.
+
+api_keys:
+  # The "api_key" key is unused for local Ollama but the schema in
+  # get_apiconfig_by_model() requires the field; any non-empty string works.
+  llama3.1:
+    - api_key: ollama
+      api_base: http://localhost:11434
+      model: llama3.1
+  mistral:
+    - api_key: ollama
+      api_base: http://localhost:11434
+      model: mistral
+  qwen2:
+    - api_key: ollama
+      api_base: http://localhost:11434
+      model: qwen2
+  # Wildcard entry that lets you pass an arbitrary tag (e.g. "llama3.1:8b-instruct-q5_K_M").
+  # The request module uses the model name exactly as passed when the lookup misses.
+  ollama-local:
+    - api_key: ollama
+      api_base: http://localhost:11434
+      model: ollama-local
+
+default_request_type: ollama   # "ollama" | "openai" | "xagent"
+default_completion_kwargs:
+  # The model tag must be one you previously ran `ollama pull` for.
+  model: llama3.1
+  temperature: 0.2
+  top_p: 0.9
+  # `num_predict` maps to OpenAI's `max_tokens`; the request module
+  # translates automatically when you use the value here.
+  max_tokens: 2048
+  request_timeout: 120
+  # Mirrors Ollama's `num_ctx`. Raise for larger prompts.
+  num_ctx: 4096
+
+enable_summary: true
+summary:
+  single_action_max_length: 4096
+  max_return_length: 8192
+
+use_selfhost_toolserver: true
+selfhost_toolserver_url: http://localhost:8080
+
+max_retry_times: 5
+max_subtask_chain_length: 15
+max_plan_refine_chain_length: 3
+max_plan_tree_depth: 3
+max_plan_tree_width: 5
+max_plan_length: 4096
+
+rapidapi_retrieve_tool_count: 0
+
+enable_ask_human_for_help: False
+tool_blacklist:
+  - FileSystemEnv_print_filesys_struture
+
+record_dir:
+
+experiment:
+  redo_action: false

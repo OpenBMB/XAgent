@@ -43,9 +43,13 @@ def handle_data(row: Raw, root_dir: str):
                         file_name = output['file_name']
                         png_base64 = None
                         if file_name:
-                            file_path = os.path.join(
-                                root_dir, "workspace", file_name)
-                            if os.path.exists(file_path):
+                            # file_name comes from stored raws and is client-influenced:
+                            # resolve it and never read outside the interaction workspace
+                            workspace_dir = os.path.realpath(
+                                os.path.join(root_dir, "workspace"))
+                            file_path = os.path.realpath(
+                                os.path.join(workspace_dir, file_name))
+                            if file_path.startswith(workspace_dir + os.sep) and os.path.isfile(file_path):
                                 try:
                                     with open(file_path, "rb") as f:
                                         png_base64 = base64.b64encode(

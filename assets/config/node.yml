@@ -63,4 +63,5 @@ shell:
   
 enabled_extensions:
   # - extensions.envs.rapidapi
+  # - extensions.envs.parallel  # optional keyless web search and page extraction
 

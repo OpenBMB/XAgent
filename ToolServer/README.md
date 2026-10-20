@@ -23,6 +23,36 @@ Notes:
 - Add your api keys in `node.yml` to enable bing search (or use backup search duckduckgo) and rapid api.
 - Change api timeout for Toolserver in `docker-compose.yml` by altering values after `-t` in `services.ToolServerManager.command` if you encounter timeout error of ToolServer.
 
+### Optional Parallel search and page extraction
+
+Enable [Parallel Search MCP](https://docs.parallel.ai/integrations/mcp/search-mcp)
+to give XAgent web search and Markdown page extraction without a Parallel account
+or API key. Anonymous search uses Fast mode and is intended for light use.
+In `assets/config/node.yml`, add the extension to your existing list:
+
+```yaml
+enabled_extensions:
+  - extensions.envs.parallel
+  # Keep any other extensions you already use here.
+
+parallel:
+  timeout: 30  # optional total timeout in seconds for each MCP call
+```
+
+Rebuild the ToolServerNode image from this checkout and restart ToolServer to
+install the MCP dependency and load the updated configuration. The agent can then
+call `ParallelEnv_search` with `query` and `objective`, and `ParallelEnv_fetch`
+with a result's `url` and an optional `objective` (up to 200 characters). Results
+include source URLs and excerpts or page content. These tools contact
+`https://search.parallel.ai/mcp`; queries and requested URLs are sent to Parallel.
+
+`WebEnv`, its DuckDuckGo fallback and configured Bing credentials keep their
+existing behavior. Leave the extension out to keep it unloaded. Parallel errors,
+including service limits, are reported to the caller without switching providers.
+Each dedicated ToolServerNode research session has its own opaque conversation
+ID, reused across search, fetch and retries; start a new ToolServer session for a
+new research run. Do not share one node between unrelated conversations.
+
 ## 🛠️ Build and Setup ToolServer
 You can pull the docker images from docker hub and start ToolServer automatically with following command:
 ```bash

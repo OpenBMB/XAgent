@@ -9,6 +9,7 @@ func_timeout
 GitPython
 google_api_python_client
 httpx[http2]
+mcp>=1.26,<2
 Markdown
 numpy
 orjson

@@ -48,7 +48,7 @@ class ParallelEnv(BaseEnv):
     async def _request(self, name, arguments):
         async with AsyncClient(
             headers={"User-Agent": USER_AGENT}, timeout=self._timeout,
-            follow_redirects=False, trust_env=False,
+            follow_redirects=False,
         ) as client:
             async with streamable_http_client(MCP_URL, http_client=client) as streams:
                 async with ClientSession(

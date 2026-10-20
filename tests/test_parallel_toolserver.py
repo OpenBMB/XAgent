@@ -64,7 +64,7 @@ class MCPServer:
         self.clients = []
 
         def client(**kwargs):
-            assert kwargs["trust_env"] is False
+            assert kwargs.get("trust_env", True) is True
             assert kwargs["follow_redirects"] is False
             result = httpx.AsyncClient(transport=httpx.MockTransport(self.handle), **kwargs)
             self.clients.append(result)

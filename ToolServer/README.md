@@ -36,7 +36,7 @@ enabled_extensions:
   # Keep any other extensions you already use here.
 
 parallel:
-  timeout: 30  # optional total timeout in seconds for each MCP call
+  timeout: 30  # optional timeout in seconds; transport cleanup may take longer
 ```
 
 Rebuild the ToolServerNode image from this checkout and restart ToolServer to

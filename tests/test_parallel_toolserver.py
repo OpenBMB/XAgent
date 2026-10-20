@@ -40,7 +40,14 @@ def runtime(monkeypatch, tmp_path):
     spec.loader.exec_module(node)
     registries = []
 
-    def register(enabled=True):
+    def register(enabled=True, node_id=None):
+        from extensions.envs import parallel
+
+        # Each real node has a private container filesystem. Reusing node_id
+        # models /reconnect_session restarting that same container.
+        state_dir = tmp_path / (node_id or f"node-{len(registries)}")
+        state_dir.mkdir(exist_ok=True)
+        monkeypatch.setattr(parallel, "SESSION_FILE", state_dir / ".xagent-parallel-session-id")
         cfg["enabled_extensions"] = ["extensions.envs.parallel"] if enabled else []
         registry = ToolRegister()
         registries.append(registry)
@@ -226,6 +233,45 @@ def test_independent_interleaved_runs_and_new_session(runtime, monkeypatch):
     assert by_query["first"] == by_query["first followup"]
     assert by_query["second"] == by_query["second followup"]
     assert len({by_query["first"], by_query["second"], by_query["reset"]}) == 3
+
+
+def test_same_node_restart_preserves_research_id(runtime, monkeypatch):
+    node, register, _ = runtime
+    original = register(node_id="existing-node")
+    server = MCPServer(monkeypatch)
+
+    async def run():
+        await dispatch(node, original, "ParallelEnv_search", {"query": "report", "objective": "Find report"})
+        # /reconnect_session restarts the same container, reconstructing its
+        # registry while preserving the container's private writable layer.
+        restarted = register(node_id="existing-node")
+        other = register(node_id="new-node")
+        await asyncio.gather(
+            dispatch(node, restarted, "ParallelEnv_fetch", {"url": "https://example.org/report"}),
+            dispatch(node, other, "ParallelEnv_search", {"query": "other report", "objective": "Find report"}),
+        )
+        await dispatch(node, restarted, "ParallelEnv_search", {"query": "followup", "objective": "Find updates"})
+
+    asyncio.run(run())
+    first = server.calls[0]["arguments"]["session_id"]
+    for call in server.calls:
+        arguments = call["arguments"]
+        if arguments.get("search_queries") == ["other report"]:
+            assert arguments["session_id"] != first
+        else:
+            assert arguments["session_id"] == first
+
+
+def test_corrupt_persisted_id_is_not_silently_replaced(runtime):
+    _, register, _ = runtime
+    registry = register(node_id="corrupt-node")
+    from extensions.envs import parallel
+
+    parallel.SESSION_FILE.write_text("invalid state")
+    restarted = register(node_id="corrupt-node")
+    assert "ParallelEnv" in registry.envs
+    assert "ParallelEnv" not in restarted.envs
+    assert parallel.SESSION_FILE.read_text() == "invalid state"
 
 
 def test_saved_bing_endpoint_and_region_still_used_when_enabled(runtime):

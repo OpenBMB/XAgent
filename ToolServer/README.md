@@ -50,8 +50,10 @@ include source URLs and excerpts or page content. These tools contact
 existing behavior. Leave the extension out to keep it unloaded. Parallel errors,
 including service limits, are reported to the caller without switching providers.
 Each dedicated ToolServerNode research session has its own opaque conversation
-ID, reused across search, fetch and retries; start a new ToolServer session for a
-new research run. Do not share one node between unrelated conversations.
+ID, reused across search, fetch and retries. The ID is stored privately inside
+the node container so reconnecting or restarting that node keeps the same ID.
+Start a new ToolServer session for a new research run. Do not share one node
+between unrelated conversations.
 
 ## 🛠️ Build and Setup ToolServer
 You can pull the docker images from docker hub and start ToolServer automatically with following command:

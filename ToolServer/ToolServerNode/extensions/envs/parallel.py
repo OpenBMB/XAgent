@@ -2,6 +2,9 @@
 
 import asyncio
 import math
+import os
+from pathlib import Path
+import tempfile
 import uuid
 from urllib.parse import urlsplit
 
@@ -17,6 +20,35 @@ from core.register import toolwrapper
 
 MCP_URL = "https://search.parallel.ai/mcp"
 USER_AGENT = "XAgent/0.2 (+https://github.com/OpenBMB/XAgent)"
+SESSION_FILE = Path(tempfile.gettempdir()) / ".xagent-parallel-session-id"
+
+
+def _conversation_id():
+    """Keep the research ID across restarts of this dedicated node container."""
+    try:
+        return str(uuid.UUID(SESSION_FILE.read_text().strip()))
+    except FileNotFoundError:
+        pass
+
+    # Publish a complete file atomically, including when workers start together.
+    # This file belongs to the container's writable layer, not a shared config
+    # volume or the user's workspace. A new node starts with no session file.
+    with tempfile.NamedTemporaryFile(
+        mode="w", dir=SESSION_FILE.parent, prefix=".xagent-parallel-", delete=False,
+    ) as state:
+        temporary = state.name
+        try:
+            state.write(str(uuid.uuid4()))
+            state.flush()
+            os.fsync(state.fileno())
+            try:
+                os.link(temporary, SESSION_FILE)
+            except FileExistsError:
+                pass
+        finally:
+            os.unlink(temporary)
+    # Invalid existing state is an error; never silently rotate a research ID.
+    return str(uuid.UUID(SESSION_FILE.read_text().strip()))
 
 
 def _error_text(error):
@@ -42,8 +74,8 @@ class ParallelEnv(BaseEnv):
                 or not math.isfinite(self._timeout) or self._timeout <= 0):
             raise ValueError("parallel.timeout must be a positive number of seconds")
         # The manager creates a dedicated node for each /get_cookie research run.
-        # Its registry owns this env; reconnecting MCP does not reset the run ID.
-        self._session_id = str(uuid.uuid4())
+        # Its registry owns this env; MCP reconnects and node restarts keep the ID.
+        self._session_id = _conversation_id()
 
     async def _request(self, name, arguments):
         async with AsyncClient(

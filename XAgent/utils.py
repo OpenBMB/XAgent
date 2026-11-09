@@ -38,6 +38,10 @@ def clip_text(text:str,max_tokens:int=None,clip_end=False)->str|int:
     Returns:
         str, int: The clipped text, and the total number of tokens in the original text.
     """
+    if not text:
+        return text, 0
+    if max_tokens is not None and max_tokens <= 0:
+        return '', 0
     encoded = encoding.encode(text)
     decoded = encoding.decode(encoded[:max_tokens] if clip_end else encoded[-max_tokens:])
     if len(decoded) != len(text):

@@ -341,7 +341,10 @@ class ToolServerInterface():
                 command_result = response.json()
                 command_result = unwrap_tool_response(command_result, self.logger)
             else:
-                command_result = response.text
+                try:
+                    command_result = response.json()
+                except ValueError:
+                    command_result = response.text
 
         if cache_output != None:
             command_result = cache_output["tool_output"]

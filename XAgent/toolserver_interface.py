@@ -115,8 +115,9 @@ class ToolServerInterface():
             str: The response from the ToolServer.
         """
         url = f"{self.url}/upload_file"
-        response = requests.post(url, timeout=10, cookies=self.cookies,
-                                 files={'file': open(file_path, 'rb'), 'filename': os.path.basename(file_path)})
+        with open(file_path, 'rb') as f:
+            response = requests.post(url, timeout=10, cookies=self.cookies,
+                                     files={'file': f, 'filename': os.path.basename(file_path)})
         response.raise_for_status()
         response = response.json()
         return response

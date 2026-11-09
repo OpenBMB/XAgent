@@ -254,7 +254,7 @@ class MessageHistory:
                 - result_message (Message): the message containing the result of the AI's proposed action
         """
         messages = messages or self.messages
-        for i in range(0, len(messages) - 1):
+        for i in range(0, len(messages)):
 
             ai_message = messages[i]
 
@@ -264,6 +264,11 @@ class MessageHistory:
             user_message = (
                 messages[i - 1] if i > 0 and messages[i - 1].role == "user" else None
             )
+            if i + 1 >= len(messages):
+                logger.debug(
+                    f"AI response at index {i} has no corresponding action result"
+                )
+                continue
             result_message = messages[i + 1]
             try:
                 assert result_message.type == "action_result"

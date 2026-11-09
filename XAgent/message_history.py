@@ -311,6 +311,7 @@ class MessageHistory:
         new_events = copy.deepcopy(new_events)
 
         # Replace "assistant" with "you". This produces much better first person past tense results.
+        events_to_remove = []
         for event in new_events:
             if event.role.lower() == "assistant":
                 event.role = "you"
@@ -330,7 +331,10 @@ class MessageHistory:
 
             # Delete all user messages
             elif event.role == "user":
-                new_events.remove(event)
+                events_to_remove.append(event)
+
+        for event in events_to_remove:
+            new_events.remove(event)
 
         prompt = f'''Your task is to create a concise running summary of actions and information results in the provided text, focusing on key and potentially important information to remember.
 

@@ -233,7 +233,7 @@ class ToolServerInterface():
         try:
             if cache_output != None:
                 response = cache_output["tool_output"]
-                status_code = cache_output["tool_output_status_code"]
+                status_code = cache_output["response_status_code"]
             else:
                 response = requests.post(
                     url, json=payload, timeout=20, cookies=self.cookies)
@@ -278,7 +278,7 @@ class ToolServerInterface():
         try:
             if cache_output != None:
                 response = cache_output["tool_output"]
-                status_code = cache_output["tool_output_status_code"]
+                status_code = cache_output["response_status_code"]
             else:
                 response = requests.post(
                     url, json=payload, timeout=10, cookies=self.cookies)

@@ -203,10 +203,10 @@ class TaskSaveItem:
             "goal": self.goal,
             # "handler": self.handler,
             # "tool_budget": self.tool_budget,
-            "prior_plan_criticsim": self.prior_plan_criticism,
+            "prior_plan_criticism": self.prior_plan_criticism,
             "milestones": self.milestones,
             # "expected_tools": self.expected_tools,
-            "exceute_status": self.status.name,
+            "execute_status": self.status.name,
         }
         if posterior:
             if self.action_list_summary != "":

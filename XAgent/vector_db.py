@@ -68,7 +68,7 @@ class VectorDBInterface():
             print(info)
             print("Vector Dim", dimension)
             print("Vector Number", self.vector_count)
-        except:
+        except Exception:
             print("Warning: Failed to obtain vector information")
 
 
@@ -99,7 +99,7 @@ class VectorDBInterface():
                 res = json.loads(response.text)
                 embedding = res['data'][0]['embedding']
                 return embedding
-            except:
+            except Exception:
                 pass
 
     def delete_sentence(self, sentence:str):
@@ -117,7 +117,7 @@ class VectorDBInterface():
         try:
             self.task_index.delete(sentence)
             print("Success delete sentence:", sentence)
-        except:
+        except Exception:
             print("Warning: Fail to delete sentence", sentence)
 
     def insert_sentence(self, vec_sentence:str, sentence:str, namespace=""):

@@ -25,7 +25,7 @@ def timer(func):
             start_time = time.time()
             result = func(*args, **kwargs)
             end_time = time.time()
-        except:
+        except Exception:
             pass
     return wrapper
 

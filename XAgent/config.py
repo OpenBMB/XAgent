@@ -116,7 +116,7 @@ class XAgentConfig(dict):
         try:
             config_file = os.getenv('CONFIG_FILE', config_file)
             cfg = yaml.load(open(config_file, 'r'), Loader=yaml.FullLoader)
-        except:
+        except Exception:
             cfg = {}
         return XAgentConfig(**cfg)
 

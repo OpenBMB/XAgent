@@ -62,7 +62,7 @@ async def check_nodes_status_loop():
     while True:
         try:
             await check_nodes_status()
-        except:
+        except Exception:
             import traceback
             traceback.print_exc()
         await asyncio.sleep(CONFIG['node'].get('health_check_interval',1))
